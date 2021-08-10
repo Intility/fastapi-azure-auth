@@ -1,0 +1,15 @@
+*.pyc
+.idea/*
+env/
+.env
+.DS_Store
+venv/
+.venv/
+build/
+dist/
+*.egg-info/
+notes
+.pytest_cache
+.coverage
+htmlcov/
+coverage.xml

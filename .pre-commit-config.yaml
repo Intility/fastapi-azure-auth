@@ -1,0 +1,46 @@
+exclude: README.md
+repos:
+  - repo: https://github.com/ambv/black
+    rev: '21.7b0'
+    hooks:
+      - id: black
+        args: ['--quiet']
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: check-case-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-ast
+      - id: check-json
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: double-quote-string-fixer
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: 3.8.3
+    hooks:
+      - id: flake8
+        additional_dependencies: [
+          'flake8-bugbear==20.1.4',  # Looks for likely bugs and design problems
+          'flake8-comprehensions==3.2.3',  # Looks for unnecessary generator functions that can be converted to list comprehensions
+          'flake8-deprecated==1.3',  # Looks for method deprecations
+          'flake8-use-fstring==1.1',  # Enforces use of f-strings over .format and %s
+          'flake8-print==3.1.4',  # Checks for print statements
+          'flake8-docstrings==1.5.0',  # Verifies that all functions/methods have docstrings
+          'flake8-type-annotations==0.1.0',  # Looks for misconfigured type annotations
+          'flake8-annotations==2.4.0',  # Enforces type annotation
+        ]
+        args: ['--enable-extensions=G']
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v2.23.3
+    hooks:
+      - id: pyupgrade
+        args: ["--py36-plus"]
+  - repo: https://github.com/pycqa/isort
+    rev: 5.9.3
+    hooks:
+      - id: isort
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.910
+    hooks:
+      - id: mypy
