@@ -84,7 +84,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     key=key,
                     algorithms=['RS256'],
                     audience=f'api://{self.app_client_id}',
-                    issuer='https://sts.windows.net/9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6/',
+                    issuer=f'https://sts.windows.net/{provider_config.tenant_id}/',
                     options=options,
                 )
             except JWTClaimsError as error:
