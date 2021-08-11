@@ -4,10 +4,11 @@ from typing import Dict, Optional
 from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer
-from intility_auth_fastapi.provider_config import provider_config
 from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
 from starlette.requests import Request
+
+from intility_auth_fastapi.provider_config import provider_config
 
 log = logging.getLogger('intility_auth_fastapi')
 

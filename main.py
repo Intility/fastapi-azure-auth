@@ -7,6 +7,7 @@ from demoproj.core.config import settings
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
+
 from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
 
 log = logging.getLogger(__name__)

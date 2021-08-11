@@ -54,7 +54,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-src_paths = ["metroid"]
+src_paths = ["intility_auth_fastapi"]
 combine_as_imports = true
 line_length = 120
 sections = [
