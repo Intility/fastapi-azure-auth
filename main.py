@@ -15,7 +15,8 @@ app = FastAPI(
     swagger_ui_oauth2_redirect_url='/oauth2-redirect',
     swagger_ui_init_oauth={'usePkceWithAuthorizationCodeGrant': True, 'clientId': settings.OPENAPI_CLIENT_ID},
     version='1.0.0',
-    description=f'Welcome {settings.PROJECT_NAME} API!',
+    description='## Welcome to my API! \n This is my description, written in `markdown`',
+    title=settings.PROJECT_NAME,
 )
 
 # Set all CORS enabled origins
