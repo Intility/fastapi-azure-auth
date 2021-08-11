@@ -33,7 +33,6 @@ class ProviderConfig:
                 log.debug('Loading Intility Azure ID Provider configuration.')
                 await self._load_openid_config()
                 self._config_timestamp = datetime.now()
-                self.has_run = True
             except Exception as error:
                 log.exception('Unable to fetch openid-configuration from Azure AD. Error: %s', error)
                 # We can't fetch an up to date openid-config, so authentication will not work.
