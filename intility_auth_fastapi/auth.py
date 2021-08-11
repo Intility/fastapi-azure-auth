@@ -26,12 +26,23 @@ def invalid_auth(detail: str) -> HTTPException:
 
 class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
     def __init__(
-        self,
-        app: FastAPI,
-        app_client_id: str,
-        scopes: Optional[Dict[str, str]] = None,
+        self, app: FastAPI, app_client_id: str, scopes: Optional[Dict[str, str]] = None, allow_guest_users: bool = True
     ) -> None:
-        self.app_client_id = app_client_id
+        """
+        Initialize settings.
+
+        :param app: Your FastAPI app.
+        :param app_client_id: Client ID for this app (not your SPA)
+        :param scopes: Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
+            Example:
+                {
+                    f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
+                }
+        :param allow_guest_users: Guest users in the Intility tenant can by default access this app,
+                                  unless service principals are set up. This setting allow you to deny this behaviour.
+        """
+        self.app_client_id: str = app_client_id
+        self.allow_guest_users: bool = allow_guest_users
 
         @app.on_event('startup')
         async def load_config() -> None:
@@ -70,7 +81,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     'require_aud': True,
                     'require_iat': True,
                     'require_exp': True,
-                    'require_nbf': False,
+                    'require_nbf': True,
                     'require_iss': True,
                     'require_sub': True,
                     'require_jti': False,
@@ -79,7 +90,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 }
 
                 # Validate token and return claims
-                return jwt.decode(
+                token = jwt.decode(
                     access_token,
                     key=key,
                     algorithms=['RS256'],
@@ -87,6 +98,10 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     issuer=f'https://sts.windows.net/{provider_config.tenant_id}/',
                     options=options,
                 )
+                if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
+                    raise invalid_auth(detail='Guest users not allowed')
+                return token
+
             except JWTClaimsError as error:
                 log.info('Token contains invalid claims. %s', error)
                 raise invalid_auth(detail='Toke contains invalid claims')
