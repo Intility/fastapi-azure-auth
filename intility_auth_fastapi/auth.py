@@ -43,6 +43,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             authorizationUrl=f'https://login.microsoftonline.com/{provider_config.tenant_id}/oauth2/v2.0/authorize',
             tokenUrl=f'https://login.microsoftonline.com/{provider_config.tenant_id}/oauth2/v2.0/token',
             scopes=scopes,
+            description='`Leave client_secret blank`',
         )
 
     async def __call__(self, request: Request) -> dict:
