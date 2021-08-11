@@ -84,14 +84,12 @@ app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends
 ```
 
 ## ⚙️ Configuration
-If you want, you can enable guest users by passing `allow_guest_users=True` to your `IntilityAuthorizationCodeBearer` 
-initialization:
-
-**TODO**: Implement feature
+If you want, you can deny guest users to access your API by passing the `allow_guest_users=False`
+to `IntilityAuthorizationCodeBearer`:
 
 ```python
 intility_scheme = IntilityAuthorizationCodeBearer(
     ...
-    allow_guest_users=True
+    allow_guest_users=False
 )
 ```
