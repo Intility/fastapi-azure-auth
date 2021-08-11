@@ -1,6 +1,7 @@
 import base64
 import logging
 from datetime import datetime, timedelta
+from typing import Optional
 
 from aiohttp import ClientSession
 from cryptography.hazmat._types import _PUBLIC_KEY_TYPES as KeyTypes
@@ -14,8 +15,7 @@ log = logging.getLogger('intility_auth_fastapi')
 class ProviderConfig:
     def __init__(self) -> None:
         self.tenant_id = '9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6'
-        self.has_run: bool = False
-        self._config_timestamp: datetime
+        self._config_timestamp: Optional[datetime] = None
 
         self.authorization_endpoint: str
         self.signing_keys: list[KeyTypes]
@@ -28,11 +28,12 @@ class ProviderConfig:
         Loads config from the Intility openid-config endpoint if it's over 24 hours old (or don't exist)
         """
         refresh_time = datetime.now() - timedelta(hours=24)
-        if not self.has_run or self._config_timestamp < refresh_time:
+        if not self._config_timestamp or self._config_timestamp < refresh_time:
             try:
                 log.debug('Loading Intility Azure ID Provider configuration.')
                 await self._load_openid_config()
                 self._config_timestamp = datetime.now()
+                self.has_run = True
             except Exception as error:
                 log.exception('Unable to fetch openid-configuration from Azure AD. Error: %s', error)
                 # We can't fetch an up to date openid-config, so authentication will not work.

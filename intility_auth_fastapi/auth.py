@@ -5,10 +5,22 @@ from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from intility_auth_fastapi.provider_config import provider_config
-from jose import JWTError, jwt
+from jose import jwt
+from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
 from starlette.requests import Request
 
 log = logging.getLogger('intility_auth_fastapi')
+
+
+def invalid_auth(detail: str) -> HTTPException:
+    """
+    Raise a 401 unauthorized with given detail message.
+    """
+    return HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=detail,
+        headers={'WWW-Authenticate': 'Bearer'},
+    )
 
 
 class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
@@ -73,15 +85,17 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     issuer='https://sts.windows.net/9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6/',
                     options=options,
                 )
+            except JWTClaimsError as error:
+                log.info('Token contains invalid claims. %s', error)
+                raise invalid_auth(detail='Toke contains invalid claims')
+            except ExpiredSignatureError as error:
+                log.info('Token signature has expired. %s', error)
+                raise invalid_auth(detail='Token signature has expired')
             except JWTError as error:
-                if str(error) == 'Signature verification failed.':
-                    # Test next key, there can be multiple
-                    if index < len(provider_config.signing_keys) - 1:
-                        continue
-                else:
-                    log.warning('Invalid token. Error: %s', error, exc_info=True)
-                    raise HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail='Could not validate credentials',
-                        headers={'WWW-Authenticate': 'Bearer'},
-                    )
+                if str(error) == 'Signature verification failed.' and index < len(provider_config.signing_keys) - 1:
+                    continue
+                log.warning('Invalid token. Error: %s', error, exc_info=True)
+                raise invalid_auth(detail='Unable to validate token')
+            except Exception as error:
+                log.exception('Unable to process jwt token. Uncaught error: %s', error)
+                raise invalid_auth(detail='Unable to process token')
