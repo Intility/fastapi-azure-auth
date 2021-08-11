@@ -7,12 +7,12 @@ router = APIRouter()
 @router.get(
     '/hello',
     response_model=HelloWorldResponse,
-    summary='Retrieve contract information',
-    name='contract_information',
-    operation_id='readContractInformation',
+    summary='Say hello',
+    name='hello_world',
+    operation_id='helloWorld',
 )
 async def world() -> dict:
     """
-    Retrieve contract information
+    Wonder who we say hello to?
     """
     return {'hello': 'world'}
