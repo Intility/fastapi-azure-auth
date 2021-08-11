@@ -45,11 +45,11 @@ class ProviderConfig:
                 else:
                     raise RuntimeError(f'Unable to fetch provider information. {error}')
 
-            log.warning('intility-auth-fastapi loaded settings from Azure AD.')
-            log.warning('authorization endpoint: %s', self.authorization_endpoint)
-            log.warning('token endpoint:         %s', self.token_endpoint)
-            log.warning('end session endpoint:   %s', self.end_session_endpoint)
-            log.warning('issuer:                 %s', self.issuer)
+            log.info('intility-auth-fastapi loaded settings from Azure AD.')
+            log.info('authorization endpoint: %s', self.authorization_endpoint)
+            log.info('token endpoint:         %s', self.token_endpoint)
+            log.info('end session endpoint:   %s', self.end_session_endpoint)
+            log.info('issuer:                 %s', self.issuer)
 
     async def _load_openid_config(self) -> None:
         """
@@ -57,7 +57,7 @@ class ProviderConfig:
         """
         config_url = f'https://login.microsoftonline.com/{self.tenant_id}/v2.0/.well-known/openid-configuration'
 
-        log.warning('Trying to get OpenID Connect config from %s', config_url)
+        log.info('Trying to get OpenID Connect config from %s', config_url)
         async with ClientSession() as session:
             # Fetch openid config
             async with session.get(config_url, timeout=10) as openid_response:
