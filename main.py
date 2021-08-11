@@ -6,7 +6,6 @@ from demoproj.api.api_v1.api import api_router
 from demoproj.core.config import settings
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.openapi.utils import get_openapi
 
 from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
 
@@ -15,6 +14,8 @@ app = FastAPI(
     openapi_url=f'{settings.API_V1_STR}/openapi.json',
     swagger_ui_oauth2_redirect_url='/oauth2-redirect',
     swagger_ui_init_oauth={'usePkceWithAuthorizationCodeGrant': True, 'clientId': settings.OPENAPI_CLIENT_ID},
+    version='1.0.0',
+    description=f'Welcome {settings.PROJECT_NAME} API!',
 )
 
 # Set all CORS enabled origins
@@ -37,24 +38,6 @@ intility_scheme = IntilityAuthorizationCodeBearer(
 
 app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(intility_scheme)])
 
-
-def custom_openapi() -> dict:
-    """
-    Generate a custom OpenAPI schema to add information about websocket endpoints (which aren't auto-documented)
-    """
-    if app.openapi_schema:
-        return app.openapi_schema
-    openapi_schema = get_openapi(
-        title=settings.PROJECT_NAME,
-        version='1.0.0',
-        description='This is a very custom OpenAPI schema. \n ### When authenticating, leave client secret blank!',
-        routes=app.routes,
-    )
-    app.openapi_schema = openapi_schema
-    return app.openapi_schema
-
-
-app.openapi = custom_openapi
 
 if __name__ == '__main__':
     parser = ArgumentParser()
