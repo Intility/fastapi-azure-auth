@@ -64,7 +64,6 @@ class ProviderConfig:
                 openid_response.raise_for_status()
                 openid_cfg = await openid_response.json()
                 jwks_uri = openid_cfg['jwks_uri']
-
                 # Fetch keys
                 async with session.get(jwks_uri, timeout=10) as jwks_response:
                     jwks_response.raise_for_status()
