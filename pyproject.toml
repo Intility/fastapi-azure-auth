@@ -29,7 +29,6 @@ python = "^3.8"
 fastapi = "^0.68.0"
 aiohttp = "^3.7.4"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
-uvicorn = "^0.14.0"
 
 
 [tool.poetry.dev-dependencies]
@@ -45,6 +44,7 @@ pytest-socket = "^0.4.0"
 pytest-dotenv = "^0.5.2"
 pytest-aiohttp = "^0.3.0"
 httpx = "^0.18.2"
+uvicorn = "^0.14.0"
 
 [tool.black]
 line-length = 120
