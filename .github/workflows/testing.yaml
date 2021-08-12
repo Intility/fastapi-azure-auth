@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8", "3.9" ]
+        python-version: [ "3.9" ]
         fastapi-version: [ "0.68.0" ]
     steps:
       - name: Check out repository
@@ -46,7 +46,7 @@ jobs:
         id: cache-venv
         with:
           path: .venv
-          key: ${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-0
+          key: ${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-1
       - name: Install dependencies
         run: poetry install --no-interaction --no-root
         if: steps.cache-venv.outputs.cache-hit != 'true'

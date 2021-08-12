@@ -88,7 +88,6 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     'require_at_hash': False,
                     'leeway': 0,
                 }
-
                 # Validate token and return claims
                 token = jwt.decode(
                     access_token,
@@ -104,7 +103,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
 
             except JWTClaimsError as error:
                 log.info('Token contains invalid claims. %s', error)
-                raise invalid_auth(detail='Toke contains invalid claims')
+                raise invalid_auth(detail='Token contains invalid claims')
             except ExpiredSignatureError as error:
                 log.info('Token signature has expired. %s', error)
                 raise invalid_auth(detail='Token signature has expired')

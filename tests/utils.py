@@ -1,5 +1,4 @@
 import base64
-import json
 import time
 from datetime import datetime, timedelta
 
@@ -12,6 +11,10 @@ from jose import jwt
 
 
 def generate_key_and_cert():
+    """
+    Generate a private key and signing cert. We'll use the signing key to sign the JWT token
+    and the signing certs will be used to mock the `keys` endpoint in Azure.
+    """
     signing_key = rsa.generate_private_key(backend=crypto_default_backend(), public_exponent=65537, key_size=2048)
     subject = issuer = x509.Name(
         [
@@ -19,7 +22,7 @@ def generate_key_and_cert():
             x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, 'OSLO'),
             x509.NameAttribute(NameOID.LOCALITY_NAME, 'OSLO'),
             x509.NameAttribute(NameOID.ORGANIZATION_NAME, 'Intility AS'),
-            x509.NameAttribute(NameOID.COMMON_NAME, 'intility.com'),
+            x509.NameAttribute(NameOID.COMMON_NAME, 'intility.no'),
         ]
     )
     signing_cert = (
@@ -41,17 +44,24 @@ def generate_key_and_cert():
     return signing_key, signing_cert
 
 
-def build_access_token_azure_not_guest(request):
-    issuer = 'https://sts.windows.net/01234567-89ab-cdef-0123-456789abcdef/'
-    return do_build_access_token(request, issuer, tenant_id='intility_tenant_id')
+def build_access_token_azure_not_guest():
+    """
+    Build an access token, coming from the tenant ID we expect
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id')
 
 
-def build_access_token_azure_guest(request):
-    issuer = 'https://sts.windows.net/01234567-89ab-cdef-0123-456789abcdef/'
-    return do_build_access_token(request, issuer, tenant_id='guest_tenant_id')
+def build_access_token_azure_guest():
+    """
+    Build an access token, but as a guest user.
+    """
+    return do_build_access_token(tenant_id='guest_tenant_id')
 
 
-def do_build_access_token(request, tenant_id=None):
+def do_build_access_token(tenant_id=None):
+    """
+    Build the access token and encode it with the signing key.
+    """
     issued_at = int(time.time())
     expires = issued_at + 3600
     claims = {
@@ -81,7 +91,7 @@ def do_build_access_token(request, tenant_id=None):
         'uti': 'abcdefghijkl-mnopqrstu',
         'ver': '1.0',
     }
-    token = jwt.encode(
+    return jwt.encode(
         claims,
         signing_key_b.private_bytes(
             crypto_serialization.Encoding.PEM,
@@ -90,23 +100,16 @@ def do_build_access_token(request, tenant_id=None):
         ),
         algorithm='RS256',
     )
-    response = {
-        'resource': 'myfastapiapp',
-        'token_type': 'bearer',
-        'refresh_token_expires_in': 28799,
-        'refresh_token': 'random_refresh_token',
-        'expires_in': 3600,
-        'id_token': 'not_used',
-        'access_token': token,
-    }
-    return 200, [], json.dumps(response)
 
 
 def build_openid_keys(empty_keys=False):
+    """
+    Build OpenID keys which we'll host at https://login.microsoftonline.com/common/discovery/keys
+    """
     if empty_keys:
-        keys = {'keys': []}
+        return {'keys': []}
     else:
-        keys = {
+        return {
             'keys': [
                 {
                     'kty': 'RSA',
@@ -132,7 +135,6 @@ def build_openid_keys(empty_keys=False):
                 },
             ]
         }
-    return keys
 
 
 signing_key_a, signing_cert_a = generate_key_and_cert()
