@@ -116,3 +116,4 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             except Exception as error:
                 log.exception('Unable to process jwt token. Uncaught error: %s', error)
                 raise invalid_auth(detail='Unable to process token')
+        raise invalid_auth(detail='Unable to verify token, no signing keys found')
