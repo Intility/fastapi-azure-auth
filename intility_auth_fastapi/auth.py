@@ -49,7 +49,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             """
             Load config on startup.
             """
-            await provider_config.load_config()
+            await provider_config.load_config()  # pragma: no cover
 
         super().__init__(
             authorizationUrl=f'https://login.microsoftonline.com/{provider_config.tenant_id}/oauth2/v2.0/authorize',
@@ -88,7 +88,6 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     'require_at_hash': False,
                     'leeway': 0,
                 }
-
                 # Validate token and return claims
                 token = jwt.decode(
                     access_token,
@@ -101,10 +100,11 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
                     raise invalid_auth(detail='Guest users not allowed')
                 return token
-
+            except HTTPException:
+                raise
             except JWTClaimsError as error:
                 log.info('Token contains invalid claims. %s', error)
-                raise invalid_auth(detail='Toke contains invalid claims')
+                raise invalid_auth(detail='Token contains invalid claims')
             except ExpiredSignatureError as error:
                 log.info('Token signature has expired. %s', error)
                 raise invalid_auth(detail='Token signature has expired')
@@ -114,5 +114,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 log.warning('Invalid token. Error: %s', error, exc_info=True)
                 raise invalid_auth(detail='Unable to validate token')
             except Exception as error:
+                # Extra failsafe in case of a bug in a future version of the jwt library
                 log.exception('Unable to process jwt token. Uncaught error: %s', error)
                 raise invalid_auth(detail='Unable to process token')
+        raise invalid_auth(detail='Unable to verify token, no signing keys found')
