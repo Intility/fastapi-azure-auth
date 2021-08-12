@@ -85,3 +85,12 @@ def mock_openid_and_empty_keys(mock_openid):
         payload=build_openid_keys(empty_keys=True),
     )
     yield mock_openid
+
+
+@pytest.fixture
+def mock_openid_and_no_valid_keys(mock_openid):
+    mock_openid.get(
+        'https://login.microsoftonline.com/common/discovery/keys',
+        payload=build_openid_keys(no_valid_keys=True),
+    )
+    yield mock_openid

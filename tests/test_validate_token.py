@@ -2,7 +2,12 @@ import pytest
 from demoproj.core.config import settings
 from httpx import AsyncClient
 from main import app, intility_scheme
-from tests.utils import build_access_token_azure_guest, build_access_token_azure_not_guest
+from tests.utils import (
+    build_access_token,
+    build_access_token_expired,
+    build_access_token_guest,
+    build_access_token_invalid_claims,
+)
 
 from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
 
@@ -10,7 +15,7 @@ from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
 @pytest.mark.asyncio
 async def test_normal_user(mock_openid_and_keys):
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_azure_not_guest()}
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'hello': 'world'}
@@ -28,7 +33,7 @@ async def test_guest_user(mock_openid_and_keys):
     )
     app.dependency_overrides[intility_scheme] = intility_scheme_no_guest
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_azure_guest()}
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_guest()}
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Guest users not allowed'}
@@ -37,7 +42,40 @@ async def test_guest_user(mock_openid_and_keys):
 @pytest.mark.asyncio
 async def test_no_keys_to_decode_with(mock_openid_and_empty_keys):
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_azure_not_guest()}
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
+
+
+async def test_invalid_token_claims(mock_openid_and_keys):
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Token contains invalid claims'}
+
+
+async def test_no_valid_keys_for_token(mock_openid_and_no_valid_keys):
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Unable to validate token'}
+
+
+async def test_expired_token(mock_openid_and_keys):
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_expired()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Token signature has expired'}
+
+
+async def test_exception_raised(mock_openid_and_keys, mocker):
+    mocker.patch('intility_auth_fastapi.auth.jwt.decode', side_effect=ValueError('lol'))
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_expired()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Unable to process token'}

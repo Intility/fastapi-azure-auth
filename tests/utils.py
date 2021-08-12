@@ -44,28 +44,43 @@ def generate_key_and_cert():
     return signing_key, signing_cert
 
 
-def build_access_token_azure_not_guest():
+def build_access_token():
     """
     Build an access token, coming from the tenant ID we expect
     """
     return do_build_access_token(tenant_id='intility_tenant_id')
 
 
-def build_access_token_azure_guest():
+def build_access_token_guest():
     """
     Build an access token, but as a guest user.
     """
     return do_build_access_token(tenant_id='guest_tenant_id')
 
 
-def do_build_access_token(tenant_id=None):
+def build_access_token_invalid_claims():
+    """
+    Build an access token, coming from the tenant ID we expect
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id', aud='Jonas')
+
+
+def build_access_token_expired():
+    """
+    Build an access token, coming from the tenant ID we expect
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id', expired=True)
+
+
+def do_build_access_token(tenant_id=None, aud=None, expired=False):
     """
     Build the access token and encode it with the signing key.
     """
+
     issued_at = int(time.time())
-    expires = issued_at + 3600
+    expires = issued_at - 1 if expired else issued_at + 3600
     claims = {
-        'aud': 'api://oauth299-9999-9999-abcd-efghijkl1234567890',
+        'aud': aud or 'api://oauth299-9999-9999-abcd-efghijkl1234567890',
         'iss': 'https://sts.windows.net/intility_tenant_id/',
         'iat': issued_at,
         'exp': expires,
@@ -102,12 +117,28 @@ def do_build_access_token(tenant_id=None):
     )
 
 
-def build_openid_keys(empty_keys=False):
+def build_openid_keys(empty_keys=False, no_valid_keys=False):
     """
     Build OpenID keys which we'll host at https://login.microsoftonline.com/common/discovery/keys
     """
     if empty_keys:
         return {'keys': []}
+    elif no_valid_keys:
+        return {
+            'keys': [
+                {
+                    'kty': 'RSA',
+                    'use': 'sig',
+                    'kid': 'dummythumbprint',
+                    'x5t': 'dummythumbprint',
+                    'n': 'somebase64encodedmodulus',
+                    'e': 'somebase64encodedexponent',
+                    'x5c': [
+                        base64.b64encode(signing_cert_a).decode(),
+                    ],
+                },
+            ]
+        }
     else:
         return {
             'keys': [
