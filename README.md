@@ -8,7 +8,7 @@
 </p>
 <p align="center">
     <a href="https://python.org">
-        <img src="https://img.shields.io/badge/python-v3.8+-blue.svg" alt="Python version">
+        <img src="https://img.shields.io/badge/python-v3.9+-blue.svg" alt="Python version">
     </a>
     <a href="https://djangoproject.com">
         <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg" alt="FastAPI Version">
@@ -36,7 +36,9 @@
 
 ## ⚡️ Quick start
 ### Azure
-**TODO**: Write Azure docs
+Azure docs will be available when create-fastapi-app is developed. In the meantime 
+please use the [.NET](https://create.intility.app/dotnet/setup/authorization) documentation.
+
 
 ### FastAPI
 
