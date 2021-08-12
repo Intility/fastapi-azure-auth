@@ -10,7 +10,7 @@
     <a href="https://python.org">
         <img src="https://img.shields.io/badge/python-v3.9+-blue.svg" alt="Python version">
     </a>
-    <a href="https://djangoproject.com">
+    <a href="https://fastapi.tiangolo.com/">
         <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg" alt="FastAPI Version">
     </a>
 </p>
