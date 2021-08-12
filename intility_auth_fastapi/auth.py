@@ -100,7 +100,8 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
                     raise invalid_auth(detail='Guest users not allowed')
                 return token
-
+            except HTTPException:
+                raise
             except JWTClaimsError as error:
                 log.info('Token contains invalid claims. %s', error)
                 raise invalid_auth(detail='Token contains invalid claims')
