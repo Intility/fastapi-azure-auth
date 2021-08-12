@@ -8,7 +8,7 @@ from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
 
 
 @pytest.mark.asyncio
-async def test_normal_user(mock_responses):
+async def test_normal_user(mock_keys):
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_azure_not_guest()}
     ) as ac:
@@ -17,7 +17,7 @@ async def test_normal_user(mock_responses):
 
 
 @pytest.mark.asyncio
-async def test_guest_user(mock_responses):
+async def test_guest_user(mock_keys):
     intility_scheme_no_guest = IntilityAuthorizationCodeBearer(
         app=app,
         app_client_id=settings.APP_CLIENT_ID,
@@ -31,5 +31,13 @@ async def test_guest_user(mock_responses):
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_azure_guest()}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    print(f'{response.json()=}')
     assert response.json() == {'detail': 'Guest users not allowed'}
+
+
+@pytest.mark.asyncio
+async def test_no_keys_to_decode_with(mock_keys_empty):
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_azure_not_guest()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}

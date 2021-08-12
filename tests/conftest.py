@@ -5,9 +5,13 @@ from tests.utils import build_openid_keys
 from intility_auth_fastapi.provider_config import provider_config
 
 
-@pytest.fixture
-def mock_responses():
+@pytest.fixture(autouse=True)
+def mock_tenant():
     provider_config.tenant_id = 'intility_tenant_id'
+
+
+@pytest.fixture
+def mock_openid():
     with aioresponses() as mock:
         mock.get(
             'https://login.microsoftonline.com/intility_tenant_id/v2.0/.well-known/openid-configuration',
@@ -60,8 +64,22 @@ def mock_responses():
                 'rbac_url': 'https://pas.windows.net',
             },
         )
-        mock.get(
-            'https://login.microsoftonline.com/common/discovery/keys',
-            payload=build_openid_keys(),
-        )
         yield mock
+
+
+@pytest.fixture
+def mock_keys(mock_openid):
+    mock_openid.get(
+        'https://login.microsoftonline.com/common/discovery/keys',
+        payload=build_openid_keys(),
+    )
+    yield mock_openid
+
+
+@pytest.fixture
+def mock_keys_empty(mock_openid):
+    mock_openid.get(
+        'https://login.microsoftonline.com/common/discovery/keys',
+        payload=build_openid_keys(empty_keys=True),
+    )
+    yield mock_openid
