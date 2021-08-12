@@ -8,6 +8,8 @@ from intility_auth_fastapi.provider_config import provider_config
 @pytest.fixture(autouse=True)
 def mock_tenant():
     provider_config.tenant_id = 'intility_tenant_id'
+    # Cleanup after each test, ensuring new config is fetched, this avoids weird behaviour
+    provider_config._config_timestamp = None
 
 
 @pytest.fixture
@@ -68,7 +70,7 @@ def mock_openid():
 
 
 @pytest.fixture
-def mock_keys(mock_openid):
+def mock_openid_and_keys(mock_openid):
     mock_openid.get(
         'https://login.microsoftonline.com/common/discovery/keys',
         payload=build_openid_keys(),
@@ -77,7 +79,7 @@ def mock_keys(mock_openid):
 
 
 @pytest.fixture
-def mock_keys_empty(mock_openid):
+def mock_openid_and_empty_keys(mock_openid):
     mock_openid.get(
         'https://login.microsoftonline.com/common/discovery/keys',
         payload=build_openid_keys(empty_keys=True),
