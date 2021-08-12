@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "intility-auth-fastapi"
-version = "0.1.0"  # Remember to change in __init__.py as well
+version = "1.0.0"  # Remember to change in __init__.py as well
 description = "Azure AD authentication for Intility"
 authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
 readme = "README.md"
