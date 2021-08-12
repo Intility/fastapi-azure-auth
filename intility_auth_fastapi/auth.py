@@ -49,7 +49,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             """
             Load config on startup.
             """
-            await provider_config.load_config()
+            await provider_config.load_config()  # pragma: no cover
 
         super().__init__(
             authorizationUrl=f'https://login.microsoftonline.com/{provider_config.tenant_id}/oauth2/v2.0/authorize',

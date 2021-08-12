@@ -15,7 +15,7 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://codecov.io/gh/intility/metroid">
+    <a href="https://codecov.io/gh/intility/intility-auth-fastapi">
         <img src="https://codecov.io/gh/intility/intility-auth-fastapi/branch/main/graph/badge.svg" alt="Codecov">
     </a>
     <a href="https://github.com/pre-commit/pre-commit">
