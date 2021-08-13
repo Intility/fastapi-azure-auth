@@ -8,9 +8,9 @@ from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
 from starlette.requests import Request
 
-from intility_auth_fastapi.provider_config import provider_config
+from fastapi_azure_auth.provider_config import provider_config
 
-log = logging.getLogger('intility_auth_fastapi')
+log = logging.getLogger('fastapi_azure_auth')
 
 
 def invalid_auth(detail: str) -> HTTPException:
@@ -24,7 +24,7 @@ def invalid_auth(detail: str) -> HTTPException:
     )
 
 
-class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
+class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
     def __init__(
         self, app: FastAPI, app_client_id: str, scopes: Optional[Dict[str, str]] = None, allow_guest_users: bool = True
     ) -> None:
@@ -38,7 +38,7 @@ class IntilityAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
                 }
-        :param allow_guest_users: Guest users in the Intility tenant can by default access this app,
+        :param allow_guest_users: Guest users in the tenant can by default access this app,
                                   unless service principals are set up. This setting allow you to deny this behaviour.
         """
         self.app_client_id: str = app_client_id

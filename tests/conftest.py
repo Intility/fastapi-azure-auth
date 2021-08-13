@@ -2,7 +2,7 @@ import pytest
 from aioresponses import aioresponses
 from tests.utils import build_openid_keys
 
-from intility_auth_fastapi.provider_config import provider_config
+from fastapi_azure_auth.provider_config import provider_config
 
 
 @pytest.fixture(autouse=True)
