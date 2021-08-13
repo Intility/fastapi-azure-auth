@@ -1,7 +1,7 @@
 import pytest
 from demoproj.core.config import settings
 from httpx import AsyncClient
-from main import app, intility_scheme
+from main import app, azure_scheme
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -9,7 +9,7 @@ from tests.utils import (
     build_access_token_invalid_claims,
 )
 
-from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
 
 
 @pytest.mark.asyncio
@@ -23,7 +23,7 @@ async def test_normal_user(mock_openid_and_keys):
 
 @pytest.mark.asyncio
 async def test_guest_user(mock_openid_and_keys):
-    intility_scheme_no_guest = IntilityAuthorizationCodeBearer(
+    azure_scheme_no_guest = AzureAuthorizationCodeBearer(
         app=app,
         app_client_id=settings.APP_CLIENT_ID,
         scopes={
@@ -31,7 +31,7 @@ async def test_guest_user(mock_openid_and_keys):
         },
         allow_guest_users=False,
     )
-    app.dependency_overrides[intility_scheme] = intility_scheme_no_guest
+    app.dependency_overrides[azure_scheme] = azure_scheme_no_guest
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_guest()}
     ) as ac:
@@ -73,7 +73,7 @@ async def test_expired_token(mock_openid_and_keys):
 
 
 async def test_exception_raised(mock_openid_and_keys, mocker):
-    mocker.patch('intility_auth_fastapi.auth.jwt.decode', side_effect=ValueError('lol'))
+    mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_expired()}
     ) as ac:

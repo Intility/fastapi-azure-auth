@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "intility-auth-fastapi"
+name = "fastapi-azure-auth"
 version = "1.0.0"  # Remember to change in __init__.py as well
 description = "Azure AD authentication for Intility"
 authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
 readme = "README.md"
-homepage = "https://github.com/intility/intility-auth-fastapi"
-repository = "https://github.com/intility/intility-auth-fastapi"
-documentation = "https://github.com/intility/intility-auth-fastapi"
+homepage = "https://github.com/intility/fastapi-azure-auth"
+repository = "https://github.com/intility/fastapi-azure-auth"
+documentation = "https://github.com/intility/fastapi-azure-auth"
 keywords = [
     'async', 'fastapi', 'azuread', 'ad', 'azure', 'azure ad', 'starlette', 'authentication'
 ]
@@ -25,7 +25,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 fastapi = "^0.68.0"
 aiohttp = "^3.7.4"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
@@ -59,7 +59,7 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
-src_paths = ["intility_auth_fastapi"]
+src_paths = ["fastapi_azure_auth"]
 combine_as_imports = true
 line_length = 120
 sections = [

@@ -9,12 +9,12 @@ from cryptography.hazmat.backends.openssl.backend import backend
 from cryptography.x509 import load_der_x509_certificate
 from fastapi import HTTPException, status
 
-log = logging.getLogger('intility_auth_fastapi')
+log = logging.getLogger('fastapi_azure_auth')
 
 
 class ProviderConfig:
     def __init__(self) -> None:
-        self.tenant_id = '9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6'
+        self.tenant_id = '9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6'  # For non-intility apps, you need to change this.
         self._config_timestamp: Optional[datetime] = None
 
         self.authorization_endpoint: str
@@ -45,7 +45,7 @@ class ProviderConfig:
                 else:
                     raise RuntimeError(f'Unable to fetch provider information. {error}')
 
-            log.info('intility-auth-fastapi loaded settings from Azure AD.')
+            log.info('fastapi-azure-auth loaded settings from Azure AD.')
             log.info('authorization endpoint: %s', self.authorization_endpoint)
             log.info('token endpoint:         %s', self.token_endpoint)
             log.info('end session endpoint:   %s', self.end_session_endpoint)

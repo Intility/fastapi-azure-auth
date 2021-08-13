@@ -7,7 +7,7 @@ from demoproj.core.config import settings
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
 
 log = logging.getLogger(__name__)
 app = FastAPI(
@@ -29,16 +29,18 @@ if settings.BACKEND_CORS_ORIGINS:  # pragma: no cover
         allow_headers=['*'],
     )
 
-intility_scheme = IntilityAuthorizationCodeBearer(
+azure_scheme = AzureAuthorizationCodeBearer(
     app=app,
     app_client_id=settings.APP_CLIENT_ID,
     scopes={
         f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**',
     },
 )
+# For non-Intility tenants, you need to configure the provider_config to match your own tenant ID:
+# from fastapi_azure_auth.provider_config import provider_config
+# provider_config.tenant_id = 'my-tenant-id'
 
-
-app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(intility_scheme)])
+app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(azure_scheme)])
 
 
 if __name__ == '__main__':
