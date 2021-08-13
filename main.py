@@ -10,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
 
 log = logging.getLogger(__name__)
+
 app = FastAPI(
     openapi_url=f'{settings.API_V1_STR}/openapi.json',
     swagger_ui_oauth2_redirect_url='/oauth2-redirect',

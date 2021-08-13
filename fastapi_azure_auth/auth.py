@@ -13,15 +13,21 @@ from fastapi_azure_auth.provider_config import provider_config
 log = logging.getLogger('fastapi_azure_auth')
 
 
-def invalid_auth(detail: str) -> HTTPException:
+class InvalidAuth(HTTPException):
+    def __init__(self, detail: str) -> None:
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=detail, headers={'WWW-Authenticate': 'Bearer'}
+        )
+
+
+class GuestUserException(InvalidAuth):
     """
-    Raise a 401 unauthorized with given detail message.
+    Exception raised when a guest user attempts to access, but the
+    `allow_guest_users` setting is set to `False`
     """
-    return HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=detail,
-        headers={'WWW-Authenticate': 'Bearer'},
-    )
+
+    def __init__(self) -> None:
+        super().__init__(detail='Guest users not allowed')
 
 
 class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
@@ -98,23 +104,23 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     options=options,
                 )
                 if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
-                    raise invalid_auth(detail='Guest users not allowed')
+                    raise GuestUserException()
                 return token
-            except HTTPException:
+            except GuestUserException:
                 raise
             except JWTClaimsError as error:
                 log.info('Token contains invalid claims. %s', error)
-                raise invalid_auth(detail='Token contains invalid claims')
+                raise InvalidAuth(detail='Token contains invalid claims')
             except ExpiredSignatureError as error:
                 log.info('Token signature has expired. %s', error)
-                raise invalid_auth(detail='Token signature has expired')
+                raise InvalidAuth(detail='Token signature has expired')
             except JWTError as error:
                 if str(error) == 'Signature verification failed.' and index < len(provider_config.signing_keys) - 1:
                     continue
                 log.warning('Invalid token. Error: %s', error, exc_info=True)
-                raise invalid_auth(detail='Unable to validate token')
+                raise InvalidAuth(detail='Unable to validate token')
             except Exception as error:
                 # Extra failsafe in case of a bug in a future version of the jwt library
                 log.exception('Unable to process jwt token. Uncaught error: %s', error)
-                raise invalid_auth(detail='Unable to process token')
-        raise invalid_auth(detail='Unable to verify token, no signing keys found')
+                raise InvalidAuth(detail='Unable to process token')
+        raise InvalidAuth(detail='Unable to verify token, no signing keys found')
