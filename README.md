@@ -99,7 +99,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends
 ```
 
 ## ⚙️ Configuration
-For those using a non-Intility tenant, you also need to change make changes to the `provider_config`:
+For those using a non-Intility tenant, you also need to make changes to the `provider_config`:
 
 ```python
 from fastapi_azure_auth.provider_config import provider_config
