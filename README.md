@@ -37,7 +37,8 @@
 
 ## 🚀 Description
 
-FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.    
+> FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.  
+  
 At Intility, FastAPI is a popular framework among its developers, 
 with customer-facing and internal services developed entirely on a FastAPI backend.  
 This package enables our developers to create features without worrying about authentication and authorization.  
