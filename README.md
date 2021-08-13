@@ -1,10 +1,10 @@
 <h1 align="center">
   <img src=".github/images/intility.png" width="124px"/><br/>
-  Intility-auth-FastAPI
+  FastAPI-Azure-auth
 </h1>
 
 <p align="center">
-    <em>Azure AD Authentication for Intility FastAPI apps made easy.</em>
+    <em>Azure AD Authentication for FastAPI apps made easy.</em>
 </p>
 <p align="center">
     <a href="https://python.org">
@@ -15,8 +15,8 @@
     </a>
 </p>
 <p align="center">
-    <a href="https://codecov.io/gh/intility/intility-auth-fastapi">
-        <img src="https://codecov.io/gh/intility/intility-auth-fastapi/branch/main/graph/badge.svg" alt="Codecov">
+    <a href="https://codecov.io/gh/intility/fastapi-azure-auth">
+        <img src="https://codecov.io/gh/intility/fastapi-azure-auth/branch/main/graph/badge.svg" alt="Codecov">
     </a>
     <a href="https://github.com/pre-commit/pre-commit">
         <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="Pre-commit">
@@ -33,6 +33,17 @@
 </p>
 
 
+----------------
+
+## 🚀 Description
+
+FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.    
+At Intility, FastAPI is a popular framework among its developers, 
+with customer-facing and internal services developed entirely on a FastAPI backend.  
+This package enables our developers to create features without worrying about authentication and authorization.  
+
+Also, [we're hiring!](https://intility.no/en/career/)
+
 ## ⚡️ Quick start
 ### Azure
 Azure docs will be available when create-fastapi-app is developed. In the meantime 
@@ -43,9 +54,9 @@ please use the [.NET](https://create.intility.app/dotnet/setup/authorization) do
 
 1. Install this library:
 ```bash
-pip install intility-auth-fastapi
+pip install fastapi-azure-auth
 # or
-poetry add intility-auth-fastapi
+poetry add fastapi-azure-auth
 ```
 
 2. Include `swagger_ui_oauth2_redirect_url` and `swagger_ui_init_oauth` in your FastAPI app initialization:
@@ -64,12 +75,12 @@ app = FastAPI(
 3. Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`. See [main.py](main.py) 
 and the `BACKEND_CORS_ORIGINS` in [config.py](demoproj/core/config.py) 
 
-4. Import and configure your Intility authentication:
+4. Import and configure your Azure authentication:
 
 ```python
-from intility_auth_fastapi.auth import IntilityAuthorizationCodeBearer
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
 
-intility_scheme = IntilityAuthorizationCodeBearer(
+azure_scheme = AzureAuthorizationCodeBearer(
     app=app,
     app_client_id=settings.APP_CLIENT_ID,  # Web app
     scopes={
@@ -78,18 +89,31 @@ intility_scheme = IntilityAuthorizationCodeBearer(
 )
 ```
 
-Set your `intility_scheme` as a dependency for your wanted views/routers:
+5. Set your `intility_scheme` as a dependency for your wanted views/routers:
 
 ```python
-app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(intility_scheme)])
+app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(azure_scheme)])
 ```
 
 ## ⚙️ Configuration
-If you want, you can deny guest users to access your API by passing the `allow_guest_users=False`
-to `IntilityAuthorizationCodeBearer`:
+For those using a non-Intility tenant, you also need to change make changes to the `provider_config`:
 
 ```python
-intility_scheme = IntilityAuthorizationCodeBearer(
+from fastapi_azure_auth.provider_config import provider_config
+
+intility_scheme = AzureAuthorizationCodeBearer(
+    ...
+)
+
+provider_config.tenant_id = 'my-own-tenant-id'
+```
+
+
+If you want, you can deny guest users to access your API by passing the `allow_guest_users=False`
+to `AzureAuthorizationCodeBearer`:
+
+```python
+intility_scheme = AzureAuthorizationCodeBearer(
     ...
     allow_guest_users=False
 )

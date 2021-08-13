@@ -6,7 +6,7 @@ from httpx import AsyncClient
 from main import app
 from tests.utils import build_access_token
 
-from intility_auth_fastapi.provider_config import provider_config
+from fastapi_azure_auth.provider_config import provider_config
 
 
 async def test_http_error_old_config_found():
