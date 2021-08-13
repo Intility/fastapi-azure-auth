@@ -8,15 +8,18 @@
 </p>
 <p align="center">
     <a href="https://python.org">
-        <img src="https://img.shields.io/badge/python-v3.9+-blue.svg" alt="Python version">
+        <img src="https://img.shields.io/badge/python-v3.9+-blue.svg?logo=python&logoColor=white&label=python" alt="Python version">
     </a>
     <a href="https://fastapi.tiangolo.com/">
-        <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg" alt="FastAPI Version">
+        <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg?logo=fastapi&logoColor=white&label=fastapi" alt="FastAPI Version">
+    </a>
+    <a href="https://pypi.org/pypi/django-guid">
+        <img src="https://img.shields.io/pypi/v/fastapi-azure-auth.svg?logo=pypi&logoColor=white&label=pypi" alt="Package version">
     </a>
 </p>
 <p align="center">
     <a href="https://codecov.io/gh/intility/fastapi-azure-auth">
-        <img src="https://codecov.io/gh/intility/fastapi-azure-auth/branch/main/graph/badge.svg" alt="Codecov">
+        <img src="https://codecov.io/gh/intility/fastapi-azure-auth/branch/main/graph/badge.svg?token=BTFGII4GYR" alt="Codecov">
     </a>
     <a href="https://github.com/pre-commit/pre-commit">
         <img src="https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white" alt="Pre-commit">
@@ -33,14 +36,13 @@
 </p>
 
 
-----------------
-
 ## 🚀 Description
 
 > FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.  
   
 At Intility, FastAPI is a popular framework among its developers, 
-with customer-facing and internal services developed entirely on a FastAPI backend.  
+with customer-facing and internal services developed entirely on a FastAPI backend.
+
 This package enables our developers to create features without worrying about authentication and authorization.  
 
 Also, [we're hiring!](https://intility.no/en/career/)
