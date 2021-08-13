@@ -13,7 +13,7 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - uses: snok/install-poetry@v1.1.2
+      - uses: snok/install-poetry@v1
       - name: Publish to pypi
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
