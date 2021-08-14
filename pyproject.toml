@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "fastapi-azure-auth"
 version = "1.0.0"  # Remember to change in __init__.py as well
-description = "Azure AD authentication for Intility"
+description = "Easy and secure implementation of Azure AD for your FastAPI APIs"
 authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
 readme = "README.md"
 homepage = "https://github.com/intility/fastapi-azure-auth"

@@ -13,7 +13,7 @@
     <a href="https://fastapi.tiangolo.com/">
         <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg?logo=fastapi&logoColor=white&label=fastapi" alt="FastAPI Version">
     </a>
-    <a href="https://pypi.org/pypi/django-guid">
+    <a href="https://pypi.org/pypi/fastapi-azure-auth">
         <img src="https://img.shields.io/pypi/v/fastapi-azure-auth.svg?logo=pypi&logoColor=white&label=pypi" alt="Package version">
     </a>
 </p>
