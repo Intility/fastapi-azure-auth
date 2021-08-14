@@ -24,14 +24,13 @@ class InvalidAuth(HTTPException):
         )
 
 
-class GuestUserException(InvalidAuth):
+class GuestUserException(Exception):
     """
     Exception raised when a guest user attempts to access, but the
     `allow_guest_users` setting is set to `False`
     """
 
-    def __init__(self) -> None:
-        super().__init__(detail='Guest users not allowed')
+    pass
 
 
 class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
@@ -111,7 +110,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     raise GuestUserException()
                 return token
             except GuestUserException:
-                raise
+                raise InvalidAuth('Guest users not allowed')
             except JWTClaimsError as error:
                 log.info('Token contains invalid claims. %s', error)
                 raise InvalidAuth(detail='Token contains invalid claims')
