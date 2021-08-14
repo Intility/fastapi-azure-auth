@@ -32,7 +32,7 @@ async def test_normal_user(mock_openid_and_keys, freezer):
             'roles': [],
             'tid': 'intility_tenant_id',
             'unique_name': 'jonas',
-            'unparsed_token': {
+            'claims': {
                 'acr': '1',
                 'aio': 'hello',
                 'amr': ['pwd'],

@@ -12,4 +12,4 @@ class User(BaseModel):
     ipaddr: Optional[IPvAnyAddress] = Field(default=None, description='IP address when token was claimed')
     upn: str = Field(..., description='UPN')
     roles: list[str] = Field(default=[], description='Roles (Groups) the user has for this app')
-    unparsed_token: dict = Field(..., description='The entire decoded token')
+    claims: dict = Field(..., description='The entire decoded token')
