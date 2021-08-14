@@ -9,6 +9,7 @@ from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
 from starlette.requests import Request
 
 from fastapi_azure_auth.provider_config import provider_config
+from fastapi_azure_auth.user import User
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -67,7 +68,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             description='`Leave client_secret blank`',
         )
 
-    async def __call__(self, request: Request) -> dict:
+    async def __call__(self, request: Request) -> User:
         """
         Extends call to also validate the token
         """
@@ -108,7 +109,9 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 )
                 if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
                     raise GuestUserException()
-                return token
+                user: User = User(**token | {'unparsed_token': token})
+                request.state.user = user
+                return user
             except GuestUserException:
                 raise InvalidAuth('Guest users not allowed')
             except JWTClaimsError as error:
