@@ -109,7 +109,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 )
                 if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
                     raise GuestUserException()
-                user: User = User(**token | {'unparsed_token': token})
+                user: User = User(**token | {'claims': token})
                 request.state.user = user
                 return user
             except GuestUserException:
