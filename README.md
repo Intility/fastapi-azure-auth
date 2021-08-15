@@ -121,3 +121,18 @@ intility_scheme = AzureAuthorizationCodeBearer(
     allow_guest_users=False
 )
 ```
+
+## 💡 Nice to knows
+
+A `User` object is attached to the request state if the token is valid. Unparsed claims can be accessed at
+`request.state.user.claims`.
+
+```python
+from fastapi_azure_auth.user import User
+from fastapi import Request
+
+@router.get(...)
+async def world(request: Request) -> dict:
+    user: User = request.state.user
+    return {'user': user}
+```
