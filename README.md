@@ -13,7 +13,7 @@
     <a href="https://fastapi.tiangolo.com/">
         <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg?logo=fastapi&logoColor=white&label=fastapi" alt="FastAPI Version">
     </a>
-    <a href="https://pypi.org/pypi/django-guid">
+    <a href="https://pypi.org/pypi/fastapi-azure-auth">
         <img src="https://img.shields.io/pypi/v/fastapi-azure-auth.svg?logo=pypi&logoColor=white&label=pypi" alt="Package version">
     </a>
 </p>
@@ -120,4 +120,19 @@ intility_scheme = AzureAuthorizationCodeBearer(
     ...
     allow_guest_users=False
 )
+```
+
+## 💡 Nice to knows
+
+A `User` object is attached to the request state if the token is valid. Unparsed claims can be accessed at
+`request.state.user.claims`.
+
+```python
+from fastapi_azure_auth.user import User
+from fastapi import Request
+
+@router.get(...)
+async def world(request: Request) -> dict:
+    user: User = request.state.user
+    return {'user': user}
 ```

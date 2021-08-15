@@ -1,3 +1,5 @@
+import time
+
 import pytest
 from demoproj.core.config import settings
 from httpx import AsyncClient
@@ -13,12 +15,53 @@ from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
 
 
 @pytest.mark.asyncio
-async def test_normal_user(mock_openid_and_keys):
+async def test_normal_user(mock_openid_and_keys, freezer):
+    issued_at = int(time.time())
+    expires = issued_at + 3600
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'hello': 'world'}
+    assert response.json() == {
+        'hello': 'world',
+        'user': {
+            'aud': 'api://oauth299-9999-9999-abcd-efghijkl1234567890',
+            'family_name': 'Krüger Svensson',
+            'given_name': 'Jonas',
+            'ipaddr': '192.168.0.0',
+            'roles': [],
+            'tid': 'intility_tenant_id',
+            'unique_name': 'jonas',
+            'claims': {
+                'acr': '1',
+                'aio': 'hello',
+                'amr': ['pwd'],
+                'appid': '11111111-1111-1111-1111-111111111111',
+                'appidacr': '0',
+                'aud': 'api://oauth299-9999-9999-abcd-efghijkl1234567890',
+                'exp': expires,
+                'family_name': 'Krüger Svensson',
+                'given_name': 'Jonas',
+                'iat': issued_at,
+                'in_corp': 'true',
+                'ipaddr': '192.168.0.0',
+                'iss': 'https://sts.windows.net/intility_tenant_id/',
+                'name': 'Jonas Krüger Svensson / Intility AS',
+                'nbf': issued_at,
+                'oid': '22222222-2222-2222-2222-222222222222',
+                'onprem_sid': 'S-1-2-34-5678901234-5678901234-456789012-34567',
+                'rh': '0.hellomylittletokenfriendwhatsupwi-thyoutodayheheiho.',
+                'scp': 'user_impersonation',
+                'sub': '5ZGASZqgF1taj9GlxDHOpeIJjWlyZJwD3mnZBoz9XVc',
+                'tid': 'intility_tenant_id',
+                'unique_name': 'jonas',
+                'upn': 'jonas@cool',
+                'uti': 'abcdefghijkl-mnopqrstu',
+                'ver': '1.0',
+            },
+            'upn': 'jonas@cool',
+        },
+    }
 
 
 @pytest.mark.asyncio
