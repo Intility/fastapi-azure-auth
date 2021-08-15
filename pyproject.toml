@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "fastapi-azure-auth"
-version = "1.0.0"  # Remember to change in __init__.py as well
-description = "Azure AD authentication for Intility"
+version = "1.1.0"  # Remember to change in __init__.py as well
+description = "Easy and secure implementation of Azure AD for your FastAPI APIs"
 authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
 readme = "README.md"
 homepage = "https://github.com/intility/fastapi-azure-auth"
@@ -45,6 +45,7 @@ pytest-dotenv = "^0.5.2"
 pytest-aiohttp = "^0.3.0"
 httpx = "^0.18.2"
 uvicorn = "^0.14.0"
+pytest-freezegun = "^0.4.2"
 
 [tool.black]
 line-length = 120

@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
@@ -9,6 +9,7 @@ from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
 from starlette.requests import Request
 
 from fastapi_azure_auth.provider_config import provider_config
+from fastapi_azure_auth.user import User
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -35,7 +36,12 @@ class GuestUserException(Exception):
 
 class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
     def __init__(
-        self, app: FastAPI, app_client_id: str, scopes: Optional[Dict[str, str]] = None, allow_guest_users: bool = True
+        self,
+        app: FastAPI,
+        app_client_id: str,
+        scopes: Optional[Dict[str, str]] = None,
+        allow_guest_users: bool = True,
+        attach_user_to_request: bool = True,
     ) -> None:
         """
         Initialize settings.
@@ -67,7 +73,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             description='`Leave client_secret blank`',
         )
 
-    async def __call__(self, request: Request) -> dict:
+    async def __call__(self, request: Request) -> dict[str, Any]:
         """
         Extends call to also validate the token
         """
@@ -108,6 +114,8 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 )
                 if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
                     raise GuestUserException()
+                user: User = User(**token | {'claims': token})
+                request.state.user = user
                 return token
             except GuestUserException:
                 raise InvalidAuth('Guest users not allowed')
