@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, status
 from fastapi.exceptions import HTTPException
@@ -36,7 +36,12 @@ class GuestUserException(Exception):
 
 class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
     def __init__(
-        self, app: FastAPI, app_client_id: str, scopes: Optional[Dict[str, str]] = None, allow_guest_users: bool = True
+        self,
+        app: FastAPI,
+        app_client_id: str,
+        scopes: Optional[Dict[str, str]] = None,
+        allow_guest_users: bool = True,
+        attach_user_to_request: bool = True,
     ) -> None:
         """
         Initialize settings.
@@ -68,7 +73,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             description='`Leave client_secret blank`',
         )
 
-    async def __call__(self, request: Request) -> User:
+    async def __call__(self, request: Request) -> dict[str, Any]:
         """
         Extends call to also validate the token
         """
@@ -111,7 +116,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     raise GuestUserException()
                 user: User = User(**token | {'claims': token})
                 request.state.user = user
-                return user
+                return token
             except GuestUserException:
                 raise InvalidAuth('Guest users not allowed')
             except JWTClaimsError as error:
