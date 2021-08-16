@@ -51,6 +51,13 @@ def build_access_token():
     return do_build_access_token(tenant_id='intility_tenant_id')
 
 
+def build_evil_access_token():
+    """
+    Build an access token, coming from the tenant ID we expect
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id', evil=True)
+
+
 def build_access_token_guest():
     """
     Build an access token, but as a guest user.
@@ -72,7 +79,7 @@ def build_access_token_expired():
     return do_build_access_token(tenant_id='intility_tenant_id', expired=True)
 
 
-def do_build_access_token(tenant_id=None, aud=None, expired=False):
+def do_build_access_token(tenant_id=None, aud=None, expired=False, evil=False):
     """
     Build the access token and encode it with the signing key.
     """
@@ -106,14 +113,16 @@ def do_build_access_token(tenant_id=None, aud=None, expired=False):
         'uti': 'abcdefghijkl-mnopqrstu',
         'ver': '1.0',
     }
+    signing_key = signing_key_a if evil else signing_key_b
     return jwt.encode(
         claims,
-        signing_key_b.private_bytes(
+        signing_key.private_bytes(
             crypto_serialization.Encoding.PEM,
             crypto_serialization.PrivateFormat.PKCS8,
             crypto_serialization.NoEncryption(),
         ),
         algorithm='RS256',
+        headers={'kid': 'real thumbprint', 'x5t': 'another thumbprint'},
     )
 
 
@@ -126,7 +135,7 @@ def build_openid_keys(empty_keys=False, no_valid_keys=False):
     elif no_valid_keys:
         return {
             'keys': [
-                {
+                {  # this key is not used
                     'kty': 'RSA',
                     'use': 'sig',
                     'kid': 'dummythumbprint',
@@ -156,8 +165,8 @@ def build_openid_keys(empty_keys=False, no_valid_keys=False):
                 {
                     'kty': 'RSA',
                     'use': 'sig',
-                    'kid': 'dummythumbprint',
-                    'x5t': 'dummythumbprint',
+                    'kid': 'real thumbprint',
+                    'x5t': 'real thumbprint2',
                     'n': 'somebase64encodedmodulus',
                     'e': 'somebase64encodedexponent',
                     'x5c': [

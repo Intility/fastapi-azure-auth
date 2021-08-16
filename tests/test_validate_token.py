@@ -9,6 +9,7 @@ from tests.utils import (
     build_access_token_expired,
     build_access_token_guest,
     build_access_token_invalid_claims,
+    build_evil_access_token,
 )
 
 from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
@@ -104,7 +105,7 @@ async def test_no_valid_keys_for_token(mock_openid_and_no_valid_keys):
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to validate token'}
+    assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
 async def test_expired_token(mock_openid_and_keys):
@@ -113,6 +114,15 @@ async def test_expired_token(mock_openid_and_keys):
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Token signature has expired'}
+
+
+async def test_evil_token(mock_openid_and_keys):
+    """Kid matches what we expect, but it's not signed correctly"""
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_evil_access_token()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Unable to validate token'}
 
 
 async def test_exception_raised(mock_openid_and_keys, mocker):
