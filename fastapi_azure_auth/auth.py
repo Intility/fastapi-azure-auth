@@ -80,60 +80,68 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
         Extends call to also validate the token
         """
         access_token = await super().__call__(request=request)
+        try:
+            # Extract header information of the token.
+            header = json.loads(base64.b64decode(access_token.split('.')[0]))  # header, claims, signature
+        except Exception as error:
+            log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
+            raise InvalidAuth(detail='Invalid token format')
+
         # Load new config if old
         await provider_config.load_config()
-        for signing_key in provider_config.signing_keys:
-            header = json.loads(base64.b64decode(access_token.split('.')[0]))  # header, claims, signature
-            if header.get('kid') == signing_key['kid']:
-                try:
-                    # Set strict in case defaults change
-                    options = {
-                        'verify_signature': True,
-                        'verify_aud': True,
-                        'verify_iat': True,
-                        'verify_exp': True,
-                        'verify_nbf': True,
-                        'verify_iss': True,
-                        'verify_sub': True,
-                        'verify_jti': True,
-                        'verify_at_hash': True,
-                        'require_aud': True,
-                        'require_iat': True,
-                        'require_exp': True,
-                        'require_nbf': True,
-                        'require_iss': True,
-                        'require_sub': True,
-                        'require_jti': False,
-                        'require_at_hash': False,
-                        'leeway': 0,
-                    }
-                    # Validate token and return claims
-                    token = jwt.decode(
-                        access_token,
-                        key=signing_key['certificate'],
-                        algorithms=['RS256'],
-                        audience=f'api://{self.app_client_id}',
-                        issuer=f'https://sts.windows.net/{provider_config.tenant_id}/',
-                        options=options,
-                    )
-                    if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
-                        raise GuestUserException()
-                    user: User = User(**token | {'claims': token})
-                    request.state.user = user
-                    return token
-                except GuestUserException:
-                    raise InvalidAuth('Guest users not allowed')
-                except JWTClaimsError as error:
-                    log.info('Token contains invalid claims. %s', error)
-                    raise InvalidAuth(detail='Token contains invalid claims')
-                except ExpiredSignatureError as error:
-                    log.info('Token signature has expired. %s', error)
-                    raise InvalidAuth(detail='Token signature has expired')
-                except JWTError as error:
-                    log.warning('Invalid token. Error: %s', error, exc_info=True)
-                    raise InvalidAuth(detail='Unable to validate token')
-                except Exception as error:
-                    # Extra failsafe in case of a bug in a future version of the jwt library
-                    log.exception('Unable to process jwt token. Uncaught error: %s', error)
-                    raise InvalidAuth(detail='Unable to process token')
+
+        # Use the `kid` from the header to find a matching signing key to use
+        if key := provider_config.signing_keys.get(header.get('kid')):
+            try:
+                # We require and validate all fields in an Azure AD token
+                options = {
+                    'verify_signature': True,
+                    'verify_aud': True,
+                    'verify_iat': True,
+                    'verify_exp': True,
+                    'verify_nbf': True,
+                    'verify_iss': True,
+                    'verify_sub': True,
+                    'verify_jti': True,
+                    'verify_at_hash': True,
+                    'require_aud': True,
+                    'require_iat': True,
+                    'require_exp': True,
+                    'require_nbf': True,
+                    'require_iss': True,
+                    'require_sub': True,
+                    'require_jti': False,
+                    'require_at_hash': False,
+                    'leeway': 0,
+                }
+                # Validate token
+                token = jwt.decode(
+                    access_token,
+                    key=key,
+                    algorithms=['RS256'],
+                    audience=f'api://{self.app_client_id}',
+                    issuer=f'https://sts.windows.net/{provider_config.tenant_id}/',
+                    options=options,
+                )
+                if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
+                    raise GuestUserException()
+                # Attach the user to the request. Can be accessed through `request.state.user`
+                user: User = User(**token | {'claims': token})
+                request.state.user = user
+                return token
+            except GuestUserException:
+                raise InvalidAuth('Guest users not allowed')
+            except JWTClaimsError as error:
+                log.info('Token contains invalid claims. %s', error)
+                raise InvalidAuth(detail='Token contains invalid claims')
+            except ExpiredSignatureError as error:
+                log.info('Token signature has expired. %s', error)
+                raise InvalidAuth(detail='Token signature has expired')
+            except JWTError as error:
+                log.warning('Invalid token. Error: %s', error, exc_info=True)
+                raise InvalidAuth(detail='Unable to validate token')
+            except Exception as error:
+                # Extra failsafe in case of a bug in a future version of the jwt library
+                log.exception('Unable to process jwt token. Uncaught error: %s', error)
+                raise InvalidAuth(detail='Unable to process token')
         raise InvalidAuth(detail='Unable to verify token, no signing keys found')
