@@ -18,7 +18,7 @@ class ProviderConfig:
         self._config_timestamp: Optional[datetime] = None
 
         self.authorization_endpoint: str
-        self.signing_keys: list[KeyTypes]
+        self.signing_keys: dict[str, KeyTypes]
         self.token_endpoint: str
         self.end_session_endpoint: str
         self.issuer: str
@@ -68,24 +68,24 @@ class ProviderConfig:
                 async with session.get(jwks_uri, timeout=10) as jwks_response:
                     jwks_response.raise_for_status()
                     keys = await jwks_response.json()
-                    signing_certificates = [x['x5c'][0] for x in keys['keys'] if x.get('use', 'sig') == 'sig']
-                    self._load_keys(signing_certificates)
+                    self._load_keys(keys['keys'])
 
         self.authorization_endpoint = openid_cfg['authorization_endpoint']
         self.token_endpoint = openid_cfg['token_endpoint']
         self.end_session_endpoint = openid_cfg['end_session_endpoint']
         self.issuer = openid_cfg['issuer']
 
-    def _load_keys(self, certificates: list[str]) -> None:
+    def _load_keys(self, keys: list[dict]) -> None:
         """
         Create certificates based on signing keys and store them
         """
-        new_keys = []
-        for cert in certificates:
-            log.debug('Loading public key from certificate: %s', cert)
-            cert_obj = load_der_x509_certificate(base64.b64decode(cert), backend)
-            new_keys.append(cert_obj.public_key())
-        self.signing_keys = new_keys
+        self.signing_keys = {}
+        for key in keys:
+            if key.get('use') == 'sig':  # Only care about keys that are used for signatures, not encryption
+                log.debug('Loading public key from certificate: %s', key)
+                cert_obj = load_der_x509_certificate(base64.b64decode(key['x5c'][0]), backend)
+                if kid := key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
+                    self.signing_keys[kid] = cert_obj.public_key()
 
 
 provider_config = ProviderConfig()
