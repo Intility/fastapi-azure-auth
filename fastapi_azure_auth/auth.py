@@ -1,3 +1,5 @@
+import base64
+import json
 import logging
 from typing import Any, Dict, Optional
 
@@ -78,11 +80,20 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
         Extends call to also validate the token
         """
         access_token = await super().__call__(request=request)
+        try:
+            # Extract header information of the token.
+            header = json.loads(base64.b64decode(access_token.split('.')[0]))  # header, claims, signature
+        except Exception as error:
+            log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
+            raise InvalidAuth(detail='Invalid token format')
+
         # Load new config if old
         await provider_config.load_config()
-        for index, key in enumerate(provider_config.signing_keys):
+
+        # Use the `kid` from the header to find a matching signing key to use
+        if key := provider_config.signing_keys.get(header.get('kid')):
             try:
-                # Set strict in case defaults change
+                # We require and validate all fields in an Azure AD token
                 options = {
                     'verify_signature': True,
                     'verify_aud': True,
@@ -103,7 +114,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                     'require_at_hash': False,
                     'leeway': 0,
                 }
-                # Validate token and return claims
+                # Validate token
                 token = jwt.decode(
                     access_token,
                     key=key,
@@ -114,6 +125,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 )
                 if not self.allow_guest_users and token['tid'] != provider_config.tenant_id:
                     raise GuestUserException()
+                # Attach the user to the request. Can be accessed through `request.state.user`
                 user: User = User(**token | {'claims': token})
                 request.state.user = user
                 return token
@@ -126,8 +138,6 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 log.info('Token signature has expired. %s', error)
                 raise InvalidAuth(detail='Token signature has expired')
             except JWTError as error:
-                if str(error) == 'Signature verification failed.' and index < len(provider_config.signing_keys) - 1:
-                    continue
                 log.warning('Invalid token. Error: %s', error, exc_info=True)
                 raise InvalidAuth(detail='Unable to validate token')
             except Exception as error:

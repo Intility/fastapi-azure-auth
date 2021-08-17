@@ -1,4 +1,5 @@
 import time
+from datetime import datetime, timedelta
 
 import pytest
 from demoproj.core.config import settings
@@ -9,6 +10,8 @@ from tests.utils import (
     build_access_token_expired,
     build_access_token_guest,
     build_access_token_invalid_claims,
+    build_evil_access_token,
+    build_openid_keys,
 )
 
 from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
@@ -91,6 +94,7 @@ async def test_no_keys_to_decode_with(mock_openid_and_empty_keys):
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
+@pytest.mark.asyncio
 async def test_invalid_token_claims(mock_openid_and_keys):
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()}
@@ -99,14 +103,16 @@ async def test_invalid_token_claims(mock_openid_and_keys):
     assert response.json() == {'detail': 'Token contains invalid claims'}
 
 
+@pytest.mark.asyncio
 async def test_no_valid_keys_for_token(mock_openid_and_no_valid_keys):
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to validate token'}
+    assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
+@pytest.mark.asyncio
 async def test_expired_token(mock_openid_and_keys):
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_expired()}
@@ -115,6 +121,42 @@ async def test_expired_token(mock_openid_and_keys):
     assert response.json() == {'detail': 'Token signature has expired'}
 
 
+@pytest.mark.asyncio
+async def test_evil_token(mock_openid_and_keys):
+    """Kid matches what we expect, but it's not signed correctly"""
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_evil_access_token()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Unable to validate token'}
+
+
+@pytest.mark.asyncio
+async def test_malformed_token(mock_openid_and_keys):
+    """A short token, that only has a broken header"""
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Invalid token format'}
+
+
+@pytest.mark.asyncio
+async def test_only_header(mock_openid_and_keys):
+    """Only header token, with a matching kid, so the rest of the logic will be called, but can't be validated"""
+    async with AsyncClient(
+        app=app,
+        base_url='http://test',
+        headers={
+            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJ'
+            'wcmludCIsInR5cCI6IkpXVCIsIng1dCI6ImFub3RoZXIgdGh1bWJwcmludCJ9'
+        },  # {'kid': 'real thumbprint', 'x5t': 'another thumbprint'}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Unable to validate token'}
+
+
+@pytest.mark.asyncio
 async def test_exception_raised(mock_openid_and_keys, mocker):
     mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
     async with AsyncClient(
@@ -122,3 +164,27 @@ async def test_exception_raised(mock_openid_and_keys, mocker):
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to process token'}
+
+
+@pytest.mark.asyncio
+async def test_change_of_keys_works(mock_openid_ok_then_empty, freezer):
+    """
+    * Do a successful request.
+    * Set time to 25 hours later, so that a new provider config has to be fetched
+    * Ensure new keys returned is an empty list, so the next request shouldn't work.
+    * Generate a new, valid token
+    * Do request
+    """
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.status_code == 200
+
+    freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
+
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+    ) as ac:
+        second_resonse = await ac.get('api/v1/hello')
+    assert second_resonse.json() == {'detail': 'Unable to verify token, no signing keys found'}

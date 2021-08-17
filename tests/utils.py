@@ -51,6 +51,13 @@ def build_access_token():
     return do_build_access_token(tenant_id='intility_tenant_id')
 
 
+def build_evil_access_token():
+    """
+    Build an access token, coming from the tenant ID we expect
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id', evil=True)
+
+
 def build_access_token_guest():
     """
     Build an access token, but as a guest user.
@@ -72,7 +79,7 @@ def build_access_token_expired():
     return do_build_access_token(tenant_id='intility_tenant_id', expired=True)
 
 
-def do_build_access_token(tenant_id=None, aud=None, expired=False):
+def do_build_access_token(tenant_id=None, aud=None, expired=False, evil=False):
     """
     Build the access token and encode it with the signing key.
     """
@@ -106,14 +113,16 @@ def do_build_access_token(tenant_id=None, aud=None, expired=False):
         'uti': 'abcdefghijkl-mnopqrstu',
         'ver': '1.0',
     }
+    signing_key = signing_key_a if evil else signing_key_b
     return jwt.encode(
         claims,
-        signing_key_b.private_bytes(
+        signing_key.private_bytes(
             crypto_serialization.Encoding.PEM,
             crypto_serialization.PrivateFormat.PKCS8,
             crypto_serialization.NoEncryption(),
         ),
         algorithm='RS256',
+        headers={'kid': 'real thumbprint', 'x5t': 'another thumbprint'},
     )
 
 
@@ -126,7 +135,7 @@ def build_openid_keys(empty_keys=False, no_valid_keys=False):
     elif no_valid_keys:
         return {
             'keys': [
-                {
+                {  # this key is not used
                     'kty': 'RSA',
                     'use': 'sig',
                     'kid': 'dummythumbprint',
@@ -156,8 +165,8 @@ def build_openid_keys(empty_keys=False, no_valid_keys=False):
                 {
                     'kty': 'RSA',
                     'use': 'sig',
-                    'kid': 'dummythumbprint',
-                    'x5t': 'dummythumbprint',
+                    'kid': 'real thumbprint',
+                    'x5t': 'real thumbprint2',
                     'n': 'somebase64encodedmodulus',
                     'e': 'somebase64encodedexponent',
                     'x5c': [
@@ -166,6 +175,57 @@ def build_openid_keys(empty_keys=False, no_valid_keys=False):
                 },
             ]
         }
+
+
+def openid_configuration():
+    return {
+        'token_endpoint': 'https://login.microsoftonline.com/intility_tenant_id/token',
+        'token_endpoint_auth_methods_supported': [
+            'client_secret_post',
+            'private_key_jwt',
+            'client_secret_basic',
+        ],
+        'jwks_uri': 'https://login.microsoftonline.com/common/discovery/keys',
+        'response_modes_supported': ['query', 'fragment', 'form_post'],
+        'subject_types_supported': ['pairwise'],
+        'id_token_signing_alg_values_supported': ['RS256'],
+        'response_types_supported': ['code', 'id_token', 'code id_token', 'token id_token', 'token'],
+        'scopes_supported': ['openid'],
+        'issuer': 'https://sts.windows.net/intility_tenant_id/',
+        'microsoft_multi_refresh_token': True,
+        'authorization_endpoint': 'https://login.microsoftonline.com/intility_tenant_idoauth2/authorize',
+        'device_authorization_endpoint': 'https://login.microsoftonline.com/intility_tenant_idoauth2/devicecode',
+        'http_logout_supported': True,
+        'frontchannel_logout_supported': True,
+        'end_session_endpoint': 'https://login.microsoftonline.com/intility_tenant_idoauth2/logout',
+        'claims_supported': [
+            'sub',
+            'iss',
+            'cloud_instance_name',
+            'cloud_instance_host_name',
+            'cloud_graph_host_name',
+            'msgraph_host',
+            'aud',
+            'exp',
+            'iat',
+            'auth_time',
+            'acr',
+            'amr',
+            'nonce',
+            'email',
+            'given_name',
+            'family_name',
+            'nickname',
+        ],
+        'check_session_iframe': 'https://login.microsoftonline.com/intility_tenant_idoauth2/checksession',
+        'userinfo_endpoint': 'https://login.microsoftonline.com/intility_tenant_idopenid/userinfo',
+        'kerberos_endpoint': 'https://login.microsoftonline.com/intility_tenant_idkerberos',
+        'tenant_region_scope': 'EU',
+        'cloud_instance_name': 'microsoftonline.com',
+        'cloud_graph_host_name': 'graph.windows.net',
+        'msgraph_host': 'graph.microsoft.com',
+        'rbac_url': 'https://pas.windows.net',
+    }
 
 
 signing_key_a, signing_cert_a = generate_key_and_cert()
