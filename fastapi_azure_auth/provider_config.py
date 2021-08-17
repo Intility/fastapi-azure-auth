@@ -1,7 +1,7 @@
 import base64
 import logging
 from datetime import datetime, timedelta
-from typing import Optional, TypedDict
+from typing import Optional
 
 from aiohttp import ClientSession
 from cryptography.hazmat._types import _PUBLIC_KEY_TYPES as KeyTypes
@@ -10,11 +10,6 @@ from cryptography.x509 import load_der_x509_certificate
 from fastapi import HTTPException, status
 
 log = logging.getLogger('fastapi_azure_auth')
-
-
-class Key(TypedDict):
-    kid: str
-    certificate: KeyTypes
 
 
 class ProviderConfig:
