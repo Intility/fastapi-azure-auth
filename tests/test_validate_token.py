@@ -125,6 +125,29 @@ async def test_evil_token(mock_openid_and_keys):
     assert response.json() == {'detail': 'Unable to validate token'}
 
 
+async def test_malformed_token(mock_openid_and_keys):
+    """A short token, that only has a broken header"""
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Invalid token format'}
+
+
+async def test_only_header(mock_openid_and_keys):
+    """Only header token, with a matching kid, so the rest of the logic will be called, but can't be validated"""
+    async with AsyncClient(
+        app=app,
+        base_url='http://test',
+        headers={
+            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJ'
+            'wcmludCIsInR5cCI6IkpXVCIsIng1dCI6ImFub3RoZXIgdGh1bWJwcmludCJ9'
+        },  # {'kid': 'real thumbprint', 'x5t': 'another thumbprint'}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Unable to validate token'}
+
+
 async def test_exception_raised(mock_openid_and_keys, mocker):
     mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
     async with AsyncClient(

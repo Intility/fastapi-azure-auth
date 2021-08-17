@@ -23,7 +23,7 @@ class ProviderConfig:
         self._config_timestamp: Optional[datetime] = None
 
         self.authorization_endpoint: str
-        self.signing_keys: list[Key]
+        self.signing_keys: dict[str, KeyTypes]
         self.token_endpoint: str
         self.end_session_endpoint: str
         self.issuer: str
@@ -84,15 +84,13 @@ class ProviderConfig:
         """
         Create certificates based on signing keys and store them
         """
-        new_keys = []
+        self.signing_keys = {}
         for key in keys:
             if key.get('use') == 'sig':  # Only care about keys that are used for signatures, not encryption
                 log.debug('Loading public key from certificate: %s', key)
                 cert_obj = load_der_x509_certificate(base64.b64decode(key['x5c'][0]), backend)
-                if key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
-                    new_key: Key = {'kid': key['kid'], 'certificate': cert_obj.public_key()}
-                    new_keys.append(new_key)
-        self.signing_keys = new_keys
+                if kid := key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
+                    self.signing_keys[kid] = cert_obj.public_key()
 
 
 provider_config = ProviderConfig()
