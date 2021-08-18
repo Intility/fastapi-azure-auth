@@ -51,6 +51,13 @@ def build_access_token():
     return do_build_access_token(tenant_id='intility_tenant_id')
 
 
+def build_access_token_normal_user():
+    """
+    Build an access token, coming from the tenant ID we expect, but not an admin user. (Only used to test dependency)
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id', admin=False)
+
+
 def build_evil_access_token():
     """
     Build an access token, coming from the tenant ID we expect
@@ -79,7 +86,7 @@ def build_access_token_expired():
     return do_build_access_token(tenant_id='intility_tenant_id', expired=True)
 
 
-def do_build_access_token(tenant_id=None, aud=None, expired=False, evil=False):
+def do_build_access_token(tenant_id=None, aud=None, expired=False, evil=False, admin=True):
     """
     Build the access token and encode it with the signing key.
     """
@@ -95,6 +102,7 @@ def do_build_access_token(tenant_id=None, aud=None, expired=False, evil=False):
         'acr': '1',
         'aio': 'hello',
         'amr': ['pwd'],
+        'roles': ['AdminUser' if admin else 'NormalUser'],
         'appid': '11111111-1111-1111-1111-111111111111',
         'appidacr': '0',
         'family_name': 'Krüger Svensson',

@@ -13,3 +13,4 @@ class User(BaseModel):
     upn: str = Field(..., description='UPN')
     roles: list[str] = Field(default=[], description='Roles (Groups) the user has for this app')
     claims: dict = Field(..., description='The entire decoded token')
+    scp: Optional[str] = Field(default=None, description='Scope')
