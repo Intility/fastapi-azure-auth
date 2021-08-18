@@ -102,7 +102,9 @@ azure_scheme = AzureAuthorizationCodeBearer(
 ```
 
 
-5. Set your `intility_scheme` as a dependency for your wanted views/routers:
+#### 5. Configure dependencies
+
+Set your `intility_scheme` as a dependency for your wanted views/routers:
 
 ```python
 # file: main.py
@@ -111,7 +113,10 @@ from demoproj.api.dependencies import azure_scheme
 app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(azure_scheme)])
 ```
 
-6. Load config on startup
+#### 6. Load config on startup
+
+This is optional but recommended. This will ensure the app crashes if something is misconfigured on startup (instead of when someone tries to do a request), and 
+ensures the first request don't have to wait for the provider config to load.
 
 ```python
 # file: main.py
