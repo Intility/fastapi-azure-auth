@@ -1,9 +1,9 @@
 import base64
 import json
 import logging
-from typing import Any, Dict, Optional
+from typing import Dict, Optional
 
-from fastapi import FastAPI, status
+from fastapi import status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer
 from jose import jwt
@@ -39,7 +39,6 @@ class GuestUserException(Exception):
 class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
     def __init__(
         self,
-        app: FastAPI,
         app_client_id: str,
         scopes: Optional[Dict[str, str]] = None,
         allow_guest_users: bool = True,
@@ -48,7 +47,6 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
         """
         Initialize settings.
 
-        :param app: Your FastAPI app.
         :param app_client_id: Client ID for this app (not your SPA)
         :param scopes: Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
             Example:
@@ -61,13 +59,6 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
         self.app_client_id: str = app_client_id
         self.allow_guest_users: bool = allow_guest_users
 
-        @app.on_event('startup')
-        async def load_config() -> None:
-            """
-            Load config on startup.
-            """
-            await provider_config.load_config()  # pragma: no cover
-
         super().__init__(
             authorizationUrl=f'https://login.microsoftonline.com/{provider_config.tenant_id}/oauth2/v2.0/authorize',
             tokenUrl=f'https://login.microsoftonline.com/{provider_config.tenant_id}/oauth2/v2.0/token',
@@ -75,7 +66,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
             description='`Leave client_secret blank`',
         )
 
-    async def __call__(self, request: Request) -> dict[str, Any]:
+    async def __call__(self, request: Request) -> User:
         """
         Extends call to also validate the token
         """
@@ -128,7 +119,7 @@ class AzureAuthorizationCodeBearer(OAuth2AuthorizationCodeBearer):
                 # Attach the user to the request. Can be accessed through `request.state.user`
                 user: User = User(**token | {'claims': token})
                 request.state.user = user
-                return token
+                return user
             except GuestUserException:
                 raise InvalidAuth('Guest users not allowed')
             except JWTClaimsError as error:

@@ -10,8 +10,8 @@ from tests.utils import (
     build_access_token_expired,
     build_access_token_guest,
     build_access_token_invalid_claims,
+    build_access_token_normal_user,
     build_evil_access_token,
-    build_openid_keys,
 )
 
 from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
@@ -29,12 +29,6 @@ async def test_normal_user(mock_openid_and_keys, freezer):
         'hello': 'world',
         'user': {
             'aud': 'api://oauth299-9999-9999-abcd-efghijkl1234567890',
-            'family_name': 'Krüger Svensson',
-            'given_name': 'Jonas',
-            'ipaddr': '192.168.0.0',
-            'roles': [],
-            'tid': 'intility_tenant_id',
-            'unique_name': 'jonas',
             'claims': {
                 'acr': '1',
                 'aio': 'hello',
@@ -54,6 +48,7 @@ async def test_normal_user(mock_openid_and_keys, freezer):
                 'oid': '22222222-2222-2222-2222-222222222222',
                 'onprem_sid': 'S-1-2-34-5678901234-5678901234-456789012-34567',
                 'rh': '0.hellomylittletokenfriendwhatsupwi-thyoutodayheheiho.',
+                'roles': ['AdminUser'],
                 'scp': 'user_impersonation',
                 'sub': '5ZGASZqgF1taj9GlxDHOpeIJjWlyZJwD3mnZBoz9XVc',
                 'tid': 'intility_tenant_id',
@@ -62,6 +57,13 @@ async def test_normal_user(mock_openid_and_keys, freezer):
                 'uti': 'abcdefghijkl-mnopqrstu',
                 'ver': '1.0',
             },
+            'family_name': 'Krüger Svensson',
+            'given_name': 'Jonas',
+            'ipaddr': '192.168.0.0',
+            'roles': ['AdminUser'],
+            'scp': 'user_impersonation',
+            'tid': 'intility_tenant_id',
+            'unique_name': 'jonas',
             'upn': 'jonas@cool',
         },
     }
@@ -70,7 +72,6 @@ async def test_normal_user(mock_openid_and_keys, freezer):
 @pytest.mark.asyncio
 async def test_guest_user(mock_openid_and_keys):
     azure_scheme_no_guest = AzureAuthorizationCodeBearer(
-        app=app,
         app_client_id=settings.APP_CLIENT_ID,
         scopes={
             f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**',
@@ -92,6 +93,15 @@ async def test_no_keys_to_decode_with(mock_openid_and_empty_keys):
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
+
+
+@pytest.mark.asyncio
+async def test_normal_user_rejected(mock_openid_and_keys):
+    async with AsyncClient(
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token_normal_user()}
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'User is not an AdminUser'}
 
 
 @pytest.mark.asyncio

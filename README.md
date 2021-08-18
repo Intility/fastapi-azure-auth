@@ -55,16 +55,18 @@ please use the [.NET](https://create.intility.app/dotnet/setup/authorization) do
 
 ### FastAPI
 
-1. Install this library:
+#### 1. Install this library:
 ```bash
 pip install fastapi-azure-auth
 # or
 poetry add fastapi-azure-auth
 ```
 
-2. Include `swagger_ui_oauth2_redirect_url` and `swagger_ui_init_oauth` in your FastAPI app initialization:
+#### 2. Configure your FastAPI app
+Include `swagger_ui_oauth2_redirect_url` and `swagger_ui_init_oauth` in your FastAPI app initialization:
 
 ```python
+# file: main.py
 app = FastAPI(
     ...
     swagger_ui_oauth2_redirect_url='/oauth2-redirect',
@@ -75,12 +77,19 @@ app = FastAPI(
 )
 ```
 
-3. Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`. See [main.py](main.py) 
+#### 3. Setup CORS
+Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`. See [main.py](main.py) 
 and the `BACKEND_CORS_ORIGINS` in [config.py](demoproj/core/config.py) 
 
-4. Import and configure your Azure authentication:
+#### 4. Configure the `AzureAuthorizationCodeBearer`
+You _can_ do this in `main.py`, but it's recommended to put it 
+in your `dependencies.py` file instead, as this will avoid circular imports later. 
+See the [demo project](demoproj/api/api_v1/endpoints/hello_world.py) and read the official documentation
+on [bigger applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
+
 
 ```python
+# file: demoproj/api/dependencies.py
 from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
 
 azure_scheme = AzureAuthorizationCodeBearer(
@@ -92,23 +101,43 @@ azure_scheme = AzureAuthorizationCodeBearer(
 )
 ```
 
+
 5. Set your `intility_scheme` as a dependency for your wanted views/routers:
 
 ```python
+# file: main.py
+from demoproj.api.dependencies import azure_scheme
+
 app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(azure_scheme)])
 ```
 
-## ⚙️ Configuration
-For those using a non-Intility tenant, you also need to make changes to the `provider_config`:
+6. Load config on startup
 
 ```python
+# file: main.py
 from fastapi_azure_auth.provider_config import provider_config
 
-intility_scheme = AzureAuthorizationCodeBearer(
-    ...
-)
+@app.on_event('startup')
+async def load_config() -> None:
+    """
+    Load config on startup.
+    """
+    await provider_config.load_config()
+```
 
-provider_config.tenant_id = 'my-own-tenant-id'
+
+## ⚙️ Configuration
+For those using a non-Intility tenant, you also need to make changes to the `provider_config` to match
+your tenant ID. You can do this in your previously created `load_config()` function.
+
+```python
+# file: main.py
+from fastapi_azure_auth.provider_config import provider_config
+
+@app.on_event('startup')
+async def load_config() -> None:
+    provider_config.tenant_id = 'my-own-tenant-id'
+    await provider_config.load_config()
 ```
 
 
@@ -116,7 +145,8 @@ If you want, you can deny guest users to access your API by passing the `allow_g
 to `AzureAuthorizationCodeBearer`:
 
 ```python
-intility_scheme = AzureAuthorizationCodeBearer(
+# file: demoproj/api/dependencies.py
+azure_scheme = AzureAuthorizationCodeBearer(
     ...
     allow_guest_users=False
 )
@@ -124,10 +154,12 @@ intility_scheme = AzureAuthorizationCodeBearer(
 
 ## 💡 Nice to knows
 
+#### User object
 A `User` object is attached to the request state if the token is valid. Unparsed claims can be accessed at
 `request.state.user.claims`.
 
 ```python
+# file: demoproj/api/api_v1/endpoints/hello_world.py
 from fastapi_azure_auth.user import User
 from fastapi import Request
 
@@ -136,3 +168,31 @@ async def world(request: Request) -> dict:
     user: User = request.state.user
     return {'user': user}
 ```
+
+
+#### Permission checking
+You often want to check that a user has a role or using a specific scope. This 
+can be done by creating your own dependency, which depends on `azure_scheme`. The `azure_scheme` dependency
+returns a [`fastapi_azure_auth.user.User`](fastapi_azure_auth/user.py) object.
+
+Create your new dependency, which checks that the user has the correct role (in this case the 
+`AdminUser`-role):
+
+```python
+# file: demoproj/api/dependencies.py
+from fastapi import Depends
+from fastapi_azure_auth.auth import InvalidAuth
+from fastapi_azure_auth.user import User
+
+async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> None:
+    """
+    Validated that a user is in the `AdminUser` role in order to access the API.
+    Raises a 401 authentication error if not.
+    """
+    if 'AdminUser' not in user.roles:
+        raise InvalidAuth('User is not an AdminUser')
+```
+
+Add the new dependency on either your route or on the API, as we've 
+done in our [demo project](demoproj/api/api_v1/endpoints/hello_world.py).
+
