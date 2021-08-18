@@ -4,6 +4,8 @@ max-line-length = 120
 ignore=
     # E501: Line length
     E501
+    # Function calls in argument defaults
+    B008
     # Docstring at the top of a public module
     D100
     # Docstring at the top of a public class (method is enough)
