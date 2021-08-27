@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/Intility/fastapi-azure-auth/remove_app_from_init/.github/images/intility.png" width="124px"/><br/>
+  <img src="https://avatars.githubusercontent.com/u/35199565" width="124px"/><br/>
   FastAPI-Azure-auth
 </h1>
 
