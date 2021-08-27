@@ -12,10 +12,19 @@ from fastapi import HTTPException, status
 log = logging.getLogger('fastapi_azure_auth')
 
 
-class ProviderConfig:
-    def __init__(self) -> None:
-        self.tenant_id = '9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6'  # For non-intility apps, you need to change this.
+class OpenIdConfig:
+    def __init__(
+        self,
+        tenant_id: Optional[str] = None,
+        multi_tenant: bool = False,
+        token_version: int = 2,
+        app_id: Optional[str] = None,
+    ) -> None:
+        self.tenant_id: Optional[str] = tenant_id
         self._config_timestamp: Optional[datetime] = None
+        self.multi_tenant: bool = multi_tenant
+        self.token_version: int = token_version
+        self.app_id = app_id
 
         self.authorization_endpoint: str
         self.signing_keys: dict[str, KeyTypes]
@@ -30,11 +39,11 @@ class ProviderConfig:
         refresh_time = datetime.now() - timedelta(hours=24)
         if not self._config_timestamp or self._config_timestamp < refresh_time:
             try:
-                log.debug('Loading Intility Azure ID Provider configuration.')
+                log.debug('Loading Azure AD OpenID configuration.')
                 await self._load_openid_config()
                 self._config_timestamp = datetime.now()
             except Exception as error:
-                log.exception('Unable to fetch openid-configuration from Azure AD. Error: %s', error)
+                log.exception('Unable to fetch OpenID configuration from Azure AD. Error: %s', error)
                 # We can't fetch an up to date openid-config, so authentication will not work.
                 if self._config_timestamp:
                     raise HTTPException(
@@ -55,7 +64,14 @@ class ProviderConfig:
         """
         Load openid config, fetch signing keys
         """
-        config_url = f'https://login.microsoftonline.com/{self.tenant_id}/v2.0/.well-known/openid-configuration'
+        path = 'common' if self.multi_tenant else self.tenant_id
+
+        if self.token_version == 2:
+            config_url = f'https://login.microsoftonline.com/{path}/v2.0/.well-known/openid-configuration'
+        else:
+            config_url = f'https://login.microsoftonline.com/{path}/.well-known/openid-configuration'
+        if self.app_id:
+            config_url += f'?appid={self.app_id}'
 
         log.info('Trying to get OpenID Connect config from %s', config_url)
         async with ClientSession() as session:
@@ -65,6 +81,7 @@ class ProviderConfig:
                 openid_cfg = await openid_response.json()
                 jwks_uri = openid_cfg['jwks_uri']
                 # Fetch keys
+                log.info('Fetching jwks from %s', jwks_uri)
                 async with session.get(jwks_uri, timeout=10) as jwks_response:
                     jwks_response.raise_for_status()
                     keys = await jwks_response.json()
@@ -86,6 +103,3 @@ class ProviderConfig:
                 cert_obj = load_der_x509_certificate(base64.b64decode(key['x5c'][0]), backend)
                 if kid := key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
                     self.signing_keys[kid] = cert_obj.public_key()
-
-
-provider_config = ProviderConfig()
