@@ -2,19 +2,16 @@ from datetime import datetime, timedelta
 
 import pytest
 from aioresponses import aioresponses
+from demo_project.api.dependencies import azure_scheme
+from demo_project.main import app
 from httpx import AsyncClient
-from main import app
 from tests.utils import build_access_token
-
-from fastapi_azure_auth.provider_config import provider_config
 
 
 async def test_http_error_old_config_found():
-    provider_config._config_timestamp = datetime.now() - timedelta(weeks=1)
+    azure_scheme.openid_config._config_timestamp = datetime.now() - timedelta(weeks=1)
     with aioresponses() as mock:
-        mock.get(
-            'https://login.microsoftonline.com/intility_tenant_id/v2.0/.well-known/openid-configuration', status=500
-        )
+        mock.get('https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration', status=500)
         async with AsyncClient(
             app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
         ) as ac:
@@ -22,7 +19,7 @@ async def test_http_error_old_config_found():
         assert response.json() == {'detail': 'Connection to Azure AD is down. Unable to fetch provider configuration'}
 
 
-async def test_http_error_no_config_cause_crash():
+async def test_http_error_no_config_cause_crash_on_startup():
     with aioresponses() as mock:
         mock.get(
             'https://login.microsoftonline.com/intility_tenant_id/v2.0/.well-known/openid-configuration', status=500

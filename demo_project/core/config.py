@@ -6,6 +6,7 @@ from pydantic import AnyHttpUrl, BaseSettings, Field, HttpUrl, validator
 class AzureActiveDirectory(BaseSettings):
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    TENANT_ID: str = Field(default='', env='TENANT_ID')
 
 
 class Credentials(BaseSettings):
@@ -19,7 +20,7 @@ class Settings(Credentials, AzureActiveDirectory):
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: List[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
 
     @validator('BACKEND_CORS_ORIGINS', pre=True)
     def assemble_cors_origins(cls, value: Union[str, List[str]]) -> Union[List[str], str]:  # pragma: no cover
@@ -45,7 +46,7 @@ class Settings(Credentials, AzureActiveDirectory):
         return value
 
     class Config:  # noqa
-        env_file = '.env'
+        env_file = 'demo_project/.env'
         env_file_encoding = 'utf-8'
         case_sensitive = True
 

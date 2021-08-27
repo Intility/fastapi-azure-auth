@@ -1,6 +1,6 @@
 <h1 align="center">
   <img src="https://raw.githubusercontent.com/Intility/fastapi-azure-auth/remove_app_from_init/.github/images/intility.png" width="124px"/><br/>
-  FastAPI-Azure-auth
+  FastAPI-Azure-Auth
 </h1>
 
 <p align="center">
@@ -79,12 +79,12 @@ app = FastAPI(
 
 #### 3. Setup CORS
 Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`. See [main.py](main.py) 
-and the `BACKEND_CORS_ORIGINS` in [config.py](demoproj/core/config.py) 
+and the `BACKEND_CORS_ORIGINS` in [config.py](demo_project/core/config.py) 
 
 #### 4. Configure the `AzureAuthorizationCodeBearer`
 You _can_ do this in `main.py`, but it's recommended to put it 
 in your `dependencies.py` file instead, as this will avoid circular imports later. 
-See the [demo project](demoproj/api/api_v1/endpoints/hello_world.py) and read the official documentation
+See the [demo project](demo_project/api/api_v1/endpoints/hello_world.py) and read the official documentation
 on [bigger applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
 
 
@@ -108,7 +108,7 @@ Set your `intility_scheme` as a dependency for your wanted views/routers:
 
 ```python
 # file: main.py
-from demoproj.api.dependencies import azure_scheme
+from demo_project import azure_scheme
 
 app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(azure_scheme)])
 ```
@@ -120,7 +120,8 @@ ensures the first request don't have to wait for the provider config to load.
 
 ```python
 # file: main.py
-from fastapi_azure_auth.provider_config import provider_config
+from fastapi_azure_auth.openid_config import provider_config
+
 
 @app.on_event('startup')
 async def load_config() -> None:
@@ -133,16 +134,15 @@ async def load_config() -> None:
 
 ## ⚙️ Configuration
 For those using a non-Intility tenant, you also need to make changes to the `provider_config` to match
-your tenant ID. You can do this in your previously created `load_config()` function.
+your tenant ID. This has to be done **before** calling the `AzureAuthorizationCodeBearer()`.
 
 ```python
 # file: main.py
-from fastapi_azure_auth.provider_config import provider_config
+from fastapi_azure_auth.openid_config import provider_config
 
-@app.on_event('startup')
-async def load_config() -> None:
-    provider_config.tenant_id = 'my-own-tenant-id'
-    await provider_config.load_config()
+provider_config.tenant_id = 'my-own-tenant-id'
+
+azure_scheme = AzureAuthorizationCodeBearer(...)
 ```
 
 
@@ -199,5 +199,5 @@ async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> None:
 ```
 
 Add the new dependency on either your route or on the API, as we've 
-done in our [demo project](demoproj/api/api_v1/endpoints/hello_world.py).
+done in our [demo project](demo_project/api/api_v1/endpoints/hello_world.py).
 
