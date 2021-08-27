@@ -3,13 +3,13 @@ from aioresponses import aioresponses
 from demo_project.api.dependencies import IssuerFetcher, azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
-from pytest_cases import fixture as pycases_fixture, parametrize as pycases_parametrize, parametrize_with_cases
+from pytest_cases import parametrize_with_cases
 from tests.utils import build_openid_keys, keys_url, openid_config_url, openid_configuration
 
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer, SingleTenantAzureAuthorizationCodeBearer
 
 
-@pycases_parametrize(version=[1, 2])
+@pytest.mark.parametrize('version', [1, 2])
 def token_version(version):
     """
     This will make your test _run_ multiple times, with given parameter.
