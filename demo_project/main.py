@@ -5,7 +5,7 @@ import uvicorn
 from demo_project.api.api_v1.api import api_router
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
-from fastapi import Depends, FastAPI
+from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
 
 log = logging.getLogger(__name__)
@@ -43,7 +43,11 @@ async def load_config() -> None:
     await azure_scheme.openid_config.load_config()
 
 
-app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(azure_scheme)])
+app.include_router(
+    api_router,
+    prefix=settings.API_V1_STR,
+    dependencies=[Security(azure_scheme, scopes=['user_impersonation'])],
+)
 
 
 if __name__ == '__main__':
