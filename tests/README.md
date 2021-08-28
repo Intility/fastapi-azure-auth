@@ -6,8 +6,11 @@ comes with some extra complexity, which I'll explain here.
 
 
 ### **[`conftest.py`](conftest.py)**  
-This file contains all fixtures we'd like to use in the entire module.
+These files contain fixtures we'd like to use in the module. We have 3 of them, one for 
+all the tests, one for multi tenant tests, nad one for single tenant tests. 
+The tests for everything is pretty straight forward, except the single tenant tests, which we'll describe here.
 
+[`single_tenant/conftest.py`](single_tenant/conftest.py):  
 The very first function is called `token_version()`, which is a simple `pytest.mark.parametrize` wrapped function, 
 giving us a `1` and then a `2`. when called. The next fixture is called `single_tenant_app()`. This fixture
 use `parametrize_with_cases` from the [`pytest_cases`](https://smarie.github.io/python-pytest-cases/#c-accessing-the-current-case) 
@@ -19,6 +22,7 @@ The following code:
 @pytest.fixture
 @parametrize_with_cases('token_version', cases=token_version)
 def single_tenant_app(token_version):
+    ...
 ```
 
 Is essentially:
@@ -37,16 +41,16 @@ twice. Once with a `v1`-token configured single-tenant FastAPI app, and then aga
 
 ### **The tests**
 
-If you run the first test in [test_single_tenant_v1_v2_tokens.py](test_single_tenant_v1_v2_tokens.py), either through
+If you run the first test in [test_single_tenant_v1_v2_tokens.py](single_tenant/test_single_tenant_v1_v2_tokens.py), either through
 your editor or through terminal:
 ```bash
-poetry run pytest tests/test_single_tenant_v1_v2_tokens.py::'test_normal_user' -s -v
+poetry run pytest tests/single_tenant/test_single_tenant_v1_v2_tokens.py::'test_normal_user' -s -v
 ```
 
 You'll see that it runs twice:
 ```bash
-tests/test_single_tenant_v1_v2_tokens.py::test_normal_user[token_version-1-token_version-token_version] PASSED
-tests/test_single_tenant_v1_v2_tokens.py::test_normal_user[token_version-2-token_version-token_version] PASSED
+..test_single_tenant_v1_v2_tokens.py::test_normal_user[token_version-1-token_version-token_version] PASSED
+..test_single_tenant_v1_v2_tokens.py::test_normal_user[token_version-2-token_version-token_version] PASSED
 ```
 
 The first time, it's run with `token_version-1`, and the second time with `token_version-2`.

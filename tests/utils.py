@@ -61,16 +61,23 @@ def build_access_token_normal_user(version: int = 2):
 
 def build_evil_access_token(version: int = 2):
     """
-    Build an access token, coming from the tenant ID we expect
+    Build an access token, but signed with an invalid key (not matching it's `kid`
     """
     return do_build_access_token(tenant_id='intility_tenant_id', evil=True, version=version)
 
 
 def build_access_token_invalid_claims(version: int = 2):
     """
-    Build an access token, coming from the tenant ID we expect
+    Build an access token, but with invalid claims (audience does not match)
     """
     return do_build_access_token(tenant_id='intility_tenant_id', aud='Jonas', version=version)
+
+
+def build_access_token_invalid_scopes(scopes='not_user_impersonation', version: int = 2):
+    """
+    Build an access token, but with invalid scopes (not `user_impersonation`)
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id', scopes=scopes, version=version)
 
 
 def build_access_token_expired(version: int = 2):
@@ -86,6 +93,7 @@ def do_build_access_token(
     expired: bool = False,
     evil: bool = False,
     admin: bool = True,
+    scopes: str = 'user_impersonation',
     version: int = 2,
 ):
     """
@@ -114,7 +122,7 @@ def do_build_access_token(
             'oid': '22222222-2222-2222-2222-222222222222',
             'onprem_sid': 'S-1-2-34-5678901234-5678901234-456789012-34567',
             'rh': '0.hellomylittletokenfriendwhatsupwi-thyoutodayheheiho.',
-            'scp': 'user_impersonation',
+            'scp': scopes,
             'sub': 'some long val',
             'tid': tenant_id,
             'unique_name': 'jonas',
@@ -140,7 +148,7 @@ def do_build_access_token(
             'oid': '22222222-2222-2222-2222-222222222222',
             'preferred_username': 'jonas.svensson@intility.no',
             'rh': 'some long val',
-            'scp': 'user_impersonation',
+            'scp': scopes,
             'sub': 'some long val',
             'tid': tenant_id,
             'uti': 'abcdefghijkl-mnopqrstu',
@@ -310,7 +318,9 @@ def openid_configuration(version: int) -> dict:
         }
 
 
-def openid_config_url(version: int) -> str:
+def openid_config_url(version: int, multi_tenant=False) -> str:
+    if multi_tenant:
+        return 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration'
     return (
         f'https://login.microsoftonline.com/intility_tenant_id/'
         f'{"v2.0/" if version == 2 else ""}.well-known/openid-configuration'

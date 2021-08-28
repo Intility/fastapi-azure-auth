@@ -136,9 +136,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             if isinstance(token_scope_string, str):
                 token_scopes = token_scope_string.split(' ')
                 if scope not in token_scopes:
-                    raise InvalidAuth('Not enough permissions (Check your scopes)')
+                    raise InvalidAuth('Required scope missing')
             else:
-                raise InvalidAuth('Token contains invalid formatted scopes.')
+                raise InvalidAuth('Token contains invalid formatted scopes')
 
         # Load new config if old
         await self.openid_config.load_config()
