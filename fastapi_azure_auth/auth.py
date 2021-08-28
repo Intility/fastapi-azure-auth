@@ -2,7 +2,8 @@ import logging
 from collections.abc import Callable
 from typing import Any, Optional
 
-from fastapi.security import OAuth2AuthorizationCodeBearer
+from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
+from fastapi.security.base import SecurityBase
 from jose import jwt
 from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
 from starlette.requests import Request
@@ -14,7 +15,7 @@ from fastapi_azure_auth.user import User
 log = logging.getLogger('fastapi_azure_auth')
 
 
-class AzureAuthorizationCodeBearerBase:
+class AzureAuthorizationCodeBearerBase(SecurityBase):
     def __init__(
         self,
         app_client_id: str,
@@ -111,10 +112,13 @@ class AzureAuthorizationCodeBearerBase:
             authorizationUrl=self.authorization_url,
             tokenUrl=self.token_url,
             scopes=scopes,
+            scheme_name='AzureAuthorizationCodeBearerBase',
             description=openapi_description or '`Leave client_secret blank`',
+            auto_error=True,
         )
+        self.model = self.oauth.model
 
-    async def __call__(self, request: Request) -> User:
+    async def __call__(self, request: Request, security_scopes: SecurityScopes) -> User:
         """
         Extends call to also validate the token.
         """
@@ -126,6 +130,15 @@ class AzureAuthorizationCodeBearerBase:
         except Exception as error:
             log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
             raise InvalidAuth(detail='Invalid token format')
+
+        for scope in security_scopes.scopes:
+            token_scope_string = claims.get('scp', '')
+            if isinstance(token_scope_string, str):
+                token_scopes = token_scope_string.split(' ')
+                if scope not in token_scopes:
+                    raise InvalidAuth('Not enough permissions (Check your scopes)')
+            else:
+                raise InvalidAuth('Token contains invalid formatted scopes.')
 
         # Load new config if old
         await self.openid_config.load_config()
@@ -240,6 +253,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
+        self.scheme_name = 'Azure AD - PKCE, Single-tenant'
 
 
 class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
@@ -296,3 +310,4 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
+        self.scheme_name = 'Azure AD - PKCE, Single-tenant'
