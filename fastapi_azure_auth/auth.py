@@ -1,6 +1,8 @@
+import asyncio
+import inspect
 import logging
 from collections.abc import Callable
-from typing import Any, Optional
+from typing import Any, Awaitable, Literal, Optional
 
 from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
 from fastapi.security.base import SecurityBase
@@ -23,8 +25,8 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         scopes: Optional[dict[str, str]] = None,
         multi_tenant: bool = False,
         validate_iss: bool = True,
-        iss_callable: Optional[Callable] = None,
-        token_version: int = 2,
+        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
+        token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
@@ -71,14 +73,12 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         """
         # Validate settings, making sure there's no misconfigured dependencies out there
         if multi_tenant:
-            if token_version != 2:
-                raise RuntimeError('Multi tenant apps only support v2 tokens')
             if validate_iss and not callable(iss_callable):
                 raise RuntimeError('`validate_iss` is enabled, so you must provide an `iss_callable`')
-        elif not validate_iss:
-            raise RuntimeError('Always validate issuers for single tenant applications')
-        elif token_version not in [1, 2]:
-            raise RuntimeError('Only token version 1 and 2 is supported')
+            elif iss_callable and not asyncio.iscoroutinefunction(iss_callable):
+                raise RuntimeError('`iss_callable` must be a coroutine')
+            elif iss_callable and 'tid' not in inspect.signature(iss_callable).parameters.keys():
+                raise RuntimeError('`iss_callable` must accept `tid` as an argument')
 
         self.app_client_id: str = app_client_id
         self.multi_tenant: bool = multi_tenant
@@ -208,7 +208,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         app_client_id: str,
         tenant_id: str,
         scopes: Optional[dict[str, str]] = None,
-        token_version: int = 2,
+        token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
@@ -241,7 +241,6 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             Override OpenAPI token URL
         :param openapi_description: str
             Override OpenAPI description
-
         """
         super().__init__(
             app_client_id=app_client_id,
