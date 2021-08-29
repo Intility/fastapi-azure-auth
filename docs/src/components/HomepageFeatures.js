@@ -18,7 +18,7 @@ const FeatureList = [
   },
   {
     title: 'Multi-tenant',
-    img: '../../static/img/global/fastad.png',
+    img: '../../static/img/global/fastadmultitenant.png',
     href: '/multi-tenant',
     description: (
       <>

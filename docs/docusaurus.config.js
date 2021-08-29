@@ -98,20 +98,7 @@ module.exports = {
         sidebarPath: require.resolve('./sidebarsMultiTenant.js'),
         editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
         sidebarCollapsible: false,
-        // ... other options
       },
     ],
-    // [
-    //   '@docusaurus/plugin-content-docs',
-    //   {
-    //     id: 'single-tenants',
-    //     path: 'single-tenant',
-    //     routeBasePath: 'single-tenant',
-    //     sidebarPath: require.resolve('./sidebarsSingleTenant.js'),
-    //     editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
-    //     sidebarCollapsible: false,
-    //     // ... other options
-    //   },
-    // ],
   ]
 }
