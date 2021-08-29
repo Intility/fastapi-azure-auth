@@ -143,7 +143,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         # Load new config if old
         await self.openid_config.load_config()
 
-        if self.multi_tenant and self.validate_iss and callable(self.iss_callable):
+        if self.multi_tenant and self.validate_iss and self.iss_callable:
             iss = await self.iss_callable(tid=claims.get('tid'))
         else:
             iss = self.openid_config.issuer
