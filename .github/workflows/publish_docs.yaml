@@ -1,4 +1,4 @@
-name: Publish docs
+name: Publish docs 📄
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'docs/**'
-      - '.github/workflows/publish-docs.yaml'
+      - '.github/workflows/publish_docs.yaml'
 
 jobs:
   gh-release:
