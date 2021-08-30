@@ -1,7 +1,7 @@
 *.pyc
 .idea/*
 env/
-.env
+demo_project/.env
 .DS_Store
 venv/
 .venv/

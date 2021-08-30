@@ -1,16 +1,13 @@
 from typing import Optional
 
-from pydantic import BaseModel, Field, IPvAnyAddress
+from pydantic import BaseModel, Field
 
 
 class User(BaseModel):
     aud: str = Field(..., description='Audience')
     tid: str = Field(..., description='Tenant ID')
-    given_name: Optional[str] = Field(default=None, description='Given name')
-    family_name: Optional[str] = Field(default=None, description='Family name')
-    unique_name: Optional[str] = Field(default=None, description='Unique name')
-    ipaddr: Optional[IPvAnyAddress] = Field(default=None, description='IP address when token was claimed')
-    upn: Optional[str] = Field(default=None, description='UPN')
     roles: list[str] = Field(default=[], description='Roles (Groups) the user has for this app')
     claims: dict = Field(..., description='The entire decoded token')
     scp: Optional[str] = Field(default=None, description='Scope')
+    name: Optional[str] = Field(default=None, description='Name')
+    access_token: str = Field(..., description='The access_token. Can be used for fetching the Graph API')
