@@ -1,6 +1,6 @@
 <h1 align="center">
   <img src="https://avatars.githubusercontent.com/u/35199565" width="124px"/><br/>
-  FastAPI-Azure-auth
+  FastAPI-Azure-Auth
 </h1>
 
 <p align="center">
