@@ -51,12 +51,13 @@ if settings.BACKEND_CORS_ORIGINS:
 
 
 async def check_if_valid_tenant(tid: str) -> str:
-    allowed_tenants = {
-        '9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6'
+    tid_to_iss_mapping = {
+        '9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6': 'https://login.microsoftonline.com/9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6/v2.0'
     }
-    if tid in allowed_tenants:
-        return tid
-    raise InvalidAuth('Tenant not allowed')
+    try:
+        return tid_to_iss_mapping[tid]
+    except KeyError:
+        raise InvalidAuth('Tenant not allowed')
 
 azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
@@ -85,19 +86,19 @@ if __name__ == '__main__':
     uvicorn.run('main:app', host='localhost', port=8000, reload=True)
 ```
 
-We're first creating an `async function`, which takes a `tid` as an argument, and returns the tenant ID it's a valid tenant,
-or raise an `InvalidAuth()` exception if not.
+We're first creating an `async function`, which takes a `tid` as an argument, and returns the tenant ID's `iss` if it's a valid tenant.
+If it's not a valid tenant, it has to raise an `InvalidAuth()` exception.
 
 ## More sophisticated callable
 If you want to cache these results in memory, you can do so by creating a more sophisticated callable:
 
 ```python
-class TenantFetcher:
+class IssuerFetcher:
     def __init__(self) -> None:
         """
         Example class for multi tenant apps, that caches issuers for an hour
         """
-        self.allowed_tenants: set = {}
+        self.tid_to_iss: dict[str, str] = {}
         self._config_timestamp: Optional[datetime] = None
 
     async def __call__(self, tid: str) -> str:
@@ -108,20 +109,23 @@ class TenantFetcher:
         refresh_time = datetime.now() - timedelta(hours=1)
         if not self._config_timestamp or self._config_timestamp < refresh_time:
             self._config_timestamp = datetime.now()
-            # logic to update your allowed tenants
+            # logic to find your allowed tenants and it's issuers here
             # (This example cache in memory for 1 hour)
-            self.allowed_tenants = {
-                'intility_tenant'
+            self.tid_to_iss = {
+                'intility_tenant': 'intility_tenant',
             }
-        if tid in allowed_tenants:
-            return tid
-        raise InvalidAuth('Tenant not allowed')
+        try:
+            return self.tid_to_iss[tid]
+        except Exception as error:
+            log.exception('`iss` not found for `tid` %s. Error %s', tid, error)
+            raise InvalidAuth('You must be an Intility customer to access this resource')
 
-tenant_fetcher = TenantFetcher()
+
+issuer_fetcher = IssuerFetcher()
 
 azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
     ...
     validate_iss=True,
-    valid_tenants_callable=tenant_fetcher
+    valid_tenants_callable=issuer_fetcher
 )
 ```
