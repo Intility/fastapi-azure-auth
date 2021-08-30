@@ -9,11 +9,7 @@ class AzureActiveDirectory(BaseSettings):
     TENANT_ID: str = Field(default='', env='TENANT_ID')
 
 
-class Credentials(BaseSettings):
-    MY_THIRD_PARTY_PASSWORD: str = Field(default='my_password', env='MY_THIRD_PARTY_PASSWORD')
-
-
-class Settings(Credentials, AzureActiveDirectory):
+class Settings(AzureActiveDirectory):
     API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = Field(..., env='SECRET_KEY')
 

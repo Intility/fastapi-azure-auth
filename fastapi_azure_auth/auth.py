@@ -49,11 +49,12 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         :param multi_tenant: bool
             Whether this is a multi tenant or single tenant application.
         :param validate_iss: bool
-            Only used for multi tenant applications
-            Whether to validate the token issuer or not. This can be skipped to allow anyone to log in.
+        **Only used for multi-tenant applications**
+            Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
         :param iss_callable: Callable
-            Only used for multi tenant applications
-            Async function that has to accept a `tid` and return a `iss` / raise an InvalidIssuer exception
+        **Only used for multi-tenant application**
+            Async function that has to accept a `tid` (tenant ID) and return a `iss` (issuer) or
+             raise an InvalidIssuer exception
             This is required when validate_iss is set to `True`.
 
         :param token_version: int
@@ -280,11 +281,10 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
                 }
 
         :param validate_iss: bool
-            Only used for multi tenant applications
-            Whether to validate the token issuer or not. This can be skipped to allow anyone to log in.
+            Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
         :param iss_callable: Callable
-            Only used for multi tenant applications
-            Async function that has to accept a `tid` and return a `iss` / raise an InvalidIssuer exception
+            Async function that has to accept a `tid` (tenant ID) and return a `iss` (issuer) or
+             raise an InvalidIssuer exception
             This is required when validate_iss is set to `True`.
 
         :param openid_config_use_app_id: bool
