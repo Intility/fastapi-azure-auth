@@ -1,0 +1,24 @@
+---
+title: Guest Users
+sidebar_position: 3
+---
+
+By default, guest users in your tenant will be able to access your APIs. You can block this in code by checking
+the users `tid` is equal to yours, or preferably by configuring Azure AD. If you're using Azure AD, the user
+will be denied to sign in, instead of getting a 403 when he's fetches his token.
+
+Go to **all** your [Enterprise Applications](https://portal.azure.com/#blade/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade/AllApps/menuId/)
+and do the following steps. You can find your Enterprise Application either by searching on the Client ID in the
+[Enterprise Applications](https://portal.azure.com/#blade/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade/AllApps/menuId/) menu,
+or by first navigating to your [App registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) and
+clicking the `Managed application in local directory` link:
+
+![guest_1_link_from_appreg](../../static/img/single-tenant/guest_1_link_from_appreg.png)
+
+Under **Properties**, enable `User assignment required?` and **Save**.
+
+Then, go to **Users and groups**, and **add user/group**. Find users or a fitting group and assign it to the role Default Access.
+
+:::note
+Groups you select should have all users as direct members of the group. Nested groups does not work with Enterprise Applications.
+:::
