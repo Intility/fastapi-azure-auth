@@ -21,16 +21,6 @@ module.exports = {
       },
       items: [
         {
-          href: '/single-tenant',
-          position: 'left',
-          label: 'Single-tenant',
-        },
-        {
-          href: '/multi-tenant',
-          position: 'left',
-          label: 'Multi-tenant',
-        },
-        {
           href: 'https://github.com/Intility/FastAPI-Azure-Auth',
           label: 'GitHub',
           position: 'right',
@@ -74,10 +64,9 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         docs: {
-          id: 'single-tenant',
-          path: 'single-tenant',
-          routeBasePath: 'single-tenant',
-          sidebarPath: require.resolve('./sidebarsSingleTenant.js'),
+          id: 'docs',
+          routeBasePath: '/',
+          sidebarPath: require.resolve('./sidebars.js'),
           editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
           sidebarCollapsible: false,
         },
@@ -89,16 +78,15 @@ module.exports = {
   ],
   plugins: [
     require.resolve('docusaurus-lunr-search'),
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'multi-tenant',
-        path: 'multi-tenant',
-        routeBasePath: 'multi-tenant',
-        sidebarPath: require.resolve('./sidebarsMultiTenant.js'),
-        editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
-        sidebarCollapsible: false,
-      },
-    ],
+  //   [
+  //     '@docusaurus/plugin-content-docs',
+  //     {
+  //       id: 'docs',
+  //       routeBasePath: '/',
+  //       sidebarPath: require.resolve('./sidebars.js'),
+  //       editUrl: 'https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/',
+  //       sidebarCollapsible: false,
+  //     },
+  //   ],
   ]
 }
