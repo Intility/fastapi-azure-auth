@@ -14,7 +14,7 @@ For a more "real life" project example, look at the
 [demo_project](https://github.com/Intility/fastapi-azure-auth/tree/main/demo_project) on GitHub.
 
 ## Getting started
-First, either create your `.env` file and fill out your variables or insert them directly in your variables later.
+First, either create your `.env` file and fill out your variables or insert them directly in your settings later.
 
 ```bash title=".env"
 APP_CLIENT_ID=
@@ -420,19 +420,19 @@ if __name__ == '__main__':
 Head over to your OpenAPI documentation at [http://localhost:8000/docs](http://localhost:8000/docs) and check out your API documentation.
 You'll see a new button called `Authorize`. Before clicking it, try out your API to see that you're unauthorized.
 
-![fastapi_1_authorize_button](../../static/img/single-tenant/fastapi_1_authorize_button.png)
-![fastapi_2_not_authenticated](../../static/img/single-tenant/fastapi_2_not_authenticated.png)
+![fastapi_1_authorize_button](../../static/img/single-and-multi-tenant/fastapi_1_authorize_button.png)
+![fastapi_2_not_authenticated](../../static/img/single-and-multi-tenant/fastapi_2_not_authenticated.png)
 
 
 Now, let's authenticate. Click the **Authorize** button. Check your scope, and leave `Client secret` blank. You do not
 need that with the PKCE flow.
 
-![fastapi_3_authenticate](../../static/img/single-tenant/fastapi_3_authenticate.png)
+![fastapi_3_authenticate](../../static/img/single-and-multi-tenant/fastapi_3_authenticate.png)
 
 
 Consent to the permissions requested:
 
-![fastapi_4_consent](../../static/img/single-tenant/fastapi_4_consent.png)
+![fastapi_4_consent](../../static/img/single-and-multi-tenant/fastapi_4_consent.png)
 
 
 :::info
