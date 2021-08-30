@@ -167,7 +167,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                     'require_iat': True,
                     'require_exp': True,
                     'require_nbf': True,
-                    'require_iss': True,
+                    'require_iss': self.validate_iss,
                     'require_sub': True,
                     'require_jti': False,
                     'require_at_hash': False,
