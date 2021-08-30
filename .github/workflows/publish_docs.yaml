@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'docs/**'
-      - '.github/workflows/publish-docs.yml'
+      - '.github/workflows/publish-docs.yaml'
 
 jobs:
   gh-release:
@@ -25,4 +25,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docusaurus/build
+          publish_dir: ./docs/build
