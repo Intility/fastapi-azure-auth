@@ -13,3 +13,12 @@ notes
 .coverage
 htmlcov/
 coverage.xml
+
+
+
+# Generated files
+.docusaurus
+.cache-loader
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*2
