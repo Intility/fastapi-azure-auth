@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="generator" content="Docusaurus v2.0.0-beta.5">
+<title data-react-helmet="true">FastAPI configuration | FastAPI-Azure-Auth</title><meta data-react-helmet="true" name="twitter:card" content="summary_large_image"><meta data-react-helmet="true" property="og:url" content="https://your-docusaurus-test-site.com/single-tenant/fastapi_configuration"><meta data-react-helmet="true" name="docusaurus_locale" content="en"><meta data-react-helmet="true" name="docusaurus_version" content="current"><meta data-react-helmet="true" name="docusaurus_tag" content="docs-docs-current"><meta data-react-helmet="true" property="og:title" content="FastAPI configuration | FastAPI-Azure-Auth"><meta data-react-helmet="true" name="description" content="We&#x27;ll do the simplest setup possible in these docs, through a one-file main.py."><meta data-react-helmet="true" property="og:description" content="We&#x27;ll do the simplest setup possible in these docs, through a one-file main.py."><link data-react-helmet="true" rel="shortcut icon" href="/img/global/favicon.ico"><link data-react-helmet="true" rel="canonical" href="https://your-docusaurus-test-site.com/single-tenant/fastapi_configuration"><link data-react-helmet="true" rel="alternate" href="https://your-docusaurus-test-site.com/single-tenant/fastapi_configuration" hreflang="en"><link data-react-helmet="true" rel="alternate" href="https://your-docusaurus-test-site.com/single-tenant/fastapi_configuration" hreflang="x-default"><link rel="stylesheet" href="/assets/css/styles.3f51c63d.css">
+<link rel="preload" href="/assets/js/runtime~main.7c774433.js" as="script">
+<link rel="preload" href="/assets/js/main.7869d062.js" as="script">
+</head>
+<body>
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){var t=null;try{t=localStorage.getItem("theme")}catch(t){}return t}();t(null!==e?e:"light")}()</script><div id="__docusaurus">
+<div><a href="#" class="skipToContent_1oUP">Skip to main content</a></div><nav class="navbar navbar--fixed-top"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Navigation bar toggle" class="navbar__toggle clean-btn" type="button" tabindex="0"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><img src="/img/global/fastad.png" alt="FastAPI-Azure-Auth logo" class="themedImage_1VuW themedImage--light_3UqQ navbar__logo"><img src="/img/global/fastad.png" alt="FastAPI-Azure-Auth logo" class="themedImage_1VuW themedImage--dark_hz6m navbar__logo"><b class="navbar__title">FastAPI-Azure-Auth</b></a></div><div class="navbar__items navbar__items--right"><a href="https://github.com/Intility/FastAPI-Azure-Auth" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link"><span>GitHub<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a><div class="react-toggle toggle_3Zt9 react-toggle--disabled"><div class="react-toggle-track" role="button" tabindex="-1"><div class="react-toggle-track-check"><span class="toggle_71bT">🌜</span></div><div class="react-toggle-track-x"><span class="toggle_71bT">🌞</span></div><div class="react-toggle-thumb"></div></div><input type="checkbox" class="react-toggle-screenreader-only" aria-label="Switch between dark and light mode"></div><div class="navbar__search"><span aria-label="expand searchbar" role="button" class="search-icon" tabindex="0"></span><input type="search" id="search_input_react" placeholder="Search" aria-label="Search" class="navbar__search-input search-bar"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div class="main-wrapper docs-wrapper docs-doc-page"><div class="docPage_31aa"><button class="clean-btn backToTopButton_35hR" type="button"><svg viewBox="0 0 24 24" width="28"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z" fill="currentColor"></path></svg></button><aside class="docSidebarContainer_3Kbt"><div class="sidebar_15mo"><nav class="menu thin-scrollbar menu_Bmed menuWithAnnouncementBar_2WvA"><ul class="menu__list"><li class="menu__list-item"><a class="menu__link" href="/">Introduction</a></li><li class="menu__list-item"><a class="menu__link" href="/installation">Installation</a></li><li class="menu__list-item"><a class="menu__link menu__link--sublist menu__link--active" href="#">Single-tenant setup</a><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/single-tenant/azure_setup">AAD Authorization</a></li><li class="menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/single-tenant/fastapi_configuration">FastAPI configuration</a></li><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/single-tenant/guest_users">Guest Users</a></li><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/single-tenant/locking_down_on_roles">Locking down on roles</a></li></ul></li><li class="menu__list-item"><a class="menu__link menu__link--sublist" href="#">Multi-tenant setup</a><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/multi-tenant/azure_setup">AAD Authorization</a></li><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/multi-tenant/fastapi_configuration">FastAPI configuration</a></li><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/multi-tenant/accept_specific_tenants_only">Accept specific tenants only</a></li><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/multi-tenant/locking_down_on_roles">Locking down on roles</a></li></ul></li><li class="menu__list-item"><a class="menu__link menu__link--sublist" href="#">Settings</a><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/settings/single_tenant">Single-tenant settings</a></li><li class="menu__list-item"><a class="menu__link" tabindex="0" href="/settings/multi_tenant">Multi-tenant settings</a></li></ul></li></ul></nav></div></aside><main class="docMainContainer_3ufF"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_3FnS"><div class="docItemContainer_33ec"><article><div class="tocCollapsible_1PrD tocMobile_3Hoh"><button type="button" class="clean-btn tocCollapsibleButton_2O1e">On this page</button></div><div class="markdown"><header><h1>FastAPI configuration</h1></header><p>We&#x27;ll do the <strong>simplest setup possible</strong> in these docs, through a one-file <code>main.py</code>.
+However, it&#x27;s highly recommended that you read the chapters about bigger applications
+<a href="https://fastapi.tiangolo.com/tutorial/bigger-applications/">here</a>, and invest in a good project structure.</p><p>We assume you&#x27;ve done the FastAPI tutorial and have dependencies installed, such as <code>FastAPI</code> and <code>Gunicorn</code>.</p><p>For a more &quot;real life&quot; project example, look at the
+<a href="https://github.com/Intility/fastapi-azure-auth/tree/main/demo_project">demo_project</a> on GitHub.</p><h2 id="getting-started">Getting started</h2><p>First, either create your <code>.env</code> file and fill out your variables or insert them directly in your settings later.</p><pre><code class="language-bash" metastring="title=&quot;.env&quot;" title="&quot;.env&quot;">APP_CLIENT_ID=
+TENANT_ID=
+OPENAPI_CLIENT_ID=
+</code></pre><p>Create your <code>main.py</code> file:</p><pre><code class="language-python" metastring="title=&quot;main.py&quot;" title="&quot;main.py&quot;">from fastapi import FastAPI
+import uvicorn
+
+app = FastAPI()
+
+
+@app.get(&quot;/&quot;)
+async def root():
+    return {&quot;message&quot;: &quot;Hello World&quot;}
+
+if __name__ == &#x27;__main__&#x27;:
+    uvicorn.run(&#x27;main:app&#x27;, reload=True)
+</code></pre><p>Run your application and ensure that everything works on <a href="http://localhost:8000/docs">http://localhost:8000/docs</a></p><div class="admonition admonition-info alert alert--info"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</h5></div><div class="admonition-content"><p>You need to run the application on the configured port in Azure AD for the next steps to work!</p></div></div><h2 id="add-your-settings">Add your settings</h2><p>First, add your settings to the application. We&#x27;ll need these later. The way I&#x27;ve set it up will look for a <code>.env</code>-file
+to populate your settings, but you can also just set a <code>default</code> value directly.</p><pre><code class="language-python" metastring="{1,5,8-19,21} title=&quot;main.py&quot;" title="&quot;main.py&quot;">from typing import Union
+
+import uvicorn
+from fastapi import FastAPI
+from pydantic import AnyHttpUrl, BaseSettings, Field
+
+
+class Settings(BaseSettings):
+    API_V1_STR: str = &#x27;/api/v1&#x27;
+    SECRET_KEY: str = Field(&#x27;my super secret key&#x27;, env=&#x27;SECRET_KEY&#x27;)
+    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = [&#x27;http://localhost:8000&#x27;]
+    OPENAPI_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;OPENAPI_CLIENT_ID&#x27;)
+    APP_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;APP_CLIENT_ID&#x27;)
+    TENANT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;TENANT_ID&#x27;)
+
+    class Config:
+        env_file = &#x27;.env&#x27;
+        env_file_encoding = &#x27;utf-8&#x27;
+        case_sensitive = True
+
+settings = Settings()
+
+app = FastAPI()
+
+@app.get(&quot;/&quot;)
+async def root():
+    return {&quot;message&quot;: &quot;Hello World&quot;}
+
+
+if __name__ == &#x27;__main__&#x27;:
+    uvicorn.run(&#x27;main:app&#x27;, reload=True)
+</code></pre><h2 id="configure-cors">Configure <code>CORS</code></h2><p>Now, let&#x27;s configure our <code>CORS</code>. Without them your OpenAPI docs won&#x27;t work as expected:</p><pre><code class="language-python" metastring="{5,26-33} title=&quot;main.py&quot;" title="&quot;main.py&quot;">from typing import Union
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import AnyHttpUrl, BaseSettings, Field
+
+
+class Settings(BaseSettings):
+    API_V1_STR: str = &#x27;/api/v1&#x27;
+    SECRET_KEY: str = Field(&#x27;my super secret key&#x27;, env=&#x27;SECRET_KEY&#x27;)
+    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = [&#x27;http://localhost:8000&#x27;]
+    OPENAPI_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;OPENAPI_CLIENT_ID&#x27;)
+    APP_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;APP_CLIENT_ID&#x27;)
+    TENANT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;TENANT_ID&#x27;)
+
+    class Config:
+        env_file = &#x27;.env&#x27;
+        env_file_encoding = &#x27;utf-8&#x27;
+        case_sensitive = True
+
+settings = Settings()
+
+app = FastAPI()
+
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=[&#x27;*&#x27;],
+        allow_headers=[&#x27;*&#x27;],
+    )
+
+
+@app.get(&quot;/&quot;)
+async def root():
+    return {&quot;message&quot;: &quot;Hello World&quot;}
+
+
+if __name__ == &#x27;__main__&#x27;:
+    uvicorn.run(&#x27;main:app&#x27;, reload=True)
+</code></pre><h2 id="configure-openapi-documentation">Configure OpenAPI Documentation</h2><p>In order for our OpenAPI documentation to work, we have to configure a few settings directly in the <code>FastAPI</code> application.</p><pre><code class="language-python" metastring="{24-30} title=&quot;main.py&quot;" title="&quot;main.py&quot;">from typing import Union
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import AnyHttpUrl, BaseSettings, Field
+
+
+class Settings(BaseSettings):
+    API_V1_STR: str = &#x27;/api/v1&#x27;
+    SECRET_KEY: str = Field(&#x27;my super secret key&#x27;, env=&#x27;SECRET_KEY&#x27;)
+    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = [&#x27;http://localhost:8000&#x27;]
+    OPENAPI_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;OPENAPI_CLIENT_ID&#x27;)
+    APP_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;APP_CLIENT_ID&#x27;)
+    TENANT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;TENANT_ID&#x27;)
+
+    class Config:
+        env_file = &#x27;.env&#x27;
+        env_file_encoding = &#x27;utf-8&#x27;
+        case_sensitive = True
+
+settings = Settings()
+
+app = FastAPI(
+    swagger_ui_oauth2_redirect_url=&#x27;/oauth2-redirect&#x27;,
+    swagger_ui_init_oauth={
+        &#x27;usePkceWithAuthorizationCodeGrant&#x27;: True,
+        &#x27;clientId&#x27;: settings.OPENAPI_CLIENT_ID,
+    },
+)
+
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=[&#x27;*&#x27;],
+        allow_headers=[&#x27;*&#x27;],
+    )
+
+
+@app.get(&quot;/&quot;)
+async def root():
+    return {&quot;message&quot;: &quot;Hello World&quot;}
+
+
+if __name__ == &#x27;__main__&#x27;:
+    uvicorn.run(&#x27;main:app&#x27;, reload=True)
+</code></pre><p>The <code>swagger_ui_oauth2_redirect_url</code> setting for redirect should be as configured in Azure AD.
+The <code>swagger_ui_init_oauth</code> are standard mapped OpenAPI properties. You can find documentation about them <a href="https://swagger.io/docs/open-source-tools/swagger-ui/usage/oauth2/">here</a></p><p>We&#x27;ve used two flags: <code>usePkceWithAuthorizationCodeGrant</code>, which is the authentication flow.
+<code>clientId</code> is our application Client ID, which will autofill a field for the end users later.</p><h2 id="implementing-fastapi-azure-auth">Implementing FastAPI-Azure-Auth</h2><p>Now, the fun part begins! 🚀</p><p>Import the <code>SingleTenantAzureAuthorizationCodeBearer</code> from <code>fastapi_azure_auth</code> and configure it:</p><pre><code class="language-python" metastring="{7,43-49} title=&quot;main.py&quot;" title="&quot;main.py&quot;">from typing import Union
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import AnyHttpUrl, BaseSettings, Field
+from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
+
+
+
+class Settings(BaseSettings):
+    API_V1_STR: str = &#x27;/api/v1&#x27;
+    SECRET_KEY: str = Field(&#x27;my super secret key&#x27;, env=&#x27;SECRET_KEY&#x27;)
+    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = [&#x27;http://localhost:8000&#x27;]
+    OPENAPI_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;OPENAPI_CLIENT_ID&#x27;)
+    APP_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;APP_CLIENT_ID&#x27;)
+    TENANT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;TENANT_ID&#x27;)
+
+    class Config:
+        env_file = &#x27;.env&#x27;
+        env_file_encoding = &#x27;utf-8&#x27;
+        case_sensitive = True
+
+settings = Settings()
+
+app = FastAPI(
+    swagger_ui_oauth2_redirect_url=&#x27;/oauth2-redirect&#x27;,
+    swagger_ui_init_oauth={
+        &#x27;usePkceWithAuthorizationCodeGrant&#x27;: True,
+        &#x27;clientId&#x27;: settings.OPENAPI_CLIENT_ID,
+    },
+)
+
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=[&#x27;*&#x27;],
+        allow_headers=[&#x27;*&#x27;],
+    )
+
+azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    tenant_id=settings.TENANT_ID,
+    scopes={
+        f&#x27;api://{settings.APP_CLIENT_ID}/user_impersonation&#x27;: &#x27;user_impersonation&#x27;,
+    }
+)
+
+
+@app.get(&quot;/&quot;)
+async def root():
+    return {&quot;message&quot;: &quot;Hello World&quot;}
+
+
+if __name__ == &#x27;__main__&#x27;:
+    uvicorn.run(&#x27;main:app&#x27;, reload=True)
+</code></pre><p>We pass the <code>app_client_id=</code> to be our Backend application ID, our <code>tenant_id</code> to be our Tenant ID, and then lastly our
+scopes. We&#x27;ll get back to the scopes later.</p><h2 id="add-loading-of-openid-configuration-on-startup">Add loading of OpenID Configuration on startup</h2><p>By adding <code>on_event(&#x27;startup&#x27;)</code> we&#x27;re able to load the OpenID configuration immediately, instead of doing it when
+the first user authenticates. This isn&#x27;t required, but makes things a bit quicker. When 24 hours has passed, the
+configuration will be considered out of date, and update when a user does a request. You can use
+<a href="https://fastapi.tiangolo.com/tutorial/background-tasks/">background tasks</a> to refresh it before that happens if you&#x27;d like.</p><pre><code class="language-python" metastring="{52-57} title=&quot;main.py&quot;" title="&quot;main.py&quot;">from typing import Union
+
+import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import AnyHttpUrl, BaseSettings, Field
+from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
+
+
+
+class Settings(BaseSettings):
+    API_V1_STR: str = &#x27;/api/v1&#x27;
+    SECRET_KEY: str = Field(&#x27;my super secret key&#x27;, env=&#x27;SECRET_KEY&#x27;)
+    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = [&#x27;http://localhost:8000&#x27;]
+    OPENAPI_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;OPENAPI_CLIENT_ID&#x27;)
+    APP_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;APP_CLIENT_ID&#x27;)
+    TENANT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;TENANT_ID&#x27;)
+
+    class Config:
+        env_file = &#x27;.env&#x27;
+        env_file_encoding = &#x27;utf-8&#x27;
+        case_sensitive = True
+
+settings = Settings()
+
+app = FastAPI(
+    swagger_ui_oauth2_redirect_url=&#x27;/oauth2-redirect&#x27;,
+    swagger_ui_init_oauth={
+        &#x27;usePkceWithAuthorizationCodeGrant&#x27;: True,
+        &#x27;clientId&#x27;: settings.OPENAPI_CLIENT_ID,
+    },
+)
+
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=[&#x27;*&#x27;],
+        allow_headers=[&#x27;*&#x27;],
+    )
+
+azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    tenant_id=settings.TENANT_ID,
+    scopes={
+        f&#x27;api://{settings.APP_CLIENT_ID}/user_impersonation&#x27;: &#x27;user_impersonation&#x27;,
+    }
+)
+
+
+@app.on_event(&#x27;startup&#x27;)
+async def load_config() -&gt; None:
+    &quot;&quot;&quot;
+    Load OpenID config on startup.
+    &quot;&quot;&quot;
+    await azure_scheme.openid_config.load_config()
+
+
+@app.get(&quot;/&quot;)
+async def root():
+    return {&quot;message&quot;: &quot;Hello World&quot;}
+
+
+if __name__ == &#x27;__main__&#x27;:
+    uvicorn.run(&#x27;main:app&#x27;, reload=True)
+</code></pre><h2 id="adding-authentication-to-our-view">Adding authentication to our view</h2><p>There&#x27;s two ways of adding dependencies in FastAPI. You can use <code>Depends()</code> or <code>Security()</code>. <code>Security()</code> has an extra
+property called <code>scopes</code>. <code>FastAPI-Azure-Auth</code> support both, but if you use <code>Security()</code> you can also lock down your API
+views based on the scope.</p><p>Let&#x27;s do that:</p><pre><code class="language-python" metastring="{4,60} title=&quot;main.py&quot;" title="&quot;main.py&quot;">from typing import Union
+
+import uvicorn
+from fastapi import FastAPI, Security
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import AnyHttpUrl, BaseSettings, Field
+from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
+
+
+
+class Settings(BaseSettings):
+    API_V1_STR: str = &#x27;/api/v1&#x27;
+    SECRET_KEY: str = Field(&#x27;my super secret key&#x27;, env=&#x27;SECRET_KEY&#x27;)
+    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = [&#x27;http://localhost:8000&#x27;]
+    OPENAPI_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;OPENAPI_CLIENT_ID&#x27;)
+    APP_CLIENT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;APP_CLIENT_ID&#x27;)
+    TENANT_ID: str = Field(default=&#x27;&#x27;, env=&#x27;TENANT_ID&#x27;)
+
+    class Config:
+        env_file = &#x27;.env&#x27;
+        env_file_encoding = &#x27;utf-8&#x27;
+        case_sensitive = True
+
+settings = Settings()
+
+app = FastAPI(
+    swagger_ui_oauth2_redirect_url=&#x27;/oauth2-redirect&#x27;,
+    swagger_ui_init_oauth={
+        &#x27;usePkceWithAuthorizationCodeGrant&#x27;: True,
+        &#x27;clientId&#x27;: settings.OPENAPI_CLIENT_ID,
+    },
+)
+
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=[&#x27;*&#x27;],
+        allow_headers=[&#x27;*&#x27;],
+    )
+
+azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    tenant_id=settings.TENANT_ID,
+    scopes={
+        f&#x27;api://{settings.APP_CLIENT_ID}/user_impersonation&#x27;: &#x27;user_impersonation&#x27;,
+    }
+)
+
+
+@app.on_event(&#x27;startup&#x27;)
+async def load_config() -&gt; None:
+    &quot;&quot;&quot;
+    Load OpenID config on startup.
+    &quot;&quot;&quot;
+    await azure_scheme.openid_config.load_config()
+
+
+@app.get(&quot;/&quot;, dependencies=[Security(azure_scheme)])
+async def root():
+    return {&quot;message&quot;: &quot;Hello World&quot;}
+
+
+if __name__ == &#x27;__main__&#x27;:
+    uvicorn.run(&#x27;main:app&#x27;, reload=True)
+</code></pre><h2 id="testing-it-out">Testing it out</h2><p>Head over to your OpenAPI documentation at <a href="http://localhost:8000/docs">http://localhost:8000/docs</a> and check out your API documentation.
+You&#x27;ll see a new button called <code>Authorize</code>. Before clicking it, try out your API to see that you&#x27;re unauthorized.</p><p><img alt="fastapi_1_authorize_button" src="/assets/images/fastapi_1_authorize_button-89218f631f158bcaf32c1a2a8998e4c3.png">
+<img alt="fastapi_2_not_authenticated" src="/assets/images/fastapi_2_not_authenticated-02088064907129c3e4ef1efe4a3799f3.png"></p><p>Now, let&#x27;s authenticate. Click the <strong>Authorize</strong> button. Check your scope, and leave <code>Client secret</code> blank. You do not
+need that with the PKCE flow.</p><p><img alt="fastapi_3_authenticate" src="/assets/images/fastapi_3_authenticate-7973c5e443c1baace990fc914d6169b2.png"></p><p>Consent to the permissions requested:</p><p><img alt="fastapi_4_consent" src="/assets/images/fastapi_4_consent-a34723e9db6e4dff37233900773fbf50.png"></p><div class="admonition admonition-info alert alert--info"><div class="admonition-heading"><h5><span class="admonition-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="16" viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"></path></svg></span>info</h5></div><div class="admonition-content"><p>If you get a warning that your redirect URL is wrong, you&#x27;re probably using <code>127.0.0.1</code> instead of <code>localhost</code></p></div></div><p>Try out your API again to see that it works!</p><h3 id="last-thing">Last thing..</h3><p>As discussed earlier, there is a <code>scope</code> parameter to the <code>Security()</code> version of <code>Depends()</code>. If you&#x27;d want to lock down
+your API to only be accessible by those with certain scopes, you can simply pass it into the dependency.</p><pre><code class="language-python">@app.get(&quot;/&quot;, dependencies=[Security(azure_scheme, scopes=&#x27;wrong_scope&#x27;)])
+</code></pre><p>If you do this and try out your API again, you&#x27;ll see that you&#x27;re denied.</p><p>You&#x27;re now safe and secure! Good luck! 🔒🚀</p><div style="text-align:center"><h4>If you like this project, please leave us a star ❤ ️️</h4><span><a href="https://github.com/intility/fastapi-azure-auth" data-color-scheme="no-preference: dark_dimmed; light: dark_dimmed; dark: dark_dimmed;" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star intility/fastapi-azure-auth on GitHub">Star</a></span></div></div><footer class="docusaurus-mt-lg"><div class="row"><div class="col"><a href="https://github.com/Intility/FastAPI-Azure-Auth/edit/main/docs/docs/single-tenant/fastapi_configuration.mdx" target="_blank" rel="noreferrer noopener"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_2_ui" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_13-_"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages navigation"><div class="pagination-nav__item"><a class="pagination-nav__link" href="/single-tenant/azure_setup"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">« AAD Authorization</div></a></div><div class="pagination-nav__item pagination-nav__item--next"><a class="pagination-nav__link" href="/single-tenant/guest_users"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Guest Users »</div></a></div></nav></div></div><div class="col col--3"><div class="tableOfContents_35-E thin-scrollbar"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#getting-started" class="table-of-contents__link">Getting started</a></li><li><a href="#add-your-settings" class="table-of-contents__link">Add your settings</a></li><li><a href="#configure-cors" class="table-of-contents__link">Configure <code>CORS</code></a></li><li><a href="#configure-openapi-documentation" class="table-of-contents__link">Configure OpenAPI Documentation</a></li><li><a href="#implementing-fastapi-azure-auth" class="table-of-contents__link">Implementing FastAPI-Azure-Auth</a></li><li><a href="#add-loading-of-openid-configuration-on-startup" class="table-of-contents__link">Add loading of OpenID Configuration on startup</a></li><li><a href="#adding-authentication-to-our-view" class="table-of-contents__link">Adding authentication to our view</a></li><li><a href="#testing-it-out" class="table-of-contents__link">Testing it out</a><ul><li><a href="#last-thing" class="table-of-contents__link">Last thing..</a></li></ul></li></ul></div></div></div></div></main></div></div><footer class="footer footer--dark"><div class="container"><div class="row footer__links"><div class="col footer__col"><div class="footer__title">Quick links</div><ul class="footer__items"><li class="footer__item"><a href="https://github.com/Intility/FastAPI-Azure-Auth/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer" class="footer__link-item"><span>SECURITY.md<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a></li><li class="footer__item"><a href="mailto:jonas.svensson@intility.no" target="_blank" rel="noopener noreferrer" class="footer__link-item"><span>jonas.svensson@intility.no<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a></li><li class="footer__item"><a href="https://intility.com" target="_blank" rel="noopener noreferrer" class="footer__link-item"><span>Intility.com<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a></li><li class="footer__item"><a href="https://portal.azure.com" target="_blank" rel="noopener noreferrer" class="footer__link-item"><span>Azure<svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_3J9K"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg></span></a></li></ul></div></div><div class="footer__bottom text--center"><div class="footer__copyright">Copyright © 2021 Intility AS. Built with Docusaurus.</div></div></div></footer></div>
+<script src="/assets/js/runtime~main.7c774433.js"></script>
+<script src="/assets/js/main.7869d062.js"></script>
+</body>
+</html>
