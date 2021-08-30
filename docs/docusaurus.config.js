@@ -6,7 +6,7 @@ module.exports = {
   title: 'FastAPI-Azure-Auth',
   tagline: 'Easy and secure implementation of Azure AD for your FastAPI APIs 🔒',
   url: 'https://your-docusaurus-test-site.com',
-  baseUrl: '/',
+  baseUrl: '/fastapi-azure-auth/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/global/favicon.ico',
