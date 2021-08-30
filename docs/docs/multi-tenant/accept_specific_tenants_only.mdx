@@ -1,0 +1,127 @@
+---
+title: Accept specific tenants only
+sidebar_position: 3
+---
+
+If your multi-tenant application only should accept a few tenants, you'll have to verify `issuers`, or the `iss` field in the JWT.
+
+We'll take the last code snippet from [FastAPI configuration](fastapi_configuration) and change a few lines of code to make
+this happen:
+
+```python {8,42-48,55-56}
+from typing import Union
+
+import uvicorn
+from fastapi import FastAPI, Security
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import AnyHttpUrl, BaseSettings, Field
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth.exceptions import InvalidAuth
+
+
+class Settings(BaseSettings):
+    SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
+    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
+    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+
+    class Config:
+        env_file = '.env'
+        env_file_encoding = 'utf-8'
+        case_sensitive = True
+
+settings = Settings()
+
+app = FastAPI(
+    swagger_ui_oauth2_redirect_url='/oauth2-redirect',
+    swagger_ui_init_oauth={
+        'usePkceWithAuthorizationCodeGrant': True,
+        'clientId': settings.OPENAPI_CLIENT_ID,
+    },
+)
+
+if settings.BACKEND_CORS_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
+
+
+async def check_if_valid_tenant(tid: str) -> str:
+    allowed_tenants = {
+        '9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6'
+    }
+    if tid in allowed_tenants:
+        return tid
+    raise InvalidAuth('Tenant not allowed')
+
+azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    scopes={
+        f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
+    },
+    validate_iss=True,
+    valid_tenants_callable=check_if_valid_tenant
+)
+
+
+@app.on_event('startup')
+async def load_config() -> None:
+    """
+    Load OpenID config on startup.
+    """
+    await azure_scheme.openid_config.load_config()
+
+
+@app.get("/", dependencies=[Security(azure_scheme)])
+async def root():
+    return {"message": "Hello World"}
+
+
+if __name__ == '__main__':
+    uvicorn.run('main:app', host='localhost', port=8000, reload=True)
+```
+
+We're first creating an `async function`, which takes a `tid` as an argument, and returns the tenant ID it's a valid tenant,
+or raise an `InvalidAuth()` exception if not.
+
+## More sophisticated callable
+If you want to cache these results in memory, you can do so by creating a more sophisticated callable:
+
+```python
+class TenantFetcher:
+    def __init__(self) -> None:
+        """
+        Example class for multi tenant apps, that caches issuers for an hour
+        """
+        self.allowed_tenants: set = {}
+        self._config_timestamp: Optional[datetime] = None
+
+    async def __call__(self, tid: str) -> str:
+        """
+        Check if memory cache needs to be updated or not, and then returns an issuer for a given tenant
+        :raises InvalidAuth when it's not a valid tenant
+        """
+        refresh_time = datetime.now() - timedelta(hours=1)
+        if not self._config_timestamp or self._config_timestamp < refresh_time:
+            self._config_timestamp = datetime.now()
+            # logic to update your allowed tenants
+            # (This example cache in memory for 1 hour)
+            self.allowed_tenants = {
+                'intility_tenant'
+            }
+        if tid in allowed_tenants:
+            return tid
+        raise InvalidAuth('Tenant not allowed')
+
+tenant_fetcher = TenantFetcher()
+
+azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
+    ...
+    validate_iss=True,
+    valid_tenants_callable=tenant_fetcher
+)
+```

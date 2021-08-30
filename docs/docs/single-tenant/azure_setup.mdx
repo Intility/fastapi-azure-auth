@@ -31,7 +31,7 @@ Press **Register**
 First we'll change the token version to version 2. In the left menu bar, click `Manifest` and find the line
 that says `accessTokenAcceptedVersion`. Change it's value from `null` to `2`.
 
-![3_manifest](../../static/img/single-tenant/2_manifest.png)
+![2_manifest](../../static/img/single-tenant/2_manifest.png)
 
 Press **Save**
 
@@ -132,3 +132,5 @@ Select the `user_impersonation` scope, and press **Add a permission**.
 Your view should now look something like this:
 
 ![9_api_permissions_finish](../../static/img/single-tenant/9_api_permissions_finish.png)
+
+That's it! Next step is to configure the FastAPI application.
