@@ -64,7 +64,12 @@ application exactly how it's described there, and then alter it to your needs la
 | [**GitHub**](https://github.com/snok/django-guid)
 
 
-## ⚡ TL;DR
+## ⚡ Setup
+
+This is a tl;dr intended to give you an idea of what this package does and how to use it. 
+For a more in-depth tutorial and settings reference you should read the 
+[documentation](https://intility.github.io/fastapi-azure-auth/).
+
 
 #### 1. Install this library:
 ```bash
