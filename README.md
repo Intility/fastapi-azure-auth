@@ -7,6 +7,10 @@
     <em>Azure AD Authentication for FastAPI apps made easy.</em>
 </p>
 <p align="center">
+    <img src="https://img.shields.io/badge/Single--tenant-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
+    <img src="https://img.shields.io/badge/Multi--tenant-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
+</p>
+<p align="center">
     <a href="https://python.org">
         <img src="https://img.shields.io/badge/python-v3.9+-blue.svg?logo=python&logoColor=white&label=python" alt="Python version">
     </a>
@@ -33,6 +37,7 @@
     <a href="https://pycqa.github.io/isort/">
         <img src="https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336" alt="isort">
     </a>
+
 </p>
 
 
@@ -47,13 +52,19 @@ This package enables our developers (and you 😊) to create features without wo
 
 Also, [we're hiring!](https://intility.no/en/career/)
 
-## ⚡️ Quick start
-### Azure
-Azure docs will be available when create-fastapi-app is developed. In the meantime 
-please use the [.NET](https://create.intility.app/dotnet/setup/authorization) documentation.
+## 📚 Resources
+
+The [documentation](https://intility.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure AD 
+and FastAPI for both single- and multi-tenant applications. It includes examples on how to lock down
+your APIs to certain scopes, tenants, roles etc. For first time users it's strongly advised to set up your 
+application exactly how it's described there, and then alter it to your needs later. 
+
+[**MIT License**](https://github.com/Intility/fastapi-azure-auth/blob/main/LICENSE)
+| [**Documentation**](https://intility.github.io/fastapi-azure-auth/)
+| [**GitHub**](https://github.com/snok/django-guid)
 
 
-### FastAPI
+## ⚡ TL;DR
 
 #### 1. Install this library:
 ```bash
@@ -71,133 +82,76 @@ app = FastAPI(
     ...
     swagger_ui_oauth2_redirect_url='/oauth2-redirect',
     swagger_ui_init_oauth={
-        'usePkceWithAuthorizationCodeGrant': True, 
-        'clientId': settings.OPENAPI_CLIENT_ID  # SPA app with grants to your app
+        'usePkceWithAuthorizationCodeGrant': True,
+        'clientId': settings.OPENAPI_CLIENT_ID,
     },
 )
 ```
 
 #### 3. Setup CORS
-Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`. See [main.py](main.py) 
-and the `BACKEND_CORS_ORIGINS` in [config.py](demoproj/core/config.py) 
+Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`. 
 
-#### 4. Configure the `AzureAuthorizationCodeBearer`
-You _can_ do this in `main.py`, but it's recommended to put it 
-in your `dependencies.py` file instead, as this will avoid circular imports later. 
-See the [demo project](demoproj/api/api_v1/endpoints/hello_world.py) and read the official documentation
-on [bigger applications](https://fastapi.tiangolo.com/tutorial/bigger-applications/)
+#### 4. Configure FastAPI-Azure-Auth
+Configure either your [`SingleTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/single_tenant)
+or [`MultiTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/multi_tenant).
 
 
 ```python
 # file: demoproj/api/dependencies.py
-from fastapi_azure_auth.auth import AzureAuthorizationCodeBearer
+from fastapi_azure_auth.auth import SingleTenantAzureAuthorizationCodeBearer
 
-azure_scheme = AzureAuthorizationCodeBearer(
-    app=app,
-    app_client_id=settings.APP_CLIENT_ID,  # Web app
+azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    tenant_id=settings.TENANT_ID,
     scopes={
-        f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User Impersonation',
-    },
+        f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
+    }
 )
 ```
+or for multi-tenant applications:
+```python
+# file: demoproj/api/dependencies.py
+from fastapi_azure_auth.auth import MultiTenantAzureAuthorizationCodeBearer
 
+azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    scopes={
+        f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
+    },    
+    validate_iss=False
+)
+```
+To validate the `iss`, configure an 
+[`iss_callable`](https://intility.github.io/fastapi-azure-auth/multi-tenant/accept_specific_tenants_only). 
 
 #### 5. Configure dependencies
 
-Set your `intility_scheme` as a dependency for your wanted views/routers:
-
+Add `azure_scheme` as a dependency for your views/routers, using either `Security()` or `Depends()`.
 ```python
 # file: main.py
 from demoproj.api.dependencies import azure_scheme
 
-app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Depends(azure_scheme)])
+app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Security(azure_scheme, scopes='user_impersonation')])
 ```
 
 #### 6. Load config on startup
 
-This is optional but recommended. This will ensure the app crashes if something is misconfigured on startup (instead of when someone tries to do a request), and 
-ensures the first request don't have to wait for the provider config to load.
+Optional but recommended. 
 
 ```python
 # file: main.py
-from fastapi_azure_auth.provider_config import provider_config
-
 @app.on_event('startup')
 async def load_config() -> None:
     """
-    Load config on startup.
+    Load OpenID config on startup.
     """
-    await provider_config.load_config()
+    await azure_scheme.openid_config.load_config()
 ```
 
 
-## ⚙️ Configuration
-For those using a non-Intility tenant, you also need to make changes to the `provider_config` to match
-your tenant ID. You can do this in your previously created `load_config()` function.
+## 📄 Example OpenAPI documentation
+Your OpenAPI documentation will get an `Authorize` button, which can be used to authenticate.
+![authorize](docs/static/img/single-and-multi-tenant/fastapi_1_authorize_button.png)
 
-```python
-# file: main.py
-from fastapi_azure_auth.provider_config import provider_config
-
-@app.on_event('startup')
-async def load_config() -> None:
-    provider_config.tenant_id = 'my-own-tenant-id'
-    await provider_config.load_config()
-```
-
-
-If you want, you can deny guest users to access your API by passing the `allow_guest_users=False`
-to `AzureAuthorizationCodeBearer`:
-
-```python
-# file: demoproj/api/dependencies.py
-azure_scheme = AzureAuthorizationCodeBearer(
-    ...
-    allow_guest_users=False
-)
-```
-
-## 💡 Nice to knows
-
-#### User object
-A `User` object is attached to the request state if the token is valid. Unparsed claims can be accessed at
-`request.state.user.claims`.
-
-```python
-# file: demoproj/api/api_v1/endpoints/hello_world.py
-from fastapi_azure_auth.user import User
-from fastapi import Request
-
-@router.get(...)
-async def world(request: Request) -> dict:
-    user: User = request.state.user
-    return {'user': user}
-```
-
-
-#### Permission checking
-You often want to check that a user has a role or using a specific scope. This 
-can be done by creating your own dependency, which depends on `azure_scheme`. The `azure_scheme` dependency
-returns a [`fastapi_azure_auth.user.User`](fastapi_azure_auth/user.py) object.
-
-Create your new dependency, which checks that the user has the correct role (in this case the 
-`AdminUser`-role):
-
-```python
-# file: demoproj/api/dependencies.py
-from fastapi import Depends
-from fastapi_azure_auth.auth import InvalidAuth
-from fastapi_azure_auth.user import User
-
-async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> None:
-    """
-    Validated that a user is in the `AdminUser` role in order to access the API.
-    Raises a 401 authentication error if not.
-    """
-    if 'AdminUser' not in user.roles:
-        raise InvalidAuth('User is not an AdminUser')
-```
-
-Add the new dependency on either your route or on the API, as we've 
-done in our [demo project](demoproj/api/api_v1/endpoints/hello_world.py).
-
+The user can select which scopes to authenticate with, based on your configuration.
+![scopes](docs/static/img/single-and-multi-tenant/fastapi_3_authenticate.png)
