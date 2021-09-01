@@ -7,10 +7,7 @@
     <em>Azure AD Authentication for FastAPI apps made easy.</em>
 </p>
 <p align="center">
-    <img src="https://img.shields.io/badge/Single--tenant-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
-    <img src="https://img.shields.io/badge/Multi--tenant-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
-</p>
-<p align="center">
+    <!-- Line 1 -->
     <a href="https://python.org">
         <img src="https://img.shields.io/badge/python-v3.9+-blue.svg?logo=python&logoColor=white&label=python" alt="Python version">
     </a>
@@ -20,8 +17,8 @@
     <a href="https://pypi.org/pypi/fastapi-azure-auth">
         <img src="https://img.shields.io/pypi/v/fastapi-azure-auth.svg?logo=pypi&logoColor=white&label=pypi" alt="Package version">
     </a>
-</p>
-<p align="center">
+    <!-- Line 2 -->
+    <br/>
     <a href="https://codecov.io/gh/intility/fastapi-azure-auth">
         <img src="https://codecov.io/gh/intility/fastapi-azure-auth/branch/main/graph/badge.svg?token=BTFGII4GYR" alt="Codecov">
     </a>
@@ -37,7 +34,14 @@
     <a href="https://pycqa.github.io/isort/">
         <img src="https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336" alt="isort">
     </a>
-
+    <!-- Line 3 -->
+    <br/>
+    <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/single-and-multi-tenant-apps">
+        <img src="https://img.shields.io/badge/Single--tenant-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
+    </a>
+    <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/single-and-multi-tenant-apps">
+        <img src="https://img.shields.io/badge/Multi--tenant-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
+    </a>
 </p>
 
 
