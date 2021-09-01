@@ -4,8 +4,8 @@ sidebar_position: 3
 ---
 
 By default, guest users in your tenant will be able to access your APIs. You can block this in code by checking
-the users `tid` is equal to yours, or preferably by configuring Azure AD. If you're using Azure AD, the user
-will be denied to sign in, instead of getting a 403 when he's fetches his token.
+the users `tid` is equal to yours, or preferably by configuring Azure AD. If you're using Azure AD to limit
+guest user access, the user will be denied access on sign in, instead of getting a 403 when using the API.
 
 Go to **all** your [Enterprise Applications](https://portal.azure.com/#blade/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade/AllApps/menuId/)
 and do the following steps. You can find your Enterprise Application either by searching on the Client ID in the
