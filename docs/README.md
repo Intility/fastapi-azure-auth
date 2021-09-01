@@ -24,10 +24,15 @@ $ yarn build
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
+It's important that you build the documentation using `yarn build` **before pushing to `main`**. After building, 
+check that everything works, such as syntax highlighting etc. 
+
+If there are issues, please try
+* to run `npm run clear` or `yarn clear`
+* delete `package-lock.json` and re-.install packages
+
+
 ### Deployment
 
-```
-$ GIT_USER=<Your GitHub username> USE_SSH=true yarn deploy
-```
-
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+GitHub actions takes care of deployment. Any changes to the `docs` folder on the `main` branch will trigger
+the pipeline. You can see the documentation live at https://intility.github.io/fastapi-azure-auth/
