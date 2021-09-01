@@ -49,7 +49,7 @@ You need to run the application on the configured port in Azure AD for the next 
 First, add your settings to the application. We'll need these later. The way I've set it up will look for a `.env`-file
 to populate your settings, but you can also just set a `default` value directly.
 
-```python {1,5,8-19,21} title="main.py"
+```python {1,5,8-18,20} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -58,7 +58,6 @@ from pydantic import AnyHttpUrl, BaseSettings, Field
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
@@ -85,9 +84,9 @@ if __name__ == '__main__':
 
 ## Configure `CORS`
 
-Now, let's configure our `CORS`. Without them your OpenAPI docs won't work as expected:
+Now, let's configure our `CORS`. Without `CORS` your OpenAPI docs won't work as expected:
 
-```python {5,26-33} title="main.py"
+```python {5,25-32} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -97,7 +96,6 @@ from pydantic import AnyHttpUrl, BaseSettings, Field
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
@@ -135,7 +133,7 @@ if __name__ == '__main__':
 ## Configure OpenAPI Documentation
 In order for our OpenAPI documentation to work, we have to configure a few settings directly in the `FastAPI` application.
 
-```python {24-30} title="main.py"
+```python {23-29} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -145,7 +143,6 @@ from pydantic import AnyHttpUrl, BaseSettings, Field
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
@@ -199,7 +196,7 @@ Now, the fun part begins! 🚀
 Import the `SingleTenantAzureAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it:
 
 
-```python {7,43-49} title="main.py"
+```python {7,42-48} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -211,7 +208,6 @@ from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
@@ -270,7 +266,7 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {52-57} title="main.py"
+```python {51-56} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -282,7 +278,6 @@ from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
@@ -346,7 +341,7 @@ views based on the scope.
 
 Let's do that:
 
-```python {4,60} title="main.py"
+```python {4,59} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -358,7 +353,6 @@ from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
 
 
 class Settings(BaseSettings):
-    API_V1_STR: str = '/api/v1'
     SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
@@ -456,8 +450,11 @@ You're now safe and secure! Good luck! 🔒🚀
 <div style={{textAlign: 'center'}}>
   <h4>If you like this project, please leave us a star ❤ ️️</h4>
 
-<GitHubButton href="https://github.com/intility/fastapi-azure-auth"
-              data-color-scheme="no-preference: dark_dimmed; light: dark_dimmed; dark: dark_dimmed;"
-              data-icon="octicon-star" data-size="large" data-show-count="true"
-              aria-label="Star intility/fastapi-azure-auth on GitHub">Star</GitHubButton>
+  <GitHubButton
+    href="https://github.com/intility/fastapi-azure-auth"
+    data-color-scheme="no-preference: dark_dimmed; light: dark_dimmed; dark: dark_dimmed;"
+    data-icon="octicon-star" data-size="large" data-show-count="true"
+    aria-label="Star intility/fastapi-azure-auth on GitHub">
+    Star
+  </GitHubButton>
 </div>
