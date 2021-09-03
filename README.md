@@ -1,5 +1,6 @@
 <h1 align="center">
-  <img src="https://avatars.githubusercontent.com/u/35199565" width="124px"/><br/>
+  <img margin="0 10px 0 0" src="https://avatars.githubusercontent.com/u/35199565" width="124px"/>
+  <img margin="0 10px 0 0" src="https://raw.githubusercontent.com/Intility/fastapi-azure-auth/main/docs/static/img/global/fastad.png" width="124px"/><br/>
   FastAPI-Azure-Auth
 </h1>
 
