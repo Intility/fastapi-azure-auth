@@ -1,7 +1,7 @@
 import base64
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 
 from aiohttp import ClientSession
 from cryptography.hazmat._types import _PUBLIC_KEY_TYPES as KeyTypes
@@ -92,7 +92,7 @@ class OpenIdConfig:
         self.end_session_endpoint = openid_cfg['end_session_endpoint']
         self.issuer = openid_cfg['issuer']
 
-    def _load_keys(self, keys: list[dict]) -> None:
+    def _load_keys(self, keys: list[dict[str, Any]]) -> None:
         """
         Create certificates based on signing keys and store them
         """
