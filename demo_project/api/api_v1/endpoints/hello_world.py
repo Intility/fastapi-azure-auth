@@ -1,3 +1,5 @@
+from typing import Union
+
 from demo_project.api.dependencies import validate_is_admin_user
 from demo_project.schemas.hello_world import HelloWorldResponse
 from fastapi import APIRouter, Depends, Request
@@ -15,7 +17,7 @@ router = APIRouter()
     operation_id='helloWorld',
     dependencies=[Depends(validate_is_admin_user)],
 )
-async def world(request: Request) -> dict:
+async def world(request: Request) -> dict[str, Union[str, User]]:
     """
     Wonder who we say hello to?
     """

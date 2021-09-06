@@ -2,7 +2,7 @@ import asyncio
 import inspect
 import logging
 from collections.abc import Callable
-from typing import Any, Awaitable, Literal, Optional
+from typing import Any, Literal, Optional
 
 from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
 from fastapi.security.base import SecurityBase
@@ -25,7 +25,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         scopes: Optional[dict[str, str]] = None,
         multi_tenant: bool = False,
         validate_iss: bool = True,
-        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
+        iss_callable: Optional[Callable[..., Any]] = None,
         token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
@@ -90,7 +90,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             app_id=app_client_id if openid_config_use_app_id else None,
         )
         self.validate_iss: bool = validate_iss
-        self.iss_callable: Optional[Callable] = iss_callable
+        self.iss_callable: Optional[Callable[..., Any]] = iss_callable
         self.token_version: int = token_version
 
         # Define settings for `OAuth2AuthorizationCodeBearer` and OpenAPI Authorization
@@ -253,7 +253,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name = 'Azure AD - PKCE, Single-tenant'
+        self.scheme_name: str = 'Azure AD - PKCE, Single-tenant'
 
 
 class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
@@ -262,7 +262,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         app_client_id: str,
         scopes: Optional[dict[str, str]] = None,
         validate_iss: bool = True,
-        iss_callable: Callable = None,
+        iss_callable: Optional[Callable[..., Any]] = None,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
@@ -309,4 +309,4 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name = 'Azure AD - PKCE, Single-tenant'
+        self.scheme_name: str = 'Azure AD - PKCE, Single-tenant'
