@@ -309,4 +309,4 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name: str = 'Azure AD - PKCE, Single-tenant'
+        self.scheme_name: str = 'Azure AD - PKCE, Multi-tenant'
