@@ -65,7 +65,7 @@ azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
         f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
     },
     validate_iss=True,
-    valid_tenants_callable=check_if_valid_tenant
+    iss_callable=check_if_valid_tenant
 )
 
 
