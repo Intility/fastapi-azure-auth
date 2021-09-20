@@ -441,7 +441,7 @@ As discussed earlier, there is a `scope` parameter to the `Security()` version o
 your API to only be accessible by those with certain scopes, you can simply pass it into the dependency.
 
 ```python
-@app.get("/", dependencies=[Security(azure_scheme, scopes='wrong_scope')])
+@app.get("/", dependencies=[Security(azure_scheme, scopes=['wrong_scope'])])
 ```
 If you do this and try out your API again, you'll see that you're denied.
 
