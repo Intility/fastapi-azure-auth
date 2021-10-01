@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 from typing import Any, Optional
 
 from aiohttp import ClientSession
-from cryptography.hazmat._types import _PUBLIC_KEY_TYPES as KeyTypes
 from cryptography.hazmat.backends.openssl.backend import backend
+from cryptography.hazmat.primitives.asymmetric.types import PUBLIC_KEY_TYPES as KeyTypes
 from cryptography.x509 import load_der_x509_certificate
 from fastapi import HTTPException, status
 
