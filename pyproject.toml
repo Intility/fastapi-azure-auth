@@ -28,7 +28,8 @@ classifiers = [
 python = "^3.9"
 fastapi = "^0.68.0"
 aiohttp = "^3"
-python-jose = {extras = ["cryptography"], version = "^35.0.0"}
+cryptography = "^35.0.0"
+python-jose = "^3.3.0"
 
 
 [tool.poetry.dev-dependencies]
