@@ -21,9 +21,10 @@ Select a fitting name for your project; Azure will present the name to the user 
 should head over to the [multi-tenant documentation](../multi-tenant/azure_setup.mdx)
 * `Redirect URI`: Choose `Web` and `http://localhost:8000` as a value
 
+Press **Register**
+
 ![1_application_registration](../../static/img/single-tenant/1_application_registration.png)
 
-Press **Register**
 
 
 ### Step 2 - Change token version to `v2`
@@ -31,37 +32,37 @@ Press **Register**
 First we'll change the token version to version 2. In the left menu bar, click `Manifest` and find the line
 that says `accessTokenAcceptedVersion`. Change its value from `null` to `2`.
 
-![2_manifest](../../static/img/single-tenant/2_manifest.png)
-
 Press **Save**
 
 (This change can take some time to happen, which is why we do this first.)
+
+![2_manifest](../../static/img/single-tenant/2_manifest.png)
 
 
 ### Step 3 - Note down your application IDs
 Go back to the `Overview`, found in the left menu.
 
-![3_overview](../../static/img/single-tenant/3_overview.png)
-
-
 Copy the `Application (Client) ID` and `Directory (tenant) ID`, we'll need these for later. I like to use `.env` files to
 store variables like these:
 
-```bash title=".env"
-APP_CLIENT_ID=
+```bash title=".env" {1,2}
 TENANT_ID=
+APP_CLIENT_ID=
+OPENAPI_CLIENT_ID=
 ````
+
+![3_overview](../../static/img/single-tenant/3_overview.png)
+
 
 ### Step 4 - Add an application scope
 
 1. Go to **Expose an API** in the left menu bar under your app registration.
 2. Press **+ Add a scope**
-3. Press **Save and continue**
+3. You'll be prompted to set an Application ID URI, leave the suggested one and press **Save and continue**
 
 ![4_add_scope](../../static/img/single-tenant/4_add_scope.png)
 
 Add a scope named `user_impersonation` that can be consented by `Admins and users`.
-![5_add_scope_props](../../static/img/single-tenant/5_add_scope_props.png)
 
 You can use the following descriptions:
 
@@ -72,6 +73,10 @@ Allows the app to access the API as the user.
 Access API as you
 Allows the app to access the API as you.
 ```
+
+
+![5_add_scope_props](../../static/img/single-tenant/5_add_scope_props.png)
+
 
 ## OpenAPI Documentation
 Our OpenAPI documentation will use the `Authorization Code Grant Flow, with Proof Key for Code Exchange` flow.
@@ -93,32 +98,34 @@ Use the same name, but with `- OpenAPI` appended to it.
 * `Supported account types`: `Single tenant`
 * `Redirect URI`: Choose `Single-Page Application (SPA)` and `http://localhost:8000/oauth2-redirect` as a value
 
+Press **Register**
+
 ![6_application_registration_openapi](../../static/img/single-tenant/6_application_registration_openapi.png)
 
-Press **Register**
 
 ### Step 2 - Change token version to `v2`
 
 Like last time, we'll change the token version to version 2. In the left menu bar, click `Manifest` and find the line
 that says `accessTokenAcceptedVersion`. Change its value from `null` to `2`.
 
+Press **Save**
+
 ![3_manifest](../../static/img/single-tenant/2_manifest.png)
 
-Press **Save**
 
 ### Step 3 - Note down your application IDs
 Go back to the `Overview`, found in the left menu.
 
-![7_overview_openapi](../../static/img/single-tenant/7_overview_openapi.png)
-
-
 Copy the `Application (Client) ID` and save it as your `OPENAPI_CLIENT_ID`:
 
 ```bash title=".env" {3}
-APP_CLIENT_ID=
 TENANT_ID=
+APP_CLIENT_ID=
 OPENAPI_CLIENT_ID=
 ````
+
+![7_overview_openapi](../../static/img/single-tenant/7_overview_openapi.png)
+
 
 ### Step 4 - Allow OpenAPI to talk to the backend
 
