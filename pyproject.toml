@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-azure-auth"
-version = "3.0.3"  # Remember to change in __init__.py as well
+version = "3.1.0"  # Remember to change in __init__.py as well
 description = "Easy and secure implementation of Azure AD for your FastAPI APIs"
 authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
 readme = "README.md"
@@ -8,8 +8,23 @@ homepage = "https://github.com/intility/fastapi-azure-auth"
 repository = "https://github.com/intility/fastapi-azure-auth"
 documentation = "https://github.com/intility/fastapi-azure-auth"
 keywords = [
-    'async', 'fastapi', 'azuread', 'ad', 'azure', 'azure ad', 'starlette', 'authentication'
+    'ad',
+    'async',
+    'asyncio',
+    'authentication',
+    'azure',
+    'azure ad',
+    'azuread',
+    'fastapi',
+    'multi tenant',
+    'oauth2',
+    'oidc',
+    'security',
+    'single tenant',
+    'starlette',
+    'trio',
 ]
+
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Web Environment',
@@ -27,9 +42,9 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = ">0.68.0"
-aiohttp = "^3"
 cryptography = "^35.0.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+httpx = ">0.18.2"
 
 
 [tool.poetry.dev-dependencies]
@@ -40,14 +55,15 @@ pytest-cov = "^2.11.1"
 pytest-asyncio = "^0.14.0"
 pytest-mock = "^3.5.1"
 requests-mock = "^1.8.0"
-aioresponses = "^0.7.2"
 pytest-socket = "^0.4.0"
 pytest-dotenv = "^0.5.2"
 pytest-aiohttp = "^0.3.0"
-httpx = "^0.18.2"
 uvicorn = "^0.14.0"
 pytest-freezegun = "^0.4.2"
 pytest-cases = "^3.6.3"
+anyio = "^3.3.4"
+respx = "^0.18.2"
+trio = "^0.19.0"
 
 [tool.black]
 line-length = 120
@@ -70,7 +86,7 @@ sections = [
     'STDLIB',
     'THIRDPARTY',
     'FIRSTPARTY',
-    'LOCALFOLDER'
+    'LOCALFOLDER',
 ]
 
 
