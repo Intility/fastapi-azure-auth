@@ -3,8 +3,6 @@ name: "CodeQL"
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   schedule:
     - cron: '0 07 * * 1'
 
@@ -32,8 +30,16 @@ jobs:
           virtualenvs-create: true
           virtualenvs-in-project: true
 
+      - name: Load cached venv
+        uses: actions/cache@v2
+        id: cache-venv
+        with:
+          path: .venv
+          key: ${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}-0
+
       - name: Install dependencies
-        run: poetry install
+        run: poetry install --no-interaction --no-root
+        if: steps.cache-venv.outputs.cache-hit != 'true'
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v1
