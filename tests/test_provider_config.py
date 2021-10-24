@@ -9,7 +9,7 @@ from tests.utils import build_access_token, build_openid_keys, openid_configurat
 from fastapi_azure_auth.openid_config import OpenIdConfig
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_http_error_old_config_found(respx_mock, mock_config_timestamp):
     azure_scheme.openid_config._config_timestamp = datetime.now() - timedelta(weeks=1)
     respx_mock.get('https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration').respond(
@@ -22,7 +22,7 @@ async def test_http_error_old_config_found(respx_mock, mock_config_timestamp):
     assert response.json() == {'detail': 'Connection to Azure AD is down. Unable to fetch provider configuration'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_http_error_no_config_cause_crash_on_startup(respx_mock):
     respx_mock.get(
         'https://login.microsoftonline.com/intility_tenant_id/v2.0/.well-known/openid-configuration'
@@ -34,7 +34,7 @@ async def test_http_error_no_config_cause_crash_on_startup(respx_mock):
             await ac.get('api/v1/hello')
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_app_id_provided(respx_mock):
     openid_config = OpenIdConfig('intility_tenant', multi_tenant=False, token_version=2, app_id='1234567890')
     respx_mock.get(

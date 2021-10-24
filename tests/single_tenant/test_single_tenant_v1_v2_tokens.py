@@ -18,7 +18,7 @@ def current_version(current_cases) -> int:
     return current_cases['single_tenant_app']['token_version'].params['version']
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freezer, current_cases):
     issued_at = int(time.time())
     expires = issued_at + 3600
@@ -107,7 +107,7 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freeze
         }
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -117,7 +117,7 @@ async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_k
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -129,7 +129,7 @@ async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys_v1_v
     assert response.json() == {'detail': 'User is not an AdminUser'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -141,7 +141,7 @@ async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys_v1_v
     assert response.json() == {'detail': 'Token contains invalid claims'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -153,7 +153,7 @@ async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_val
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -165,7 +165,7 @@ async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys_
     assert response.json() == {'detail': 'Required scope missing'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -177,7 +177,7 @@ async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_vali
     assert response.json() == {'detail': 'Required scope missing'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -189,7 +189,7 @@ async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_a
     assert response.json() == {'detail': 'Token contains invalid formatted scopes'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_expired_token(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with AsyncClient(
@@ -201,7 +201,7 @@ async def test_expired_token(single_tenant_app, mock_openid_and_keys_v1_v2, curr
     assert response.json() == {'detail': 'Token signature has expired'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_evil_token(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
     """Kid matches what we expect, but it's not signed correctly"""
     test_version = current_version(current_cases)
@@ -214,7 +214,7 @@ async def test_evil_token(single_tenant_app, mock_openid_and_keys_v1_v2, current
     assert response.json() == {'detail': 'Unable to validate token'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_malformed_token(single_tenant_app, mock_openid_and_keys_v1_v2):
     """A short token, that only has a broken header"""
     async with AsyncClient(
@@ -224,7 +224,7 @@ async def test_malformed_token(single_tenant_app, mock_openid_and_keys_v1_v2):
     assert response.json() == {'detail': 'Invalid token format'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_only_header(single_tenant_app, mock_openid_and_keys_v1_v2):
     """Only header token, with a matching kid, so the rest of the logic will be called, but can't be validated"""
     async with AsyncClient(
@@ -239,7 +239,7 @@ async def test_only_header(single_tenant_app, mock_openid_and_keys_v1_v2):
     assert response.json() == {'detail': 'Invalid token format'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_exception_raised(single_tenant_app, mock_openid_and_keys_v1_v2, mocker, current_cases):
     test_version = current_version(current_cases)
     mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
@@ -252,7 +252,7 @@ async def test_exception_raised(single_tenant_app, mock_openid_and_keys_v1_v2, m
     assert response.json() == {'detail': 'Unable to process token'}
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty_v1_v2, freezer, current_cases):
     """
     * Do a successful request.
