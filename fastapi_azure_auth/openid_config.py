@@ -3,11 +3,11 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
-from aiohttp import ClientSession
 from cryptography.hazmat.backends.openssl.backend import backend
 from cryptography.hazmat.primitives.asymmetric.types import PUBLIC_KEY_TYPES as KeyTypes
 from cryptography.x509 import load_der_x509_certificate
 from fastapi import HTTPException, status
+from httpx import AsyncClient
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -29,7 +29,6 @@ class OpenIdConfig:
         self.authorization_endpoint: str
         self.signing_keys: dict[str, KeyTypes]
         self.token_endpoint: str
-        self.end_session_endpoint: str
         self.issuer: str
 
     async def load_config(self) -> None:
@@ -57,7 +56,6 @@ class OpenIdConfig:
             log.info('fastapi-azure-auth loaded settings from Azure AD.')
             log.info('authorization endpoint: %s', self.authorization_endpoint)
             log.info('token endpoint:         %s', self.token_endpoint)
-            log.info('end session endpoint:   %s', self.end_session_endpoint)
             log.info('issuer:                 %s', self.issuer)
 
     async def _load_openid_config(self) -> None:
@@ -73,24 +71,21 @@ class OpenIdConfig:
         if self.app_id:
             config_url += f'?appid={self.app_id}'
 
-        log.info('Trying to get OpenID Connect config from %s', config_url)
-        async with ClientSession() as session:
-            # Fetch openid config
-            async with session.get(config_url, timeout=10) as openid_response:
-                openid_response.raise_for_status()
-                openid_cfg = await openid_response.json()
-                jwks_uri = openid_cfg['jwks_uri']
-                # Fetch keys
-                log.info('Fetching jwks from %s', jwks_uri)
-                async with session.get(jwks_uri, timeout=10) as jwks_response:
-                    jwks_response.raise_for_status()
-                    keys = await jwks_response.json()
-                    self._load_keys(keys['keys'])
+        async with AsyncClient(timeout=10) as client:
+            log.info('Fetching OpenID Connect config from %s', config_url)
+            openid_response = await client.get(config_url)
+            openid_response.raise_for_status()
+            openid_cfg = openid_response.json()
 
-        self.authorization_endpoint = openid_cfg['authorization_endpoint']
-        self.token_endpoint = openid_cfg['token_endpoint']
-        self.end_session_endpoint = openid_cfg['end_session_endpoint']
-        self.issuer = openid_cfg['issuer']
+            self.authorization_endpoint = openid_cfg['authorization_endpoint']
+            self.token_endpoint = openid_cfg['token_endpoint']
+            self.issuer = openid_cfg['issuer']
+
+            jwks_uri = openid_cfg['jwks_uri']
+            log.info('Fetching jwks from %s', jwks_uri)
+            jwks_response = await client.get(jwks_uri)
+            jwks_response.raise_for_status()
+            self._load_keys(jwks_response.json()['keys'])
 
     def _load_keys(self, keys: list[dict[str, Any]]) -> None:
         """

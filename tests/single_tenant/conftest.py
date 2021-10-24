@@ -1,5 +1,5 @@
+import httpx
 import pytest
-from aioresponses import aioresponses
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
@@ -50,62 +50,43 @@ def single_tenant_app(token_version):
 
 @pytest.fixture
 @parametrize_with_cases('token_version', cases=token_version)
-def mock_openid_v1_v2(token_version):
-    with aioresponses() as mock:
-        mock.get(
-            openid_config_url(version=token_version),
-            payload=openid_configuration(version=token_version),
-        )
-        yield mock
+def mock_openid_v1_v2(token_version, respx_mock):
+    respx_mock.get(openid_config_url(version=token_version)).respond(json=openid_configuration(version=token_version))
+    yield
 
 
 @pytest.fixture
 @parametrize_with_cases('token_version', cases=token_version)
-def mock_openid_and_keys_v1_v2(mock_openid_v1_v2, token_version):
-    mock_openid_v1_v2.get(
-        keys_url(version=token_version),
-        payload=build_openid_keys(),
-    )
-    yield mock_openid_v1_v2
+def mock_openid_and_keys_v1_v2(token_version, respx_mock, mock_openid_v1_v2):
+    respx_mock.get(keys_url(version=token_version)).respond(json=build_openid_keys())
+    yield
 
 
 @pytest.fixture
 @parametrize_with_cases('token_version', cases=token_version)
-def mock_openid_and_empty_keys_v1_v2(mock_openid_v1_v2, token_version):
-    mock_openid_v1_v2.get(
-        keys_url(version=token_version),
-        payload=build_openid_keys(empty_keys=True),
-    )
-    yield mock_openid_v1_v2
+def mock_openid_and_empty_keys_v1_v2(token_version, respx_mock, mock_openid_v1_v2):
+    respx_mock.get(keys_url(version=token_version)).respond(json=build_openid_keys(empty_keys=True))
+    yield
 
 
 @pytest.fixture
 @parametrize_with_cases('token_version', cases=token_version)
-def mock_openid_ok_then_empty_v1_v2(mock_openid_v1_v2, token_version):
-    mock_openid_v1_v2.get(
-        keys_url(version=token_version),
-        payload=build_openid_keys(),
-    )
-    mock_openid_v1_v2.get(
-        keys_url(version=token_version),
-        payload=build_openid_keys(empty_keys=True),
-    )
-    mock_openid_v1_v2.get(
-        openid_config_url(version=token_version),
-        payload=openid_configuration(version=token_version),
-    )
-    mock_openid_v1_v2.get(
-        openid_config_url(version=token_version),
-        payload=openid_configuration(version=token_version),
-    )
-    yield mock_openid_v1_v2
+def mock_openid_ok_then_empty_v1_v2(token_version, respx_mock, mock_openid_v1_v2):
+    keys_route = respx_mock.get(keys_url(version=token_version))
+    keys_route.side_effect = [
+        httpx.Response(json=build_openid_keys(), status_code=200),
+        httpx.Response(json=build_openid_keys(empty_keys=True), status_code=200),
+    ]
+    openid_route = respx_mock.get(openid_config_url(version=token_version))
+    openid_route.side_effect = [
+        httpx.Response(json=openid_configuration(version=token_version), status_code=200),
+        httpx.Response(json=openid_configuration(version=token_version), status_code=200),
+    ]
+    yield
 
 
 @pytest.fixture
 @parametrize_with_cases('token_version', cases=token_version)
-def mock_openid_and_no_valid_keys_v1_v2(mock_openid_v1_v2, token_version):
-    mock_openid_v1_v2.get(
-        keys_url(version=token_version),
-        payload=build_openid_keys(no_valid_keys=True),
-    )
-    yield mock_openid_v1_v2
+def mock_openid_and_no_valid_keys_v1_v2(token_version, respx_mock, mock_openid_v1_v2):
+    respx_mock.get(keys_url(version=token_version)).respond(json=build_openid_keys(no_valid_keys=True))
+    yield
