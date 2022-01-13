@@ -21,6 +21,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
     def __init__(
         self,
         app_client_id: str,
+        auto_error: Optional[bool] = True,
         tenant_id: Optional[str] = None,
         scopes: Optional[dict[str, str]] = None,
         multi_tenant: bool = False,
@@ -37,6 +38,8 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
 
         :param app_client_id: str
             Your applications client ID. This will be the `Web app` in Azure AD
+        :param auto_error: Optional[bool] = True
+            Whether to throw exceptions or return None on __call__.
         :param tenant_id: str
             Your Azure tenant ID, only needed for single tenant apps
         :param scopes: Optional[dict[str, str]
@@ -72,6 +75,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             Override OpenAPI description
 
         """
+        self.auto_error = auto_error
         # Validate settings, making sure there's no misconfigured dependencies out there
         if multi_tenant:
             if validate_iss and not callable(iss_callable):
@@ -119,7 +123,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         )
         self.model = self.oauth.model
 
-    async def __call__(self, request: Request, security_scopes: SecurityScopes) -> User:
+    async def __call__(self, request: Request, security_scopes: SecurityScopes) -> Optional[User]:
         """
         Extends call to also validate the token.
         """
@@ -130,6 +134,8 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             claims: dict[str, Any] = jwt.get_unverified_claims(token=access_token) or {}
         except Exception as error:
             log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
+            if not self.auto_error:
+                return None
             raise InvalidAuth(detail='Invalid token format')
 
         for scope in security_scopes.scopes:
@@ -137,8 +143,12 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             if isinstance(token_scope_string, str):
                 token_scopes = token_scope_string.split(' ')
                 if scope not in token_scopes:
+                    if not self.auto_error:
+                        return None
                     raise InvalidAuth('Required scope missing')
             else:
+                if not self.auto_error:
+                    return None
                 raise InvalidAuth('Token contains invalid formatted scopes')
 
         # Load new config if old
@@ -188,18 +198,28 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 return user
         except JWTClaimsError as error:
             log.info('Token contains invalid claims. %s', error)
+            if not self.auto_error:
+                return None
             raise InvalidAuth(detail='Token contains invalid claims')
         except ExpiredSignatureError as error:
             log.info('Token signature has expired. %s', error)
+            if not self.auto_error:
+                return None
             raise InvalidAuth(detail='Token signature has expired')
         except JWTError as error:
             log.warning('Invalid token. Error: %s', error, exc_info=True)
+            if not self.auto_error:
+                return None
             raise InvalidAuth(detail='Unable to validate token')
         except Exception as error:
             # Extra failsafe in case of a bug in a future version of the jwt library
             log.exception('Unable to process jwt token. Uncaught error: %s', error)
+            if not self.auto_error:
+                return None
             raise InvalidAuth(detail='Unable to process token')
         log.warning('Unable to verify token. No signing keys found')
+        if not self.auto_error:
+            return None
         raise InvalidAuth(detail='Unable to verify token, no signing keys found')
 
 
@@ -208,6 +228,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         self,
         app_client_id: str,
         tenant_id: str,
+        auto_error: Optional[bool] = True,
         scopes: Optional[dict[str, str]] = None,
         token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
@@ -222,6 +243,8 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             Your applications client ID. This will be the `Web app` in Azure AD
         :param tenant_id: str
             Your Azure tenant ID, only needed for single tenant apps
+        :param auto_error: Optional[bool] = True
+            Whether to throw exceptions or return None on __call__.
         :param scopes: Optional[dict[str, str]
             Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
             Example:
@@ -245,6 +268,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         """
         super().__init__(
             app_client_id=app_client_id,
+            auto_error=auto_error,
             tenant_id=tenant_id,
             scopes=scopes,
             token_version=token_version,
@@ -260,6 +284,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
     def __init__(
         self,
         app_client_id: str,
+        auto_error: Optional[bool] = True,
         scopes: Optional[dict[str, str]] = None,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[..., Any]] = None,
@@ -273,6 +298,8 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
 
         :param app_client_id: str
             Your applications client ID. This will be the `Web app` in Azure AD
+        :param auto_error: Optional[bool] = True
+            Whether to throw exceptions or return None on __call__.
         :param scopes: Optional[dict[str, str]
             Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
             Example:
@@ -300,6 +327,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         """
         super().__init__(
             app_client_id=app_client_id,
+            auto_error=auto_error,
             scopes=scopes,
             validate_iss=validate_iss,
             iss_callable=iss_callable,
