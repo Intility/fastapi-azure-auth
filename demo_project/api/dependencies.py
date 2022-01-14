@@ -1,9 +1,10 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Union
 
 from demo_project.core.config import settings
 from fastapi import Depends
+from fastapi.security.api_key import APIKeyHeader
 
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
 from fastapi_azure_auth.exceptions import InvalidAuth
@@ -56,3 +57,30 @@ class IssuerFetcher:
         except Exception as error:
             log.exception('`iss` not found for `tid` %s. Error %s', tid, error)
             raise InvalidAuth('You must be an Intility customer to access this resource')
+
+
+azure_scheme_auto_error_false = SingleTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    scopes={
+        f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**',
+    },
+    tenant_id=settings.TENANT_ID,
+    auto_error=False,
+)
+
+
+api_key_auth_auto_error_false = APIKeyHeader(name='TEST-API-KEY', auto_error=False)
+
+
+async def multi_auth(
+    azure_auth: Optional[User] = Depends(azure_scheme_auto_error_false),
+    api_key: Optional[str] = Depends(api_key_auth_auto_error_false),
+) -> Union[User, str]:
+    """
+    Example implementation.
+    """
+    if azure_auth:
+        return azure_auth
+    if api_key == 'JonasIsCool':
+        return api_key
+    raise InvalidAuth('You must either provide a valid bearer token or API key')

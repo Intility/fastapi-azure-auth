@@ -2,7 +2,7 @@ import logging
 from argparse import ArgumentParser
 
 import uvicorn
-from demo_project.api.api_v1.api import api_router
+from demo_project.api.api_v1.api import api_router_azure_auth, api_router_multi_auth
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from fastapi import FastAPI, Security
@@ -44,9 +44,14 @@ async def load_config() -> None:
 
 
 app.include_router(
-    api_router,
+    api_router_azure_auth,
     prefix=settings.API_V1_STR,
     dependencies=[Security(azure_scheme, scopes=['user_impersonation'])],
+)
+app.include_router(
+    api_router_multi_auth,
+    prefix=settings.API_V1_STR,
+    # Dependencies specified on the API itself
 )
 
 

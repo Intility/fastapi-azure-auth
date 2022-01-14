@@ -26,7 +26,22 @@ openapi_schema = {
                 },
                 'security': [{'Azure AD - PKCE, Single-tenant': []}],
             }
-        }
+        },
+        '/api/v1/hello-multi-auth': {
+            'get': {
+                'tags': ['hello'],
+                'summary': 'Say hello with an API key',
+                'description': 'Wonder how this auth is done?',
+                'operationId': 'helloWorldApiKey',
+                'responses': {
+                    '200': {
+                        'description': 'Successful Response',
+                        'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
+                    }
+                },
+                'security': [{'Azure AD - PKCE, Single-tenant': []}, {'APIKeyHeader': []}],
+            }
+        },
     },
     'components': {
         'schemas': {
@@ -35,12 +50,21 @@ openapi_schema = {
                 'required': ['hello', 'user'],
                 'type': 'object',
                 'properties': {
-                    'hello': {'title': 'Hello', 'type': 'string', 'description': "What we're saying hello to"},
+                    'hello': {'title': 'Hello', 'type': 'string', 'description': 'What we\'re saying hello to'},
                     'user': {
                         'title': 'User',
                         'allOf': [{'$ref': '#/components/schemas/User'}],
                         'description': 'The user object',
                     },
+                },
+            },
+            'TokenType': {
+                'title': 'TokenType',
+                'required': ['api_key', 'azure_auth'],
+                'type': 'object',
+                'properties': {
+                    'api_key': {'title': 'Api Key', 'type': 'boolean', 'description': 'API key was used'},
+                    'azure_auth': {'title': 'Azure Auth', 'type': 'boolean', 'description': 'Azure auth was used'},
                 },
             },
             'User': {
@@ -81,7 +105,8 @@ openapi_schema = {
                         'tokenUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/token',
                     }
                 },
-            }
+            },
+            'APIKeyHeader': {'type': 'apiKey', 'in': 'header', 'name': 'TEST-API-KEY'},
         },
     },
 }
