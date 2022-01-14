@@ -342,7 +342,7 @@ http2 = ["h2 (>=3,<5)"]
 
 [[package]]
 name = "identify"
-version = "2.4.3"
+version = "2.4.4"
 description = "File identification library for Python"
 category = "dev"
 optional = false
@@ -736,14 +736,14 @@ test = ["fixtures", "mock", "purl", "pytest", "sphinx", "testrepository (>=0.0.1
 
 [[package]]
 name = "respx"
-version = "0.18.2"
+version = "0.19.1"
 description = "A utility for mocking out the Python HTTPX and HTTP Core libraries."
 category = "dev"
 optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-httpx = ">=0.20.0"
+httpx = ">=0.21.0"
 
 [[package]]
 name = "rfc3986"
@@ -911,7 +911,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "5c7367364a15fd2a3c805c77d62cb4e5318d3c9b5285c2168365411b81e43e74"
+content-hash = "d7f733d66169138e58a6793bb404ee92155a8c90de1ae460b1913d59e149d383"
 
 [metadata.files]
 aiohttp = [
@@ -1277,8 +1277,8 @@ httpx = [
     {file = "httpx-0.21.3.tar.gz", hash = "sha256:7a3eb67ef0b8abbd6d9402248ef2f84a76080fa1c839f8662e6eb385640e445a"},
 ]
 identify = [
-    {file = "identify-2.4.3-py2.py3-none-any.whl", hash = "sha256:ac9c919c8ac5b90d03f8e1bce6dedcbd8a3b2a59c46737c04ed852e2d307af29"},
-    {file = "identify-2.4.3.tar.gz", hash = "sha256:8d80d877441073e7222ff272da45ca5ca1d901412790544b446e7d363ad5e9f0"},
+    {file = "identify-2.4.4-py2.py3-none-any.whl", hash = "sha256:aa68609c7454dbcaae60a01ff6b8df1de9b39fe6e50b1f6107ec81dcda624aa6"},
+    {file = "identify-2.4.4.tar.gz", hash = "sha256:6b4b5031f69c48bf93a646b90de9b381c6b5f560df4cbe0ed3cf7650ae741e4d"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
@@ -1605,8 +1605,8 @@ requests-mock = [
     {file = "requests_mock-1.9.3-py2.py3-none-any.whl", hash = "sha256:0a2d38a117c08bb78939ec163522976ad59a6b7fdd82b709e23bb98004a44970"},
 ]
 respx = [
-    {file = "respx-0.18.2-py2.py3-none-any.whl", hash = "sha256:09fb4fc49f3900fb124d13b188c90355a45efde29fd18c5e2f513804cf7f84c6"},
-    {file = "respx-0.18.2.tar.gz", hash = "sha256:d39ff874f514dc4293b2e1f7c5e6c8c2ad871ee02ef49b3f57535257008495d8"},
+    {file = "respx-0.19.1-py2.py3-none-any.whl", hash = "sha256:4b13ba2aa4fc619ad5523786bacb4a565fab4ba3d02582b12f23942aa5a9bdf6"},
+    {file = "respx-0.19.1.tar.gz", hash = "sha256:df26cf743f4c48bb38f134a3b0ec7384d5350671264c1c28bbddf41658d6f01a"},
 ]
 rfc3986 = [
     {file = "rfc3986-1.5.0-py2.py3-none-any.whl", hash = "sha256:a86d6e1f5b1dc238b218b012df0aa79409667bb209e58da56d0b94704e712a97"},
