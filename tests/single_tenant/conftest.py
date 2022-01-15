@@ -34,7 +34,6 @@ def single_tenant_app(token_version):
             token_version=1,
         )
         app.dependency_overrides[azure_scheme] = azure_scheme_overrides
-        yield azure_scheme
     elif token_version == 2:
         azure_scheme_overrides = SingleTenantAzureAuthorizationCodeBearer(
             app_client_id=settings.APP_CLIENT_ID,
@@ -45,7 +44,7 @@ def single_tenant_app(token_version):
             token_version=2,
         )
         app.dependency_overrides[azure_scheme] = azure_scheme_overrides
-        yield azure_scheme
+    yield
 
 
 @pytest.fixture
