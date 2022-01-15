@@ -1,11 +1,12 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Union
 
 from demo_project.core.config import settings
 from fastapi import Depends
+from fastapi.security.api_key import APIKeyHeader
 
-from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer, SingleTenantAzureAuthorizationCodeBearer
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.user import User
 
@@ -49,10 +50,40 @@ class IssuerFetcher:
             # logic to find your allowed tenants and it's issuers here
             # (This example cache in memory for 1 hour)
             self.tid_to_iss = {
-                'intility_tenant': 'intility_tenant',
+                'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0',
             }
         try:
             return self.tid_to_iss[tid]
         except Exception as error:
             log.exception('`iss` not found for `tid` %s. Error %s', tid, error)
             raise InvalidAuth('You must be an Intility customer to access this resource')
+
+
+issuer_fetcher = IssuerFetcher()
+
+azure_scheme_auto_error_false = MultiTenantAzureAuthorizationCodeBearer(
+    app_client_id=settings.APP_CLIENT_ID,
+    scopes={
+        f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
+    },
+    validate_iss=True,
+    iss_callable=issuer_fetcher,
+    auto_error=False,
+)
+
+
+api_key_auth_auto_error_false = APIKeyHeader(name='TEST-API-KEY', auto_error=False)
+
+
+async def multi_auth(
+    azure_auth: Optional[User] = Depends(azure_scheme_auto_error_false),
+    api_key: Optional[str] = Depends(api_key_auth_auto_error_false),
+) -> Union[User, str]:
+    """
+    Example implementation.
+    """
+    if azure_auth:
+        return azure_auth
+    if api_key == 'JonasIsCool':
+        return api_key
+    raise InvalidAuth('You must either provide a valid bearer token or API key')

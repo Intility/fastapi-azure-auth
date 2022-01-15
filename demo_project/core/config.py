@@ -1,6 +1,6 @@
 from typing import List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, Field, HttpUrl, validator
+from pydantic import AnyHttpUrl, BaseSettings, Field, HttpUrl
 
 
 class AzureActiveDirectory(BaseSettings):
@@ -18,28 +18,8 @@ class Settings(AzureActiveDirectory):
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: List[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
 
-    @validator('BACKEND_CORS_ORIGINS', pre=True)
-    def assemble_cors_origins(cls, value: Union[str, List[str]]) -> Union[List[str], str]:  # pragma: no cover
-        """
-        Validate cors list
-        """
-        if isinstance(value, str) and not value.startswith('['):
-            return [i.strip() for i in value.split(',')]
-        elif isinstance(value, (list, str)):
-            return value
-        raise ValueError(value)
-
     PROJECT_NAME: str = 'My Project'
     SENTRY_DSN: Optional[HttpUrl] = None
-
-    @validator('SENTRY_DSN', pre=True)
-    def sentry_dsn_can_be_blank(cls, value: str) -> Optional[str]:  # pragma: no cover
-        """
-        Validate sentry DSN
-        """
-        if not value:
-            return None
-        return value
 
     class Config:  # noqa
         env_file = 'demo_project/.env'
