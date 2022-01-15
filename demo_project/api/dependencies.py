@@ -6,7 +6,7 @@ from demo_project.core.config import settings
 from fastapi import Depends
 from fastapi.security.api_key import APIKeyHeader
 
-from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer, SingleTenantAzureAuthorizationCodeBearer
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.user import User
 
@@ -50,7 +50,7 @@ class IssuerFetcher:
             # logic to find your allowed tenants and it's issuers here
             # (This example cache in memory for 1 hour)
             self.tid_to_iss = {
-                'intility_tenant': 'intility_tenant',
+                'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0',
             }
         try:
             return self.tid_to_iss[tid]
@@ -59,12 +59,15 @@ class IssuerFetcher:
             raise InvalidAuth('You must be an Intility customer to access this resource')
 
 
-azure_scheme_auto_error_false = SingleTenantAzureAuthorizationCodeBearer(
+issuer_fetcher = IssuerFetcher()
+
+azure_scheme_auto_error_false = MultiTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     scopes={
-        f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**',
+        f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
     },
-    tenant_id=settings.TENANT_ID,
+    validate_iss=True,
+    iss_callable=issuer_fetcher,
     auto_error=False,
 )
 

@@ -39,7 +39,7 @@ openapi_schema = {
                         'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
                     }
                 },
-                'security': [{'Azure AD - PKCE, Single-tenant': []}, {'APIKeyHeader': []}],
+                'security': [{'Azure AD - PKCE, Multi-tenant': []}, {'APIKeyHeader': []}],
             }
         },
     },
@@ -105,6 +105,20 @@ openapi_schema = {
                         'tokenUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/token',
                     }
                 },
+            },
+            'Azure AD - PKCE, Multi-tenant': {
+                'description': '`Leave ' 'client_secret ' 'blank`',
+                'flows': {
+                    'authorizationCode': {
+                        'authorizationUrl': 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize',
+                        'scopes': {
+                            'api://oauth299-9999-9999-abcd-efghijkl1234567890/user_impersonation': 'User '
+                            'impersonation'
+                        },
+                        'tokenUrl': 'https://login.microsoftonline.com/common/oauth2/v2.0/token',
+                    }
+                },
+                'type': 'oauth2',
             },
             'APIKeyHeader': {'type': 'apiKey', 'in': 'header', 'name': 'TEST-API-KEY'},
         },
