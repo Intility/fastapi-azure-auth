@@ -1,8 +1,7 @@
-import asyncio
 import inspect
 import logging
 from collections.abc import Callable
-from typing import Any, Literal, Optional
+from typing import Any, Awaitable, Literal, Optional
 
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
@@ -27,7 +26,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         scopes: Optional[dict[str, str]] = None,
         multi_tenant: bool = False,
         validate_iss: bool = True,
-        iss_callable: Optional[Callable[..., Any]] = None,
+        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
@@ -55,7 +54,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         :param validate_iss: bool
         **Only used for multi-tenant applications**
             Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
-        :param iss_callable: Callable
+        :param iss_callable: Async Callable
         **Only used for multi-tenant application**
             Async function that has to accept a `tid` (tenant ID) and return a `iss` (issuer) or
              raise an InvalidIssuer exception
@@ -81,8 +80,6 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         if multi_tenant:
             if validate_iss and not callable(iss_callable):
                 raise RuntimeError('`validate_iss` is enabled, so you must provide an `iss_callable`')
-            elif iss_callable and not asyncio.iscoroutinefunction(iss_callable):
-                raise RuntimeError('`iss_callable` must be a coroutine')
             elif iss_callable and 'tid' not in inspect.signature(iss_callable).parameters.keys():
                 raise RuntimeError('`iss_callable` must accept `tid` as an argument')
 
@@ -277,7 +274,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         auto_error: bool = True,
         scopes: Optional[dict[str, str]] = None,
         validate_iss: bool = True,
-        iss_callable: Optional[Callable[..., Any]] = None,
+        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
@@ -299,7 +296,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
 
         :param validate_iss: bool
             Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
-        :param iss_callable: Callable
+        :param iss_callable: Async Callable
             Async function that has to accept a `tid` (tenant ID) and return a `iss` (issuer) or
              raise an InvalidIssuer exception
             This is required when validate_iss is set to `True`.

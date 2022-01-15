@@ -23,7 +23,7 @@ def multi_tenant_app():
         iss_callable=issuer_fetcher,
     )
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
-    yield azure_scheme
+    yield
 
 
 @pytest.fixture
