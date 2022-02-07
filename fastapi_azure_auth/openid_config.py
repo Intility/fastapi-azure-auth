@@ -1,11 +1,10 @@
-import base64
 import logging
 from datetime import datetime, timedelta
 from typing import Any, Optional
 
-from cryptography.hazmat.backends.openssl.backend import backend
 from cryptography.hazmat.primitives.asymmetric.types import PUBLIC_KEY_TYPES as KeyTypes
-from cryptography.x509 import load_der_x509_certificate
+from jose import jwk
+
 from fastapi import HTTPException, status
 from httpx import AsyncClient
 
@@ -19,12 +18,14 @@ class OpenIdConfig:
         multi_tenant: bool = False,
         token_version: int = 2,
         app_id: Optional[str] = None,
+        config_url: Optional[str] = None,
     ) -> None:
         self.tenant_id: Optional[str] = tenant_id
         self._config_timestamp: Optional[datetime] = None
         self.multi_tenant: bool = multi_tenant
         self.token_version: int = token_version
         self.app_id = app_id
+        self.config_url = config_url
 
         self.authorization_endpoint: str
         self.signing_keys: dict[str, KeyTypes]
@@ -64,7 +65,9 @@ class OpenIdConfig:
         """
         path = 'common' if self.multi_tenant else self.tenant_id
 
-        if self.token_version == 2:
+        if self.config_url:
+            config_url = self.config_url
+        elif self.token_version == 2:
             config_url = f'https://login.microsoftonline.com/{path}/v2.0/.well-known/openid-configuration'
         else:
             config_url = f'https://login.microsoftonline.com/{path}/.well-known/openid-configuration'
@@ -95,6 +98,8 @@ class OpenIdConfig:
         for key in keys:
             if key.get('use') == 'sig':  # Only care about keys that are used for signatures, not encryption
                 log.debug('Loading public key from certificate: %s', key)
-                cert_obj = load_der_x509_certificate(base64.b64decode(key['x5c'][0]), backend)
+
+                cert_obj = jwk.construct(key, "RS256")
+
                 if kid := key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
-                    self.signing_keys[kid] = cert_obj.public_key()
+                    self.signing_keys[kid] = cert_obj

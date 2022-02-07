@@ -31,6 +31,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
+        openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
     ) -> None:
         """
@@ -71,6 +72,8 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             Override OpenAPI authorization URL
         :param openapi_token_url: str
             Override OpenAPI token URL
+        :param openid_config_url: str
+            Override OpenID config URL
         :param openapi_description: str
             Override OpenAPI description
 
@@ -90,6 +93,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             multi_tenant=self.multi_tenant,
             token_version=token_version,
             app_id=app_client_id if openid_config_use_app_id else None,
+            config_url=openid_config_url if openid_config_url else None,
         )
         self.validate_iss: bool = validate_iss
         self.iss_callable: Optional[Callable[..., Any]] = iss_callable
@@ -221,6 +225,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
+        openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
     ) -> None:
         """
@@ -250,6 +255,8 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             Override OpenAPI authorization URL
         :param openapi_token_url: str
             Override OpenAPI token URL
+        :param openid_config_url: str
+            Override OpenID config URL
         :param openapi_description: str
             Override OpenAPI description
         """
@@ -262,6 +269,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openid_config_use_app_id=openid_config_use_app_id,
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
+            openid_config_url=openid_config_url,
             openapi_description=openapi_description,
         )
         self.scheme_name: str = 'Azure AD - PKCE, Single-tenant'
@@ -278,6 +286,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
+        openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
     ) -> None:
         """
@@ -309,6 +318,8 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             Override OpenAPI authorization URL
         :param openapi_token_url: str
             Override OpenAPI token URL
+        :param openid_config_url: str
+            Override OpenID config URL
         :param openapi_description: str
             Override OpenAPI description
         """
@@ -322,6 +333,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openid_config_use_app_id=openid_config_use_app_id,
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
+            openid_config_url=openid_config_url,
             openapi_description=openapi_description,
         )
         self.scheme_name: str = 'Azure AD - PKCE, Multi-tenant'
