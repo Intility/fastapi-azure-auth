@@ -183,8 +183,8 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
                     'use': 'sig',
                     'kid': 'dummythumbprint',
                     'x5t': 'dummythumbprint',
-                    'n': 'somebase64encodedmodulus',
-                    'e': 'somebase64encodedexponent',
+                    'n': base64.b64encode(str(signing_key_a.public_key().public_numbers().n).encode()).decode(),
+                    'e': base64.b64encode(str(signing_key_a.public_key().public_numbers().e).encode()).decode(),
                     'x5c': [
                         base64.b64encode(signing_cert_a).decode(),
                     ],
@@ -199,8 +199,8 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
                     'use': 'sig',
                     'kid': 'dummythumbprint',
                     'x5t': 'dummythumbprint',
-                    'n': 'somebase64encodedmodulus',
-                    'e': 'somebase64encodedexponent',
+                    'n': base64.b64encode(str(signing_key_a.public_key().public_numbers().n).encode()).decode(),
+                    'e': base64.b64encode(str(signing_key_a.public_key().public_numbers().e).encode()).decode(),
                     'x5c': [
                         base64.b64encode(signing_cert_a).decode(),
                     ],
@@ -210,8 +210,8 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
                     'use': 'sig',
                     'kid': 'real thumbprint',
                     'x5t': 'real thumbprint2',
-                    'n': 'somebase64encodedmodulus',
-                    'e': 'somebase64encodedexponent',
+                    'n': base64.b64encode(str(signing_key_b.public_key().public_numbers().n).encode()).decode(),
+                    'e': base64.b64encode(str(signing_key_b.public_key().public_numbers().e).encode()).decode(),
                     'x5c': [
                         base64.b64encode(signing_cert_b).decode(),
                     ],
