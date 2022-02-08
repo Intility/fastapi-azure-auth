@@ -1,47 +1,17 @@
 import time
-from datetime import datetime, timedelta
 from typing import Optional
 
-from cryptography import x509
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
-from cryptography.hazmat.primitives import hashes, serialization, serialization as crypto_serialization
+from cryptography.hazmat.primitives import serialization, serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.x509.oid import NameOID
 from jose import jwk, jwt
 
 
-def generate_key_and_cert():
+def generate_private_key():
     """
-    Generate a private key and signing cert. We'll use the signing key to sign the JWT token
-    and the signing certs will be used to mock the `keys` endpoint in Azure.
+    Generate a private key
     """
-    signing_key = rsa.generate_private_key(backend=crypto_default_backend(), public_exponent=65537, key_size=2048)
-    subject = issuer = x509.Name(
-        [
-            x509.NameAttribute(NameOID.COUNTRY_NAME, 'NO'),
-            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, 'OSLO'),
-            x509.NameAttribute(NameOID.LOCALITY_NAME, 'OSLO'),
-            x509.NameAttribute(NameOID.ORGANIZATION_NAME, 'Intility AS'),
-            x509.NameAttribute(NameOID.COMMON_NAME, 'intility.no'),
-        ]
-    )
-    signing_cert = (
-        x509.CertificateBuilder()
-        .subject_name(subject)
-        .issuer_name(issuer)
-        .public_key(signing_key.public_key())
-        .serial_number(x509.random_serial_number())
-        .not_valid_before(datetime.utcnow())
-        .not_valid_after(
-            # Our certificate will be valid for 10 days
-            datetime.utcnow()
-            + timedelta(days=10)
-            # Sign our certificate with our private key
-        )
-        .sign(signing_key, hashes.SHA256(), crypto_default_backend())
-        .public_bytes(crypto_serialization.Encoding.DER)
-    )
-    return signing_key, signing_cert
+    return rsa.generate_private_key(backend=crypto_default_backend(), public_exponent=65537, key_size=2048)
 
 
 def build_access_token(version: int = 2):
@@ -338,5 +308,5 @@ def keys_url(version: int) -> str:
     return 'https://login.microsoftonline.com/intility_tenant/discovery/v2.0/keys'
 
 
-signing_key_a, signing_cert_a = generate_key_and_cert()
-signing_key_b, signing_cert_b = generate_key_and_cert()
+signing_key_a = generate_private_key()
+signing_key_b = generate_private_key()
