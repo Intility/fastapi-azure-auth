@@ -1,14 +1,13 @@
-import base64
 import time
 from datetime import datetime, timedelta
 from typing import Optional
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
-from cryptography.hazmat.primitives import hashes, serialization as crypto_serialization
+from cryptography.hazmat.primitives import hashes, serialization, serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
-from jose import jwt
+from jose import jwk, jwt
 
 
 def generate_key_and_cert():
@@ -165,7 +164,7 @@ def do_build_access_token(
             crypto_serialization.NoEncryption(),
         ),
         algorithm='RS256',
-        headers={'kid': 'real thumbprint', 'x5t': 'another thumbprint'},
+        headers={'kid': 'real thumbprint', 'x5t': 'real thumbprint'},
     )
 
 
@@ -178,43 +177,49 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
     elif no_valid_keys:
         return {
             'keys': [
-                {  # this key is not used
-                    'kty': 'RSA',
+                {
                     'use': 'sig',
                     'kid': 'dummythumbprint',
                     'x5t': 'dummythumbprint',
-                    'n': base64.b64encode(str(signing_key_a.public_key().public_numbers().n).encode()).decode(),
-                    'e': base64.b64encode(str(signing_key_a.public_key().public_numbers().e).encode()).decode(),
-                    'x5c': [
-                        base64.b64encode(signing_cert_a).decode(),
-                    ],
-                },
+                    **jwk.construct(
+                        signing_key_a.private_bytes(
+                            encoding=serialization.Encoding.PEM,
+                            format=serialization.PrivateFormat.TraditionalOpenSSL,
+                            encryption_algorithm=serialization.NoEncryption(),
+                        ),
+                        'RS256',
+                    ).to_dict(),
+                }
             ]
         }
     else:
         return {
             'keys': [
                 {
-                    'kty': 'RSA',
                     'use': 'sig',
                     'kid': 'dummythumbprint',
                     'x5t': 'dummythumbprint',
-                    'n': base64.b64encode(str(signing_key_a.public_key().public_numbers().n).encode()).decode(),
-                    'e': base64.b64encode(str(signing_key_a.public_key().public_numbers().e).encode()).decode(),
-                    'x5c': [
-                        base64.b64encode(signing_cert_a).decode(),
-                    ],
+                    **jwk.construct(
+                        signing_key_a.private_bytes(
+                            encoding=serialization.Encoding.PEM,
+                            format=serialization.PrivateFormat.TraditionalOpenSSL,
+                            encryption_algorithm=serialization.NoEncryption(),
+                        ),
+                        'RS256',
+                    ).to_dict(),
                 },
                 {
-                    'kty': 'RSA',
                     'use': 'sig',
                     'kid': 'real thumbprint',
-                    'x5t': 'real thumbprint2',
-                    'n': base64.b64encode(str(signing_key_b.public_key().public_numbers().n).encode()).decode(),
-                    'e': base64.b64encode(str(signing_key_b.public_key().public_numbers().e).encode()).decode(),
-                    'x5c': [
-                        base64.b64encode(signing_cert_b).decode(),
-                    ],
+                    'x5t': 'real thumbprint',
+                    **jwk.construct(
+                        signing_key_b.private_bytes(
+                            encoding=serialization.Encoding.PEM,
+                            format=serialization.PrivateFormat.TraditionalOpenSSL,
+                            encryption_algorithm=serialization.NoEncryption(),
+                        ),
+                        'RS256',
+                    ).to_dict(),
                 },
             ]
         }
