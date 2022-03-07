@@ -1,6 +1,6 @@
 import inspect
 import logging
-from collections.abc import Callable
+from typing import Callable
 from typing import Any, Awaitable, Literal, Optional
 
 from fastapi.exceptions import HTTPException
