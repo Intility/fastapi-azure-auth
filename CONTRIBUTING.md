@@ -4,7 +4,7 @@ This package is open to contributions 👏
 
 To contribute, please follow these steps:
 
-1. Create an issue explaining what you'd like to fix or add. This way, we can approve and discuss the 
+1. Create an issue explaining what you'd like to fix or add. This way, we can approve and discuss the
 solution before any time is spent on developing it.
 2. Fork the upstream repository into a personal account.
 3. Install [poetry](https://python-poetry.org/), and install all dependencies using ``poetry install``
@@ -15,5 +15,5 @@ solution before any time is spent on developing it.
 8. Run `pre-commit run --all-files` locally to ensure proper linting
 9. Create a pull request to the Intility repository with a detailed summary of your changes and what motivated the change
 
-If you need a more detailed walk through, please see this 
+If you need a more detailed walk through, please see this
 [issue comment](https://github.com/Intility/fastapi-azure-auth/issues/49#issuecomment-1056962282).
