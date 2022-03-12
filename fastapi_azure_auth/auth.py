@@ -1,7 +1,6 @@
 import inspect
 import logging
-from collections.abc import Callable
-from typing import Any, Awaitable, Literal, Optional
+from typing import Any, Awaitable, Callable, Literal, Optional
 
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
