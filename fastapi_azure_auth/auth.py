@@ -38,7 +38,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         Initialize settings.
 
         :param app_client_id: str
-            Your applications client ID. This will be the `Web app` in Azure AD
+            Your application client ID. This will be the `Web app` in Azure AD
         :param auto_error: bool
             Whether to throw exceptions or return None on __call__.
         :param tenant_id: str
@@ -73,7 +73,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         :param openapi_token_url: str
             Override OpenAPI token URL
         :param openid_config_url: str
-            Override OpenID config URL
+            Override OpenID config URL (used for B2C tenants)
         :param openapi_description: str
             Override OpenAPI description
 
@@ -93,8 +93,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             multi_tenant=self.multi_tenant,
             token_version=token_version,
             app_id=app_client_id if openid_config_use_app_id else None,
-            config_url=openid_config_url if openid_config_url else None,
+            config_url=openid_config_url or None,
         )
+
         self.validate_iss: bool = validate_iss
         self.iss_callable: Optional[Callable[..., Any]] = iss_callable
         self.token_version: int = token_version
@@ -137,17 +138,16 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 claims: dict[str, Any] = jwt.get_unverified_claims(token=access_token) or {}
             except Exception as error:
                 log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
-                raise InvalidAuth(detail='Invalid token format')
+                raise InvalidAuth(detail='Invalid token format') from error
 
             for scope in security_scopes.scopes:
                 token_scope_string = claims.get('scp', '')
-                if isinstance(token_scope_string, str):
-                    token_scopes = token_scope_string.split(' ')
-                    if scope not in token_scopes:
-                        raise InvalidAuth('Required scope missing')
-                else:
+                if not isinstance(token_scope_string, str):
                     raise InvalidAuth('Token contains invalid formatted scopes')
 
+                token_scopes = token_scope_string.split(' ')
+                if scope not in token_scopes:
+                    raise InvalidAuth('Required scope missing')
             # Load new config if old
             await self.openid_config.load_config()
 
@@ -195,17 +195,17 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                     return user
             except JWTClaimsError as error:
                 log.info('Token contains invalid claims. %s', error)
-                raise InvalidAuth(detail='Token contains invalid claims')
+                raise InvalidAuth(detail='Token contains invalid claims') from error
             except ExpiredSignatureError as error:
                 log.info('Token signature has expired. %s', error)
-                raise InvalidAuth(detail='Token signature has expired')
+                raise InvalidAuth(detail='Token signature has expired') from error
             except JWTError as error:
                 log.warning('Invalid token. Error: %s', error, exc_info=True)
-                raise InvalidAuth(detail='Unable to validate token')
+                raise InvalidAuth(detail='Unable to validate token') from error
             except Exception as error:
                 # Extra failsafe in case of a bug in a future version of the jwt library
                 log.exception('Unable to process jwt token. Uncaught error: %s', error)
-                raise InvalidAuth(detail='Unable to process token')
+                raise InvalidAuth(detail='Unable to process token') from error
             log.warning('Unable to verify token. No signing keys found')
             raise InvalidAuth(detail='Unable to verify token, no signing keys found')
         except (HTTPException, InvalidAuth):
@@ -225,14 +225,13 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
-        openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
     ) -> None:
         """
         Initialize settings for a single tenant application.
 
         :param app_client_id: str
-            Your applications client ID. This will be the `Web app` in Azure AD
+            Your application client ID. This will be the `Web app` in Azure AD
         :param tenant_id: str
             Your Azure tenant ID, only needed for single tenant apps
         :param auto_error: bool
@@ -255,8 +254,6 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             Override OpenAPI authorization URL
         :param openapi_token_url: str
             Override OpenAPI token URL
-        :param openid_config_url: str
-            Override OpenID config URL
         :param openapi_description: str
             Override OpenAPI description
         """
@@ -269,7 +266,6 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openid_config_use_app_id=openid_config_use_app_id,
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
-            openid_config_url=openid_config_url,
             openapi_description=openapi_description,
         )
         self.scheme_name: str = 'Azure AD - PKCE, Single-tenant'
@@ -286,14 +282,13 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
-        openid_config_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
     ) -> None:
         """
         Initialize settings for a multi-tenant application.
 
         :param app_client_id: str
-            Your applications client ID. This will be the `Web app` in Azure AD
+            Your application client ID. This will be the `Web app` in Azure AD
         :param auto_error: bool
             Whether to throw exceptions or return None on __call__.
         :param scopes: Optional[dict[str, str]
@@ -318,8 +313,6 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             Override OpenAPI authorization URL
         :param openapi_token_url: str
             Override OpenAPI token URL
-        :param openid_config_url: str
-            Override OpenID config URL
         :param openapi_description: str
             Override OpenAPI description
         """
@@ -333,7 +326,6 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openid_config_use_app_id=openid_config_use_app_id,
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
-            openid_config_url=openid_config_url,
             openapi_description=openapi_description,
         )
         self.scheme_name: str = 'Azure AD - PKCE, Multi-tenant'
