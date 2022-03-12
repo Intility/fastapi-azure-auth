@@ -45,3 +45,21 @@ async def test_app_id_provided(respx_mock):
     )
     await openid_config.load_config()
     assert len(openid_config.signing_keys) == 2
+
+
+@pytest.mark.anyio
+async def test_custom_config_id(respx_mock):
+    openid_config = OpenIdConfig(
+        'intility_tenant',
+        multi_tenant=False,
+        token_version=2,
+        config_url='https://login.microsoftonline.com/override_tenant/v2.0/.well-known/openid-configuration',
+    )
+    respx_mock.get('https://login.microsoftonline.com/override_tenant/v2.0/.well-known/openid-configuration').respond(
+        json=openid_configuration(version=2)
+    )
+    respx_mock.get('https://login.microsoftonline.com/intility_tenant/discovery/v2.0/keys').respond(
+        json=build_openid_keys()
+    )
+    await openid_config.load_config()
+    assert len(openid_config.signing_keys) == 2
