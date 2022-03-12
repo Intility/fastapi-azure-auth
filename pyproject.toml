@@ -42,7 +42,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.9"
 fastapi = ">0.68.0"
-cryptography = "^35.0.0"
+cryptography = ">35.0.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 httpx = ">0.18.2"
 
@@ -50,15 +50,15 @@ httpx = ">0.18.2"
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.9.3"
 black = "^20.8b1"
-pytest = "^6.2.2"
-pytest-cov = "^2.11.1"
-pytest-asyncio = "^0.14.0"
+pytest = "^7.0.1"
+pytest-cov = "^3.0.0"
+pytest-asyncio = "^0.18.2"
 pytest-mock = "^3.5.1"
 requests-mock = "^1.8.0"
 pytest-socket = "^0.4.0"
 pytest-dotenv = "^0.5.2"
 pytest-aiohttp = "^0.3.0"
-uvicorn = "^0.14.0"
+uvicorn = "^0.17.5"
 pytest-freezegun = "^0.4.2"
 pytest-cases = "^3.6.3"
 anyio = "^3.3.4"
