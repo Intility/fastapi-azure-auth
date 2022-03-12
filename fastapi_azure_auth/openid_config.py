@@ -49,9 +49,10 @@ class OpenIdConfig:
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail='Connection to Azure AD is down. Unable to fetch provider configuration',
                         headers={'WWW-Authenticate': 'Bearer'},
-                    )
+                    ) from error
+
                 else:
-                    raise RuntimeError(f'Unable to fetch provider information. {error}')
+                    raise RuntimeError(f'Unable to fetch provider information. {error}') from error
 
             log.info('fastapi-azure-auth loaded settings from Azure AD.')
             log.info('authorization endpoint: %s', self.authorization_endpoint)
@@ -97,8 +98,6 @@ class OpenIdConfig:
         for key in keys:
             if key.get('use') == 'sig':  # Only care about keys that are used for signatures, not encryption
                 log.debug('Loading public key from certificate: %s', key)
-
                 cert_obj = jwk.construct(key, 'RS256')
-
                 if kid := key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
                     self.signing_keys[kid] = cert_obj
