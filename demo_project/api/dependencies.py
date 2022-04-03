@@ -16,7 +16,16 @@ log = logging.getLogger(__name__)
 azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     scopes={
-        f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**',
+        # f'openid': '**No client secret needed, leave blank**',
+        # f'offline_access': '**No client secret needed, leave blank**',
+        # f'.default': '**No client secret needed, leave blank**',
+        # f'User.Read': '**No client secret needed, leave blank**',
+        f'api://{settings.APP_CLIENT_ID}/.default': '**No client secret needed, leave blank**',
+        # f'User.Read': '**No client secret needed, leave blank**',
+        # f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**',
+        # f'User.Read': '**No client secret needed, leave blank**',
+        # f'https://graph.microsoft.com/.default': '**No client secret needed, leave blank**',
+        # f'openid': '**No client secret needed, leave blank**',
     },
     tenant_id=settings.TENANT_ID,
 )
