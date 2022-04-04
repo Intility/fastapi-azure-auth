@@ -15,9 +15,7 @@ log = logging.getLogger(__name__)
 
 azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
-    scopes={
-        f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**',
-    },
+    scopes={f'api://{settings.APP_CLIENT_ID}/user_impersonation': '**No client secret needed, leave blank**'},
     tenant_id=settings.TENANT_ID,
 )
 

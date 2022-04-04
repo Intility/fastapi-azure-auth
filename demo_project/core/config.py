@@ -7,6 +7,8 @@ class AzureActiveDirectory(BaseSettings):
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
+    GRAPH_SECRET: str = Field(default='', env='GRAPH_SECRET')
+    CLIENT_SECRET: str = Field(default='', env='CLIENT_SECRET')
 
 
 class Settings(AzureActiveDirectory):

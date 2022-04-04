@@ -2,7 +2,7 @@ import logging
 from argparse import ArgumentParser
 
 import uvicorn
-from demo_project.api.api_v1.api import api_router_azure_auth, api_router_multi_auth
+from demo_project.api.api_v1.api import api_router_azure_auth, api_router_graph, api_router_multi_auth
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from fastapi import FastAPI, Security
@@ -16,7 +16,7 @@ app = FastAPI(
     swagger_ui_init_oauth={
         'usePkceWithAuthorizationCodeGrant': True,
         'clientId': settings.OPENAPI_CLIENT_ID,
-        # 'additionalQueryStringParams': {'prompt': 'consent'},
+        'additionalQueryStringParams': {'prompt': 'consent'},
     },
     version='1.0.0',
     description='## Welcome to my API! \n This is my description, written in `markdown`',
@@ -50,6 +50,11 @@ app.include_router(
 )
 app.include_router(
     api_router_multi_auth,
+    prefix=settings.API_V1_STR,
+    # Dependencies specified on the API itself
+)
+app.include_router(
+    api_router_graph,
     prefix=settings.API_V1_STR,
     # Dependencies specified on the API itself
 )
