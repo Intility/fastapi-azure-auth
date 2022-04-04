@@ -1,0 +1,55 @@
+---
+title: Calling your APIs from Python
+sidebar_position: 3
+---
+
+In order to call your APIs from Python (or any other backend), you should use the [Client Credential Flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow).
+
+1. Navigate to [Azure -> Azure Active Directory -> App registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
+and find your **OpenAPI application registration** (ideally you'd create a new one for your new application, but we'll reuse this for now)
+2. Navigate over to `Certificate & secrets`
+3. Click `New client secret`
+4. Give it a name and an expiry time
+5. Click `Add`
+
+![secret_picture](../../static/img/usage-and-faq/secret_picture.png)
+
+
+:::info
+You can use client certificates too, but we won't cover this here.
+:::
+
+6. Copy the secret and save it for later.
+
+![copy_secret](../../static/img/usage-and-faq/copy_secret.png)
+
+
+7. Fetch the token from Azure, and then call your own API endpoint:
+
+```python title="my_script.py"
+from httpx import AsyncClient
+from demo_project.core.config import settings
+
+async with AsyncClient() as client:
+    azure_response = await client.post(
+        url=f'https://login.microsoftonline.com/{settings.TENANT_ID}/oauth2/v2.0/token',
+        data={
+            'grant_type': 'client_credentials',
+            'client_id': settings.OPENAPI_CLIENT_ID,
+            'client_secret': settings.CLIENT_SECRET,
+            'scope': f'api://{settings.APP_CLIENT_ID}/.default',  # note: NOT .user_impersonation
+        }
+    )
+    token = azure_response.json()['access_token']
+
+    my_api_response = await client.get(
+        'http://localhost:8000/api/v1/hello-graph',
+        headers={'Authorization': f'Bearer {token}'},
+    )
+    print(my_api_response.json())
+```
+
+:::info
+If you install `ipython`  you can use `asyncio` code directly in your terminal.
+(`poetry add ipython --dev`)
+:::
