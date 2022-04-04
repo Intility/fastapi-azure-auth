@@ -1,0 +1,54 @@
+---
+title: Accessing the user object
+sidebar_position: 1
+---
+
+You can access your user object in two ways, either with `Depends(<schema name>)` or with `request.state.user`.
+
+### `Depends(<schema name>)`
+
+```python title="depends_api_example.py"
+from fastapi import APIRouter, Depends
+
+from demo_project.api.dependencies import azure_scheme
+from fastapi_azure_auth.user import User
+
+router = APIRouter()
+
+
+@router.get(
+    '/hello-user',
+    response_model=User,
+    operation_id='helloWorldApiKey',
+)
+async def hello_user(user: User = Depends(azure_scheme)) -> dict[str, bool]:
+    """
+    Wonder how this auth is done?
+    """
+    return user.dict()
+```
+
+
+### `request.state.user`
+
+```python title="request_state_user_api_example.py"
+from fastapi import APIRouter, Depends, Request
+
+from demo_project.api.dependencies import azure_scheme
+from fastapi_azure_auth.user import User
+
+router = APIRouter()
+
+
+@router.get(
+    '/hello-user',
+    response_model=User,
+    operation_id='helloWorldApiKey',
+    dependencies=[Depends(azure_scheme)]
+)
+async def hello_user(request: Request) -> dict[str, bool]:
+    """
+    Wonder how this auth is done?
+    """
+    return request.state.user.dict()
+```
