@@ -3,109 +3,74 @@ from demo_project.main import app
 from fastapi.testclient import TestClient
 
 openapi_schema = {
-    'openapi': '3.0.2',
-    'info': {
-        'title': 'My Project',
-        'description': '## Welcome to my API! \n This is my description, written in `markdown`',
-        'version': '1.0.0',
-    },
-    'paths': {
-        '/api/v1/hello': {
-            'get': {
-                'tags': ['hello'],
-                'summary': 'Say hello',
-                'description': 'Wonder who we say hello to?',
-                'operationId': 'helloWorld',
-                'responses': {
-                    '200': {
-                        'description': 'Successful Response',
-                        'content': {
-                            'application/json': {'schema': {'$ref': '#/components/schemas/HelloWorldResponse'}}
-                        },
-                    }
-                },
-                'security': [{'Azure AD - PKCE, Single-tenant': []}],
-            }
-        },
-        '/api/v1/hello-multi-auth': {
-            'get': {
-                'tags': ['hello'],
-                'summary': 'Say hello with an API key',
-                'description': 'Wonder how this auth is done?',
-                'operationId': 'helloWorldApiKey',
-                'responses': {
-                    '200': {
-                        'description': 'Successful Response',
-                        'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
-                    }
-                },
-                'security': [{'Azure AD - PKCE, Multi-tenant': []}, {'APIKeyHeader': []}],
-            }
-        },
-    },
     'components': {
         'schemas': {
             'HelloWorldResponse': {
-                'title': 'HelloWorldResponse',
-                'required': ['hello', 'user'],
-                'type': 'object',
                 'properties': {
-                    'hello': {'title': 'Hello', 'type': 'string', 'description': 'What we\'re saying hello to'},
+                    'hello': {
+                        'description': 'What ' "we're " 'saying ' 'hello ' 'to',
+                        'title': 'Hello',
+                        'type': 'string',
+                    },
                     'user': {
-                        'title': 'User',
                         'allOf': [{'$ref': '#/components/schemas/User'}],
-                        'description': 'The user object',
+                        'description': 'The ' 'user ' 'object',
+                        'title': 'User',
                     },
                 },
+                'required': ['hello', 'user'],
+                'title': 'HelloWorldResponse',
+                'type': 'object',
             },
             'TokenType': {
-                'title': 'TokenType',
-                'required': ['api_key', 'azure_auth'],
-                'type': 'object',
                 'properties': {
-                    'api_key': {'title': 'Api Key', 'type': 'boolean', 'description': 'API key was used'},
-                    'azure_auth': {'title': 'Azure Auth', 'type': 'boolean', 'description': 'Azure auth was used'},
+                    'api_key': {'description': 'API ' 'key ' 'was ' 'used', 'title': 'Api ' 'Key', 'type': 'boolean'},
+                    'azure_auth': {
+                        'description': 'Azure ' 'auth ' 'was ' 'used',
+                        'title': 'Azure ' 'Auth',
+                        'type': 'boolean',
+                    },
                 },
+                'required': ['api_key', 'azure_auth'],
+                'title': 'TokenType',
+                'type': 'object',
             },
             'User': {
-                'title': 'User',
-                'required': ['aud', 'tid', 'claims', 'access_token'],
-                'type': 'object',
                 'properties': {
-                    'aud': {'title': 'Aud', 'type': 'string', 'description': 'Audience'},
-                    'tid': {'title': 'Tid', 'type': 'string', 'description': 'Tenant ID'},
+                    'access_token': {
+                        'description': 'The '
+                        'access_token. '
+                        'Can '
+                        'be '
+                        'used '
+                        'for '
+                        'fetching '
+                        'the '
+                        'Graph '
+                        'API',
+                        'title': 'Access ' 'Token',
+                        'type': 'string',
+                    },
+                    'aud': {'description': 'Audience', 'title': 'Aud', 'type': 'string'},
+                    'claims': {'description': 'The ' 'entire ' 'decoded ' 'token', 'title': 'Claims', 'type': 'object'},
+                    'name': {'description': 'Name', 'title': 'Name', 'type': 'string'},
                     'roles': {
+                        'default': [],
+                        'description': 'Roles ' '(Groups) ' 'the ' 'user ' 'has ' 'for ' 'this ' 'app',
+                        'items': {'type': 'string'},
                         'title': 'Roles',
                         'type': 'array',
-                        'items': {'type': 'string'},
-                        'description': 'Roles (Groups) the user has for this app',
-                        'default': [],
                     },
-                    'claims': {'title': 'Claims', 'type': 'object', 'description': 'The entire decoded token'},
-                    'scp': {'title': 'Scp', 'type': 'string', 'description': 'Scope'},
-                    'name': {'title': 'Name', 'type': 'string', 'description': 'Name'},
-                    'access_token': {
-                        'title': 'Access Token',
-                        'type': 'string',
-                        'description': 'The access_token. Can be used for fetching the Graph API',
-                    },
+                    'scp': {'description': 'Scope', 'title': 'Scp', 'type': 'string'},
+                    'tid': {'description': 'Tenant ' 'ID', 'title': 'Tid', 'type': 'string'},
                 },
+                'required': ['aud', 'tid', 'claims', 'access_token'],
+                'title': 'User',
+                'type': 'object',
             },
         },
         'securitySchemes': {
-            'Azure AD - PKCE, Single-tenant': {
-                'type': 'oauth2',
-                'description': '`Leave client_secret blank`',
-                'flows': {
-                    'authorizationCode': {
-                        'scopes': {
-                            'api://oauth299-9999-9999-abcd-efghijkl1234567890/user_impersonation': '**No client secret needed, leave blank**'
-                        },
-                        'authorizationUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize',
-                        'tokenUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/token',
-                    }
-                },
-            },
+            'APIKeyHeader': {'in': 'header', 'name': 'TEST-API-KEY', 'type': 'apiKey'},
             'Azure AD - PKCE, Multi-tenant': {
                 'description': '`Leave ' 'client_secret ' 'blank`',
                 'flows': {
@@ -120,7 +85,81 @@ openapi_schema = {
                 },
                 'type': 'oauth2',
             },
-            'APIKeyHeader': {'type': 'apiKey', 'in': 'header', 'name': 'TEST-API-KEY'},
+            'Azure AD - PKCE, Single-tenant': {
+                'description': '`Leave ' 'client_secret ' 'blank`',
+                'flows': {
+                    'authorizationCode': {
+                        'authorizationUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/authorize',
+                        'scopes': {
+                            'api://oauth299-9999-9999-abcd-efghijkl1234567890/user_impersonation': '**No '
+                            'client '
+                            'secret '
+                            'needed, '
+                            'leave '
+                            'blank**'
+                        },
+                        'tokenUrl': 'https://login.microsoftonline.com/intility_tenant_id/oauth2/v2.0/token',
+                    }
+                },
+                'type': 'oauth2',
+            },
+        },
+    },
+    'info': {
+        'description': '## Welcome to my API! \n' ' This is my description, written in `markdown`',
+        'title': 'My Project',
+        'version': '1.0.0',
+    },
+    'openapi': '3.0.2',
+    'paths': {
+        '/api/v1/hello': {
+            'get': {
+                'description': 'Wonder who we say hello ' 'to?',
+                'operationId': 'helloWorld',
+                'responses': {
+                    '200': {
+                        'content': {
+                            'application/json': {'schema': {'$ref': '#/components/schemas/HelloWorldResponse'}}
+                        },
+                        'description': 'Successful ' 'Response',
+                    }
+                },
+                'security': [{'Azure AD - PKCE, Single-tenant': []}],
+                'summary': 'Say hello',
+                'tags': ['hello'],
+            }
+        },
+        '/api/v1/hello-graph': {
+            'get': {
+                'description': 'An example on how '
+                'to use "on behalf '
+                'of"-flow to fetch a '
+                'graph token and '
+                'then fetch data '
+                'from graph.',
+                'operationId': 'helloGraph',
+                'responses': {
+                    '200': {'content': {'application/json': {'schema': {}}}, 'description': 'Successful ' 'Response'}
+                },
+                'security': [{'Azure AD - PKCE, Single-tenant': []}],
+                'summary': 'Fetch graph API using ' 'OBO',
+                'tags': ['graph'],
+            }
+        },
+        '/api/v1/hello-multi-auth': {
+            'get': {
+                'description': 'Wonder how ' 'this auth is ' 'done?',
+                'operationId': 'helloWorldApiKey',
+                'responses': {
+                    '200': {
+                        'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
+                        'description': 'Successful ' 'Response',
+                    }
+                },
+                'security': [{'Azure AD - PKCE, Multi-tenant': []}, {'APIKeyHeader': []}],
+                'summary': 'Say hello with an ' 'API key',
+                'tags': ['hello'],
+            }
         },
     },
 }

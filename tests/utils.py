@@ -176,7 +176,9 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
                             encryption_algorithm=serialization.NoEncryption(),
                         ),
                         'RS256',
-                    ).to_dict(),
+                    )
+                    .public_key()
+                    .to_dict(),
                 },
                 {
                     'use': 'sig',
@@ -189,7 +191,9 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
                             encryption_algorithm=serialization.NoEncryption(),
                         ),
                         'RS256',
-                    ).to_dict(),
+                    )
+                    .public_key()
+                    .to_dict(),
                 },
             ]
         }
