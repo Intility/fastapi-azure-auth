@@ -126,6 +126,6 @@ issuer_fetcher = IssuerFetcher()
 azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
     ...
     validate_iss=True,
-    valid_tenants_callable=issuer_fetcher
+    iss_callable=issuer_fetcher
 )
 ```
