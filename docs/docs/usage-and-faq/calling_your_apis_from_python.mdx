@@ -6,11 +6,17 @@ sidebar_position: 3
 In order to call your APIs from Python (or any other backend), you should use the [Client Credential Flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow).
 
 1. Navigate to [Azure -> Azure Active Directory -> App registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
-and find your **OpenAPI application registration** (ideally you'd create a new one for your new application, but we'll reuse this for now)
+and find your **OpenAPI application registration***
 2. Navigate over to `Certificate & secrets`
 3. Click `New client secret`
 4. Give it a name and an expiry time
 5. Click `Add`
+
+:::info
+*In this example, we used the already created OpenAPI app registration in order to keep it short,
+but in reality you should create a new app registration for _every_ application talking to your backend.
+In other words, if someone wants to use your API, they should create their own app registration and their own secret.
+:::
 
 ![secret_picture](../../static/img/usage-and-faq/secret_picture.png)
 
@@ -35,8 +41,8 @@ async with AsyncClient() as client:
         url=f'https://login.microsoftonline.com/{settings.TENANT_ID}/oauth2/v2.0/token',
         data={
             'grant_type': 'client_credentials',
-            'client_id': settings.OPENAPI_CLIENT_ID,
-            'client_secret': settings.CLIENT_SECRET,
+            'client_id': settings.OPENAPI_CLIENT_ID,  # the ID of the app reg you created the secret for
+            'client_secret': settings.CLIENT_SECRET,  # the secret you created
             'scope': f'api://{settings.APP_CLIENT_ID}/.default',  # note: NOT .user_impersonation
         }
     )
