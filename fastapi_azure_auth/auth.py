@@ -189,8 +189,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                         options=options,
                     )
                     # Attach the user to the request. Can be accessed through `request.state.user`
-                    user_info = {'claims': token, 'access_token': access_token}
-                    user: User = User(**token, **user_info)
+                    user: User = User(**{**token, 'claims': token, 'access_token': access_token})
                     request.state.user = user
                     return user
             except JWTClaimsError as error:
