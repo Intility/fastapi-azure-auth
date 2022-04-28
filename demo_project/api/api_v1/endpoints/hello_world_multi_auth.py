@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Dict, Union
 
 from demo_project.api.dependencies import multi_auth
 from demo_project.schemas.hello_world import TokenType
@@ -16,7 +16,7 @@ router = APIRouter()
     name='hello_world_api_key',
     operation_id='helloWorldApiKey',
 )
-async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) -> dict[str, bool]:
+async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) -> Dict[str, bool]:
     """
     Wonder how this auth is done?
     """

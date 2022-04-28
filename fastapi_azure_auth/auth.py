@@ -1,6 +1,6 @@
 import inspect
 import logging
-from typing import Any, Awaitable, Callable, Literal, Optional
+from typing import Any, Awaitable, Callable, Dict, Literal, Optional
 
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
@@ -22,7 +22,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         app_client_id: str,
         auto_error: bool = True,
         tenant_id: Optional[str] = None,
-        scopes: Optional[dict[str, str]] = None,
+        scopes: Optional[Dict[str, str]] = None,
         multi_tenant: bool = False,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
@@ -189,7 +189,8 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                         options=options,
                     )
                     # Attach the user to the request. Can be accessed through `request.state.user`
-                    user: User = User(**token | {'claims': token, 'access_token': access_token})
+                    user_info = {'claims': token, 'access_token': access_token}
+                    user: User = User(**token, **user_info)
                     request.state.user = user
                     return user
             except JWTClaimsError as error:
@@ -219,7 +220,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         app_client_id: str,
         tenant_id: str,
         auto_error: bool = True,
-        scopes: Optional[dict[str, str]] = None,
+        scopes: Optional[Dict[str, str]] = None,
         token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
@@ -275,7 +276,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         self,
         app_client_id: str,
         auto_error: bool = True,
-        scopes: Optional[dict[str, str]] = None,
+        scopes: Optional[Dict[str, str]] = None,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         openid_config_use_app_id: bool = False,
