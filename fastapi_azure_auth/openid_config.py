@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
 
 from cryptography.hazmat.primitives.asymmetric.types import PUBLIC_KEY_TYPES as KeyTypes
 from fastapi import HTTPException, status
@@ -90,7 +90,7 @@ class OpenIdConfig:
             jwks_response.raise_for_status()
             self._load_keys(jwks_response.json()['keys'])
 
-    def _load_keys(self, keys: list[dict[str, Any]]) -> None:
+    def _load_keys(self, keys: List[Dict[str, Any]]) -> None:
         """
         Create certificates based on signing keys and store them
         """
