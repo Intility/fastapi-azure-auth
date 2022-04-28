@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.9", "3.10" ]
+        python-version: [ "3.8", "3.9", "3.10" ]
         fastapi-version: [ "0.68.0", "0.70.0", "0.71.0" ]
     steps:
       - name: Check out repository
