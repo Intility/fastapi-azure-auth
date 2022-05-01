@@ -10,7 +10,7 @@
 <p align="center">
     <!-- Line 1 -->
     <a href="https://python.org">
-        <img src="https://img.shields.io/badge/python-v3.9+-blue.svg?logo=python&logoColor=white&label=python" alt="Python version">
+        <img src="https://img.shields.io/badge/python-v3.8+-blue.svg?logo=python&logoColor=white&label=python" alt="Python version">
     </a>
     <a href="https://fastapi.tiangolo.com/">
         <img src="https://img.shields.io/badge/FastAPI-0.68.0+%20-blue.svg?logo=fastapi&logoColor=white&label=fastapi" alt="FastAPI Version">
