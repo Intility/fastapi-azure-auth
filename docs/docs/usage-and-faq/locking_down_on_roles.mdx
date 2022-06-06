@@ -7,7 +7,7 @@ You can lock down on roles by creating your own wrapper dependency:
 
 ```python title="dependencies.py"
 from fastapi import Depends
-from fastapi_azure_auth.auth import InvalidAuth
+from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.user import User
 
 async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> None:
