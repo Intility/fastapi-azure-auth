@@ -222,6 +222,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         scopes: Optional[Dict[str, str]] = None,
         token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
+        openid_config_url: Optional[str] = None,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
@@ -248,7 +249,8 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         :param openid_config_use_app_id: bool
             Set this to True if you're using claims-mapping. If you're unsure, leave at False.
             https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response
-
+        :param openid_config_url: str
+            Override OpenID config URL (used for B2C tenants)
         :param openapi_authorization_url: str
             Override OpenAPI authorization URL
         :param openapi_token_url: str
@@ -263,6 +265,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             scopes=scopes,
             token_version=token_version,
             openid_config_use_app_id=openid_config_use_app_id,
+            openid_config_url=openid_config_url,
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
@@ -279,6 +282,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         openid_config_use_app_id: bool = False,
+        openid_config_url: Optional[str] = None,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
         openapi_description: Optional[str] = None,
@@ -288,6 +292,8 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
 
         :param app_client_id: str
             Your application client ID. This will be the `Web app` in Azure AD
+        :param openid_config_url: str
+            Override OpenID config URL (used for B2C tenants)
         :param auto_error: bool
             Whether to throw exceptions or return None on __call__.
         :param scopes: Optional[dict[str, str]
@@ -323,6 +329,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             iss_callable=iss_callable,
             multi_tenant=True,
             openid_config_use_app_id=openid_config_use_app_id,
+            openid_config_url=openid_config_url,
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
