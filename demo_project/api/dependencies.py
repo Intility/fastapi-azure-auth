@@ -6,7 +6,11 @@ from demo_project.core.config import settings
 from fastapi import Depends
 from fastapi.security.api_key import APIKeyHeader
 
-from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer, SingleTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth import (
+    MultiTenantAzureAuthorizationCodeBearer,
+    SingleTenantAzureAuthorizationCodeBearer,
+    MultiTenantAzureAuthorizationCodeBearerB2C
+)
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.user import User
 
@@ -27,7 +31,6 @@ async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> None:
     """
     if 'AdminUser' not in user.roles:
         raise InvalidAuth('User is not an AdminUser')
-
 
 class IssuerFetcher:
     def __init__(self) -> None:
@@ -69,12 +72,39 @@ azure_scheme_auto_error_false = MultiTenantAzureAuthorizationCodeBearer(
     auto_error=False,
 )
 
+azure_scheme_auto_error_false_b2c = MultiTenantAzureAuthorizationCodeBearerB2C(
+    app_client_id=settings.APP_CLIENT_ID,
+    openapi_authorization_url=settings.AUTH_URL,
+    openapi_token_url=settings.TOKEN_URL,
+    openid_config_url=settings.CONFIG_URL,
+    scopes={
+        f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
+    },
+    validate_iss=True,
+    iss_callable=issuer_fetcher,
+    auto_error=False,
+)
+
 
 api_key_auth_auto_error_false = APIKeyHeader(name='TEST-API-KEY', auto_error=False)
 
 
 async def multi_auth(
     azure_auth: Optional[User] = Depends(azure_scheme_auto_error_false),
+    api_key: Optional[str] = Depends(api_key_auth_auto_error_false),
+) -> Union[User, str]:
+    """
+    Example implementation.
+    """
+    if azure_auth:
+        return azure_auth
+    if api_key == 'JonasIsCool':
+        return api_key
+    raise InvalidAuth('You must either provide a valid bearer token or API key')
+
+
+async def multi_auth_b2c(
+    azure_auth: Optional[User] = Depends(azure_scheme_auto_error_false_b2c),
     api_key: Optional[str] = Depends(api_key_auth_auto_error_false),
 ) -> Union[User, str]:
     """

@@ -328,3 +328,62 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_description=openapi_description,
         )
         self.scheme_name: str = 'Azure AD - PKCE, Multi-tenant'
+
+class MultiTenantAzureAuthorizationCodeBearerB2C(AzureAuthorizationCodeBearerBase):
+    def __init__(
+        self,
+        app_client_id: str,
+        auto_error: bool = True,
+        scopes: Optional[Dict[str, str]] = None,
+        validate_iss: bool = True,
+        iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
+        openid_config_use_app_id: bool = False,
+        openid_config_url: Optional[str] = None,
+        openapi_authorization_url: Optional[str] = None,
+        openapi_token_url: Optional[str] = None,
+        openapi_description: Optional[str] = None,
+    ) -> None:
+        """
+        Initialize settings for a B2C multi-tenant application.
+        :param app_client_id: str
+            Your application client ID. This will be the `Web app` in Azure AD
+        :param openid_config_url: str
+            Override OpenID config URL (used for B2C tenants)
+        :param auto_error: bool
+            Whether to throw exceptions or return None on __call__.
+        :param scopes: Optional[dict[str, str]
+            Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
+            Example:
+                {
+                    f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
+                }
+        :param validate_iss: bool
+            Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
+        :param iss_callable: Async Callable
+            Async function that has to accept a `tid` (tenant ID) and return a `iss` (issuer) or
+             raise an InvalidIssuer exception
+            This is required when validate_iss is set to `True`.
+        :param openid_config_use_app_id: bool
+            Set this to True if you're using claims-mapping. If you're unsure, leave at False.
+            https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response
+        :param openapi_authorization_url: str
+            Override OpenAPI authorization URL
+        :param openapi_token_url: str
+            Override OpenAPI token URL
+        :param openapi_description: str
+            Override OpenAPI description
+        """
+        super().__init__(
+            app_client_id=app_client_id,
+            auto_error=auto_error,
+            scopes=scopes,
+            validate_iss=validate_iss,
+            iss_callable=iss_callable,
+            multi_tenant=True,
+            openid_config_use_app_id=openid_config_use_app_id,
+            openid_config_url=openid_config_url,
+            openapi_authorization_url=openapi_authorization_url,
+            openapi_token_url=openapi_token_url,
+            openapi_description=openapi_description,
+        )
+        self.scheme_name: str = 'Azure AD - PKCE, B2C Multi-tenant'

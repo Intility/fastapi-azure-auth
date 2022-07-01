@@ -112,6 +112,21 @@ openapi_schema = {
     },
     'openapi': '3.0.2',
     'paths': {
+        '/api/v1/hello-multi-auth-bc': {
+            'get': {
+                'description': 'Wonder how ' 'this auth is ' 'done?',
+                'operationId': 'helloWorldApiKey',
+                'responses': {
+                    '200': {
+                        'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
+                        'description': 'Successful ' 'Response',
+                    }
+                },
+                'security': [{'Azure AD - PKCE, B2C Multi-tenant': []}, {'APIKeyHeader': []}],
+                'summary': 'Say hello with an ' 'API key',
+                'tags': ['hello'],
+            }
+        },
         '/api/v1/hello': {
             'get': {
                 'description': 'Wonder who we say hello ' 'to?',
