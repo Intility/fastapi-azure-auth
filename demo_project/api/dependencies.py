@@ -8,8 +8,8 @@ from fastapi.security.api_key import APIKeyHeader
 
 from fastapi_azure_auth import (
     MultiTenantAzureAuthorizationCodeBearer,
+    MultiTenantAzureAuthorizationCodeBearerB2C,
     SingleTenantAzureAuthorizationCodeBearer,
-    MultiTenantAzureAuthorizationCodeBearerB2C
 )
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.user import User
@@ -31,6 +31,7 @@ async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> None:
     """
     if 'AdminUser' not in user.roles:
         raise InvalidAuth('User is not an AdminUser')
+
 
 class IssuerFetcher:
     def __init__(self) -> None:
