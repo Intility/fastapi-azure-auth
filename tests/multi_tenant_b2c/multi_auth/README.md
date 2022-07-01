@@ -1,0 +1,1 @@
+This folder contains tests to ensure that b2c multiple authentication schemes will work together.
