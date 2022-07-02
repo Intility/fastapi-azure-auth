@@ -202,25 +202,26 @@ def test_client():
     yield TestClient(app=app)
 
 
-def test_openapi_schema(test_client):
+@pytest.mark.parametrize(
+    'code,expected',
+    [(200, openapi_schema), (401, {'detail': 'Not authenticated'})],
+    ids=['test_openapi_schema', 'test_no_token'],
+)
+def test_openapi_schema(test_client, code, expected):
     response = test_client.get('api/v1/openapi.json')
-    assert response.status_code == 200, response.text
-    assert response.json() == openapi_schema
+    assert response.status_code == code, response.text
+    assert response.json() == expected
 
 
-def test_no_token(test_client):
-    response = test_client.get('/api/v1/hello')
-    assert response.status_code == 401, response.text
-    assert response.json() == {'detail': 'Not authenticated'}
-
-
-def test_incorrect_token(test_client):
-    response = test_client.get('/api/v1/hello', headers={'Authorization': 'Non-existent testtoken'})
-    assert response.status_code == 401, response.text
-    assert response.json() == {'detail': 'Not authenticated'}
-
-
-def test_token(test_client):
-    response = test_client.get('/api/v1/hello', headers={'Authorization': 'Bearer '})
-    assert response.status_code == 401, response.text
-    assert response.json() == {'detail': 'Invalid token format'}
+@pytest.mark.parametrize(
+    'code,headers,expected',
+    [
+        (401, {'Authorization': 'Non-existent testtoken'}, {'detail': 'Not authenticated'}),
+        (401, {'Authorization': 'Bearer '}, {'detail': 'Invalid token format'}),
+    ],
+    ids=['test_openapi_schema', 'test_no_token'],
+)
+def test_incorrect_token(test_client, code, headers, expected):
+    response = test_client.get('/api/v1/hello', headers=headers)
+    assert response.status_code == code, response.text
+    assert response.json() == expected

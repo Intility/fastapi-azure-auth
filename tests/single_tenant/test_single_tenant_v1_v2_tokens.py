@@ -122,38 +122,14 @@ async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_k
         (build_access_token_expired, {'detail': 'Token signature has expired'}),
         (build_evil_access_token, {'detail': 'Unable to validate token'}),
     ],
-    ids=['test_openid_and_keys', 'test_invalid_token_claims', 'test_expired_token', 'test_evil_token'],
+    ids=['test_normal_user_rejected', 'test_invalid_token_claims', 'test_expired_token', 'test_evil_token'],
 )
 @pytest.mark.anyio
-async def test_openid_and_keys(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases, jwt, expected):
+async def test_valid_token(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases, jwt, expected):
     test_version = current_version(current_cases)
     async with get_ac(jwt(test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == expected
-
-
-@pytest.mark.parametrize(
-    'jwt',
-    [
-        'eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9',
-        'eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJwcmludCIsInR5cCI6IkpXVCIsIng1dCI6ImFub3RoZXIgdGh1bWJwcmludCJ9',
-    ],
-    ids=['test_malformed_token', 'test_only_header'],
-)
-@pytest.mark.anyio
-async def test_invalid_format(single_tenant_app, mock_openid_and_keys_v1_v2, jwt):
-    """A short token, that only has a broken header"""
-    async with get_ac(jwt) as ac:
-        response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Invalid token format'}
-
-
-@pytest.mark.anyio
-async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
-    test_version = current_version(current_cases)
-    async with get_ac(build_access_token_invalid_scopes(version=test_version)) as ac:
-        response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Required scope missing'}
 
 
 @pytest.mark.anyio
@@ -165,11 +141,46 @@ async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_val
 
 
 @pytest.mark.anyio
+async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
+    test_version = current_version(current_cases)
+    async with get_ac(build_access_token_invalid_scopes(version=test_version)) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Required scope missing'}
+
+
+@pytest.mark.anyio
+async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
+    test_version = current_version(current_cases)
+    async with get_ac(build_access_token_invalid_scopes(version=test_version)) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Required scope missing'}
+
+
+@pytest.mark.anyio
 async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
     async with get_ac(build_access_token_invalid_scopes(scopes=None, version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Token contains invalid formatted scopes'}
+
+
+@pytest.mark.parametrize(
+    'jwt,expected',
+    [
+        ('eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9', {'detail': 'Invalid token format'}),
+        (
+            'eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJwcmludCIsInR5cCI6IkpXVCIsIng1dCI6ImFub3RoZXIgdGh1bWJwcmludCJ9',
+            {'detail': 'Invalid token format'},
+        ),
+    ],
+    ids=['test_malformed_token', 'test_only_header'],
+)
+@pytest.mark.anyio
+async def test_invalid_format(single_tenant_app, mock_openid_and_keys_v1_v2, jwt, expected):
+    """A short token, that only has a broken header"""
+    async with get_ac(jwt) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == expected
 
 
 @pytest.mark.anyio
