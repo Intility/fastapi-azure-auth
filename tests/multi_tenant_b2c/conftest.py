@@ -2,7 +2,7 @@ import httpx
 import pytest
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
-from multi_tenant_b2c.common import generate_obj
+from tests.multi_tenant_b2c.common import generate_obj
 from tests.utils import build_openid_keys, keys_url, openid_config_url, openid_configuration
 
 
