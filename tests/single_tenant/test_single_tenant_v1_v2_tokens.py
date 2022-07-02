@@ -2,8 +2,7 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
-from demo_project.main import app
-from httpx import AsyncClient
+from tests.multi_tenant.conftest import get_ac
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -24,7 +23,7 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freeze
     expires = issued_at + 3600
     test_version = current_version(current_cases)
     access_token = build_access_token(version=test_version)
-    async with AsyncClient(app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + access_token}) as ac:
+    async with get_ac(access_token) as ac:
         response = await ac.get('api/v1/hello')
     if test_version == 1:
         assert response.json() == {
@@ -110,144 +109,74 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freeze
 @pytest.mark.anyio
 async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=test_version)}
-    ) as ac:
+    async with get_ac(build_access_token(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
+@pytest.mark.parametrize(
+    'jwt,expected',
+    [
+        (build_access_token_normal_user, {'detail': 'User is not an AdminUser'}),
+        (build_access_token_invalid_claims, {'detail': 'Token contains invalid claims'}),
+        (build_access_token_expired, {'detail': 'Token signature has expired'}),
+        (build_evil_access_token, {'detail': 'Unable to validate token'}),
+    ],
+    ids=['test_openid_and_keys', 'test_invalid_token_claims', 'test_expired_token', 'test_evil_token'],
+)
 @pytest.mark.anyio
-async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
+async def test_openid_and_keys(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases, jwt, expected):
     test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_normal_user(version=test_version)},
-    ) as ac:
+    async with get_ac(jwt(test_version)) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'User is not an AdminUser'}
+    assert response.json() == expected
 
 
+@pytest.mark.parametrize(
+    'jwt',
+    [
+        'eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9',
+        'eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJwcmludCIsInR5cCI6IkpXVCIsIng1dCI6ImFub3RoZXIgdGh1bWJwcmludCJ9',
+    ],
+    ids=['test_malformed_token', 'test_only_header'],
+)
 @pytest.mark.anyio
-async def test_invalid_token_claims(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
-    test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims(version=test_version)},
-    ) as ac:
+async def test_invalid_format(single_tenant_app, mock_openid_and_keys_v1_v2, jwt):
+    """A short token, that only has a broken header"""
+    async with get_ac(jwt) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Token contains invalid claims'}
-
-
-@pytest.mark.anyio
-async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
-    test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims(version=test_version)},
-    ) as ac:
-        response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
+    assert response.json() == {'detail': 'Invalid token format'}
 
 
 @pytest.mark.anyio
 async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(version=test_version)},
-    ) as ac:
+    async with get_ac(build_access_token_invalid_scopes(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Required scope missing'}
 
 
 @pytest.mark.anyio
-async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
+async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(version=test_version)},
-    ) as ac:
+    async with get_ac(build_access_token_invalid_claims(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Required scope missing'}
+    assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
 @pytest.mark.anyio
 async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
     test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(scopes=None, version=test_version)},
-    ) as ac:
+    async with get_ac(build_access_token_invalid_scopes(scopes=None, version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Token contains invalid formatted scopes'}
-
-
-@pytest.mark.anyio
-async def test_expired_token(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
-    test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_expired(version=test_version)},
-    ) as ac:
-        response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Token signature has expired'}
-
-
-@pytest.mark.anyio
-async def test_evil_token(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
-    """Kid matches what we expect, but it's not signed correctly"""
-    test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_evil_access_token(version=test_version)},
-    ) as ac:
-        response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Unable to validate token'}
-
-
-@pytest.mark.anyio
-async def test_malformed_token(single_tenant_app, mock_openid_and_keys_v1_v2):
-    """A short token, that only has a broken header"""
-    async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsInR5cI6IkpXVCJ9'}
-    ) as ac:
-        response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Invalid token format'}
-
-
-@pytest.mark.anyio
-async def test_only_header(single_tenant_app, mock_openid_and_keys_v1_v2):
-    """Only header token, with a matching kid, so the rest of the logic will be called, but can't be validated"""
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={
-            'Authorization': 'Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6InJlYWwgdGh1bWJ'
-            'wcmludCIsInR5cCI6IkpXVCIsIng1dCI6ImFub3RoZXIgdGh1bWJwcmludCJ9'
-        },  # {'kid': 'real thumbprint', 'x5t': 'another thumbprint'}
-    ) as ac:
-        response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Invalid token format'}
 
 
 @pytest.mark.anyio
 async def test_exception_raised(single_tenant_app, mock_openid_and_keys_v1_v2, mocker, current_cases):
     test_version = current_version(current_cases)
     mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
-    async with AsyncClient(
-        app=app,
-        base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_expired(version=test_version)},
-    ) as ac:
+    async with get_ac(build_access_token_expired(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to process token'}
 
@@ -262,16 +191,12 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
     * Do request
     """
     test_version = current_version(current_cases)
-    async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=test_version)}
-    ) as ac:
+    async with get_ac(build_access_token(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
 
     freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
 
-    async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=test_version)}
-    ) as ac:
-        second_resonse = await ac.get('api/v1/hello')
-    assert second_resonse.json() == {'detail': 'Unable to verify token, no signing keys found'}
+    async with get_ac(build_access_token(version=test_version)) as ac:
+        second_response = await ac.get('api/v1/hello')
+    assert second_response.json() == {'detail': 'Unable to verify token, no signing keys found'}

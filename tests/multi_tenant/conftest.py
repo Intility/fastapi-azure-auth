@@ -11,7 +11,18 @@ from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 
 @pytest.fixture
 def multi_tenant_app():
-    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object()
+    async def issuer_fetcher(tid):
+        tids = {'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0'}
+        return tids[tid]
+
+    azure_scheme_overrides = MultiTenantAzureAuthorizationCodeBearer(
+        app_client_id=settings.APP_CLIENT_ID,
+        scopes={
+            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
+        },
+        validate_iss=True,
+        iss_callable=issuer_fetcher,
+    )
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     yield
 
@@ -55,9 +66,16 @@ def mock_openid_and_no_valid_keys(respx_mock, mock_openid):
     yield
 
 
-def generate_azure_scheme_multi_tenant_object(issuer=None):
+def get_ac(jwt, new_headers=None):
+    headers = {'Authorization': 'Bearer ' + jwt}
+    if new_headers:
+        headers = new_headers
+    return AsyncClient(app=app, base_url='http://test', headers=headers)
+
+
+def generate_obj(issuer=None):
     """
-    This method is used just to generate the Multi Tenant Obj
+    This method is used just to generate the B2C Obj
     """
 
     async def issuer_fetcher(tid):
