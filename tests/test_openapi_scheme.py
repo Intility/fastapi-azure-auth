@@ -203,12 +203,12 @@ def test_client():
 
 
 @pytest.mark.parametrize(
-    'code,expected',
-    [(200, openapi_schema), (401, {'detail': 'Not authenticated'})],
+    'code,url,expected',
+    [(200, 'api/v1/openapi.json', openapi_schema), (401, '/api/v1/hello', {'detail': 'Not authenticated'})],
     ids=['test_openapi_schema', 'test_no_token'],
 )
-def test_openapi_schema(test_client, code, expected):
-    response = test_client.get('api/v1/openapi.json')
+def test_openapi_schema(test_client, code, url, expected):
+    response = test_client.get(url)
     assert response.status_code == code, response.text
     assert response.json() == expected
 
@@ -219,7 +219,7 @@ def test_openapi_schema(test_client, code, expected):
         (401, {'Authorization': 'Non-existent testtoken'}, {'detail': 'Not authenticated'}),
         (401, {'Authorization': 'Bearer '}, {'detail': 'Invalid token format'}),
     ],
-    ids=['test_openapi_schema', 'test_no_token'],
+    ids=['test_openapi_schema', 'test_token'],
 )
 def test_incorrect_token(test_client, code, headers, expected):
     response = test_client.get('/api/v1/hello', headers=headers)
