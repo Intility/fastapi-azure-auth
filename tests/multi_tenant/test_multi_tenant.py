@@ -6,6 +6,7 @@ from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
 from httpx import AsyncClient
+from multi_tenant.common import generate_obj
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -80,14 +81,8 @@ async def test_iss_callable_raise_error(mock_openid_and_keys):
     async def issuer_fetcher(tid):
         raise InvalidAuth(f'Tenant {tid} not a valid tenant')
 
-    azure_scheme_overrides = MultiTenantAzureAuthorizationCodeBearer(
-        app_client_id=settings.APP_CLIENT_ID,
-        scopes={
-            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
-        },
-        validate_iss=True,
-        iss_callable=issuer_fetcher,
-    )
+    azure_scheme_overrides = generate_obj(issuer_fetcher)
+
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=2)}

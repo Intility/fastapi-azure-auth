@@ -330,7 +330,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         self.scheme_name: str = 'Azure AD - PKCE, Multi-tenant'
 
 
-class MultiTenantAzureAuthorizationCodeBearerB2C(AzureAuthorizationCodeBearerBase):
+class B2CAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
     def __init__(
         self,
         app_client_id: str,

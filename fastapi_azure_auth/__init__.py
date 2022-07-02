@@ -1,6 +1,6 @@
 from fastapi_azure_auth.auth import (  # noqa: F401
+    B2CAuthorizationCodeBearer as B2CAuthorizationCodeBearer,
     MultiTenantAzureAuthorizationCodeBearer as MultiTenantAzureAuthorizationCodeBearer,
-    MultiTenantAzureAuthorizationCodeBearerB2C as MultiTenantAzureAuthorizationCodeBearerB2C,
     SingleTenantAzureAuthorizationCodeBearer as SingleTenantAzureAuthorizationCodeBearer,
 )
 
