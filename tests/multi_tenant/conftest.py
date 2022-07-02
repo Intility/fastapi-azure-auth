@@ -1,9 +1,11 @@
 import httpx
 import pytest
+from core.config import settings
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
-from tests.multi_tenant.common import generate_obj
 from tests.utils import build_openid_keys, keys_url, openid_config_url, openid_configuration
+
+from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 
 
 @pytest.fixture
@@ -50,3 +52,25 @@ def mock_openid_ok_then_empty(respx_mock, mock_openid):
 def mock_openid_and_no_valid_keys(respx_mock, mock_openid):
     respx_mock.get(keys_url(version=2)).respond(json=build_openid_keys(no_valid_keys=True))
     yield
+
+
+def generate_obj(issuer=None):
+    """
+    This method is used just to generate the B2C Obj
+    """
+
+    async def issuer_fetcher(tid):
+        tids = {'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0'}
+        return tids[tid]
+
+    current_issuer = issuer_fetcher
+    if issuer:
+        current_issuer = issuer
+    return MultiTenantAzureAuthorizationCodeBearer(
+        app_client_id=settings.APP_CLIENT_ID,
+        scopes={
+            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
+        },
+        validate_iss=True,
+        iss_callable=current_issuer,
+    )

@@ -6,7 +6,7 @@ from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
 from httpx import AsyncClient
-from multi_tenant.common import generate_obj
+from multi_tenant.conftest import generate_obj
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
