@@ -1,27 +1,14 @@
 import httpx
 import pytest
 from demo_project.api.dependencies import azure_scheme
-from demo_project.core.config import settings
 from demo_project.main import app
+from multi_tenant_b2c.common import generate_obj
 from tests.utils import build_openid_keys, keys_url, openid_config_url, openid_configuration
-
-from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearerB2C
 
 
 @pytest.fixture
 def multi_tenant_app():
-    async def issuer_fetcher(tid):
-        tids = {'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0'}
-        return tids[tid]
-
-    azure_scheme_overrides = MultiTenantAzureAuthorizationCodeBearerB2C(
-        app_client_id=settings.APP_CLIENT_ID,
-        scopes={
-            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
-        },
-        validate_iss=True,
-        iss_callable=issuer_fetcher,
-    )
+    azure_scheme_overrides = generate_obj()
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     yield
 
