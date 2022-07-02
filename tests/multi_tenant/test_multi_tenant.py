@@ -3,10 +3,9 @@ from datetime import datetime, timedelta
 
 import pytest
 from demo_project.api.dependencies import azure_scheme
-from demo_project.core.config import settings
 from demo_project.main import app
 from httpx import AsyncClient
-from tests.multi_tenant.conftest import generate_azure_scheme_multi_tenant_object
+from multi_tenant.conftest import generate_async_client, generate_obj
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -16,7 +15,6 @@ from tests.utils import (
     build_evil_access_token,
 )
 
-from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 from fastapi_azure_auth.exceptions import InvalidAuth
 
 
@@ -81,25 +79,17 @@ async def test_iss_callable_raise_error(mock_openid_and_keys):
     async def issuer_fetcher(tid):
         raise InvalidAuth(f'Tenant {tid} not a valid tenant')
 
-    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object(issuer_fetcher)
-
+    azure_scheme_overrides = generate_obj(issuer_fetcher)
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
-    async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=2)}
-    ) as ac:
+
+    async with generate_async_client(build_access_token(version=2)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Tenant intility_tenant_id not a valid tenant'}
 
 
 @pytest.mark.anyio
 async def test_skip_iss_validation(mock_openid_and_keys):
-    azure_scheme_overrides = MultiTenantAzureAuthorizationCodeBearer(
-        app_client_id=settings.APP_CLIENT_ID,
-        scopes={
-            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
-        },
-        validate_iss=False,
-    )
+    azure_scheme_overrides = generate_obj()
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     async with AsyncClient(
         app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=2)}
