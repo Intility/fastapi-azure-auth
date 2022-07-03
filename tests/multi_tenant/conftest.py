@@ -1,7 +1,7 @@
 import httpx
 import pytest
-from core.config import settings
 from demo_project.api.dependencies import azure_scheme
+from demo_project.core.config import settings
 from demo_project.main import app
 from tests.utils import build_openid_keys, keys_url, openid_config_url, openid_configuration
 
