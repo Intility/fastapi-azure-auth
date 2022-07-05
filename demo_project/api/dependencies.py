@@ -7,7 +7,7 @@ from fastapi import Depends
 from fastapi.security.api_key import APIKeyHeader
 
 from fastapi_azure_auth import (
-    B2CAuthorizationCodeBearer,
+    B2CMultiTenantAuthorizationCodeBearer,
     MultiTenantAzureAuthorizationCodeBearer,
     SingleTenantAzureAuthorizationCodeBearer,
 )
@@ -73,7 +73,7 @@ azure_scheme_auto_error_false = MultiTenantAzureAuthorizationCodeBearer(
     auto_error=False,
 )
 
-azure_scheme_auto_error_false_b2c = B2CAuthorizationCodeBearer(
+azure_scheme_auto_error_false_b2c = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     openapi_authorization_url=settings.AUTH_URL,
     openapi_token_url=settings.TOKEN_URL,

@@ -10,7 +10,7 @@ from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 
 @pytest.fixture
 def multi_tenant_app():
-    azure_scheme_overrides = generate_obj()
+    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object()
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     yield
 
@@ -54,9 +54,9 @@ def mock_openid_and_no_valid_keys(respx_mock, mock_openid):
     yield
 
 
-def generate_obj(issuer=None):
+def generate_azure_scheme_multi_tenant_object(issuer=None):
     """
-    This method is used just to generate the B2C Obj
+    This method is used just to generate the Multi Tenant Obj
     """
 
     async def issuer_fetcher(tid):

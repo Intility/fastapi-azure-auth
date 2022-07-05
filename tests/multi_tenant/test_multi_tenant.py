@@ -6,7 +6,7 @@ from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
 from httpx import AsyncClient
-from tests.multi_tenant.conftest import generate_obj
+from tests.multi_tenant.conftest import generate_azure_scheme_multi_tenant_object
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -81,7 +81,7 @@ async def test_iss_callable_raise_error(mock_openid_and_keys):
     async def issuer_fetcher(tid):
         raise InvalidAuth(f'Tenant {tid} not a valid tenant')
 
-    azure_scheme_overrides = generate_obj(issuer_fetcher)
+    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object(issuer_fetcher)
 
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     async with AsyncClient(
