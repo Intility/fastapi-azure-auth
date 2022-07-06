@@ -85,6 +85,19 @@ openapi_schema = {
                 },
                 'type': 'oauth2',
             },
+            'Azure AD - PKCE, B2C Multi-tenant': {
+                'type': 'oauth2',
+                'description': '`Leave client_secret blank`',
+                'flows': {
+                    'authorizationCode': {
+                        'scopes': {
+                            'api://oauth299-9999-9999-abcd-efghijkl1234567890/user_impersonation': 'User impersonation'
+                        },
+                        'authorizationUrl': 'https://dummy.com/',
+                        'tokenUrl': 'https://dummy.com/',
+                    }
+                },
+            },
             'Azure AD - PKCE, Single-tenant': {
                 'description': '`Leave ' 'client_secret ' 'blank`',
                 'flows': {
@@ -112,6 +125,21 @@ openapi_schema = {
     },
     'openapi': '3.0.2',
     'paths': {
+        '/api/v1/hello-multi-auth-b2c': {
+            'get': {
+                'description': 'Wonder how ' 'this auth is ' 'done?',
+                'operationId': 'helloWorldApiKey',
+                'responses': {
+                    '200': {
+                        'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
+                        'description': 'Successful ' 'Response',
+                    }
+                },
+                'security': [{'Azure AD - PKCE, B2C Multi-tenant': []}, {'APIKeyHeader': []}],
+                'summary': 'Say hello with an ' 'API key',
+                'tags': ['hello'],
+            }
+        },
         '/api/v1/hello': {
             'get': {
                 'description': 'Wonder who we say hello ' 'to?',
