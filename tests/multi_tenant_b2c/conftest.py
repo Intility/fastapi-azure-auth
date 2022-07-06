@@ -5,12 +5,12 @@ from demo_project.core.config import settings
 from demo_project.main import app
 from tests.utils import build_openid_keys, keys_url, openid_config_url, openid_configuration
 
-from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
 
 
 @pytest.fixture
 def multi_tenant_app():
-    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object()
+    azure_scheme_overrides = generate_azure_scheme_multi_tenant_b2c_object()
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     yield
 
@@ -54,9 +54,9 @@ def mock_openid_and_no_valid_keys(respx_mock, mock_openid):
     yield
 
 
-def generate_azure_scheme_multi_tenant_object(issuer=None):
+def generate_azure_scheme_multi_tenant_b2c_object(issuer=None):
     """
-    This method is used just to generate the Multi Tenant Obj
+    This method is used just to generate the Multi Tenant B2C Obj
     """
 
     async def issuer_fetcher(tid):
@@ -66,8 +66,13 @@ def generate_azure_scheme_multi_tenant_object(issuer=None):
     current_issuer = issuer_fetcher
     if issuer:
         current_issuer = issuer
-    return MultiTenantAzureAuthorizationCodeBearer(
+    return B2CMultiTenantAuthorizationCodeBearer(
         app_client_id=settings.APP_CLIENT_ID,
+        openapi_authorization_url=settings.AUTH_URL,
+        openapi_token_url=settings.TOKEN_URL,
+        # The value below is used only for testing purpose you should use:
+        # https://login.microsoftonline.com/common/v2.0/oauth2/token
+        openid_config_url='https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
         scopes={
             f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
         },
