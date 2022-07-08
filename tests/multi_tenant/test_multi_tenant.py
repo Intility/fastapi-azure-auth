@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import pytest
 from demo_project.api.dependencies import azure_scheme
 from demo_project.main import app
-from tests.multi_tenant.conftest import generate_obj, get_ac
+from tests.multi_tenant.conftest import generate_azure_scheme_multi_tenant_object, get_async_client
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -22,7 +22,7 @@ async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
     issued_at = int(time.time())
     expires = issued_at + 3600
     access_token = build_access_token(version=2)
-    async with get_ac(access_token) as ac:
+    async with get_async_client(access_token) as ac:
         response = await ac.get('api/v1/hello')
         assert response.json() == {
             'hello': 'world',
@@ -66,7 +66,7 @@ async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
 
 @pytest.mark.anyio
 async def test_no_keys_to_decode_with(multi_tenant_app, mock_openid_and_empty_keys):
-    async with get_ac(build_access_token(version=2)) as ac:
+    async with get_async_client(build_access_token(version=2)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
@@ -76,19 +76,19 @@ async def test_iss_callable_raise_error(mock_openid_and_keys):
     async def issuer_fetcher(tid):
         raise InvalidAuth(f'Tenant {tid} not a valid tenant')
 
-    azure_scheme_overrides = generate_obj(issuer_fetcher)
+    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object(issuer_fetcher)
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
 
-    async with get_ac(build_access_token(version=2)) as ac:
+    async with get_async_client(build_access_token(version=2)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Tenant intility_tenant_id not a valid tenant'}
 
 
 @pytest.mark.anyio
 async def test_skip_iss_validation(mock_openid_and_keys):
-    azure_scheme_overrides = generate_obj()
+    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object()
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
-    async with get_ac(build_access_token(version=2)) as ac:
+    async with get_async_client(build_access_token(version=2)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200, response.json()
 
@@ -103,7 +103,7 @@ async def test_skip_iss_validation(mock_openid_and_keys):
 )
 @pytest.mark.anyio
 async def test_token(multi_tenant_app, mock_openid_and_keys, jwt, expected):
-    async with get_ac(jwt) as ac:
+    async with get_async_client(jwt) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': expected}
 
@@ -125,7 +125,7 @@ async def test_token(multi_tenant_app, mock_openid_and_keys, jwt, expected):
 )
 @pytest.mark.anyio
 async def test_invalid_token(multi_tenant_app, mock_openid_and_no_valid_keys, jwt, expected):
-    async with get_ac(jwt) as ac:
+    async with get_async_client(jwt) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': expected}
 
@@ -145,7 +145,7 @@ async def test_invalid_token(multi_tenant_app, mock_openid_and_no_valid_keys, jw
 )
 @pytest.mark.anyio
 async def test_broken_token(multi_tenant_app, mock_openid_and_keys, jwt, expected):
-    async with get_ac(jwt) as ac:
+    async with get_async_client(jwt) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': expected}
 
@@ -153,7 +153,7 @@ async def test_broken_token(multi_tenant_app, mock_openid_and_keys, jwt, expecte
 @pytest.mark.anyio
 async def test_exception_raised(multi_tenant_app, mock_openid_and_keys, mocker):
     mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
-    async with get_ac(build_access_token_expired(version=2)) as ac:
+    async with get_async_client(build_access_token_expired(version=2)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to process token'}
 
@@ -167,12 +167,12 @@ async def test_change_of_keys_works(multi_tenant_app, mock_openid_ok_then_empty,
     * Generate a new, valid token
     * Do request
     """
-    async with get_ac(build_access_token(version=2)) as ac:
+    async with get_async_client(build_access_token(version=2)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
 
     freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
 
-    async with get_ac(build_access_token(version=2)) as ac:
+    async with get_async_client(build_access_token(version=2)) as ac:
         second_response = await ac.get('api/v1/hello')
     assert second_response.json() == {'detail': 'Unable to verify token, no signing keys found'}

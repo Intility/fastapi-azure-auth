@@ -2,7 +2,7 @@ import time
 from datetime import datetime, timedelta
 
 import pytest
-from tests.multi_tenant.conftest import get_ac
+from tests.multi_tenant.conftest import get_async_client
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -18,12 +18,14 @@ def current_version(current_cases) -> int:
 
 
 @pytest.mark.anyio
-async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freezer, current_cases):
+async def test_normal_user(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_keys_v1_v2, freezer, current_cases
+):
     issued_at = int(time.time())
     expires = issued_at + 3600
     test_version = current_version(current_cases)
     access_token = build_access_token(version=test_version)
-    async with get_ac(access_token) as ac:
+    async with get_async_client(access_token) as ac:
         response = await ac.get('api/v1/hello')
     if test_version == 1:
         assert response.json() == {
@@ -107,9 +109,11 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freeze
 
 
 @pytest.mark.anyio
-async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_keys_v1_v2, current_cases):
+async def test_no_keys_to_decode_with(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_empty_keys_v1_v2, current_cases
+):
     test_version = current_version(current_cases)
-    async with get_ac(build_access_token(version=test_version)) as ac:
+    async with get_async_client(build_access_token(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
@@ -125,41 +129,51 @@ async def test_no_keys_to_decode_with(single_tenant_app, mock_openid_and_empty_k
     ids=['test_normal_user_rejected', 'test_invalid_token_claims', 'test_expired_token', 'test_evil_token'],
 )
 @pytest.mark.anyio
-async def test_valid_token(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases, jwt, expected):
+async def test_valid_token(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_keys_v1_v2, current_cases, jwt, expected
+):
     test_version = current_version(current_cases)
-    async with get_ac(jwt(test_version)) as ac:
+    async with get_async_client(jwt(test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == expected
 
 
 @pytest.mark.anyio
-async def test_no_valid_keys_for_token(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
+async def test_no_valid_keys_for_token(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_no_valid_keys_v1_v2, current_cases
+):
     test_version = current_version(current_cases)
-    async with get_ac(build_access_token_invalid_claims(version=test_version)) as ac:
+    async with get_async_client(build_access_token_invalid_claims(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
 
 
 @pytest.mark.anyio
-async def test_no_valid_scopes(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
+async def test_no_valid_scopes(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_no_valid_keys_v1_v2, current_cases
+):
     test_version = current_version(current_cases)
-    async with get_ac(build_access_token_invalid_scopes(version=test_version)) as ac:
+    async with get_async_client(build_access_token_invalid_scopes(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Required scope missing'}
 
 
 @pytest.mark.anyio
-async def test_no_valid_invalid_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
+async def test_no_valid_invalid_scope(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_no_valid_keys_v1_v2, current_cases
+):
     test_version = current_version(current_cases)
-    async with get_ac(build_access_token_invalid_scopes(version=test_version)) as ac:
+    async with get_async_client(build_access_token_invalid_scopes(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Required scope missing'}
 
 
 @pytest.mark.anyio
-async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_and_no_valid_keys_v1_v2, current_cases):
+async def test_no_valid_invalid_formatted_scope(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_no_valid_keys_v1_v2, current_cases
+):
     test_version = current_version(current_cases)
-    async with get_ac(build_access_token_invalid_scopes(scopes=None, version=test_version)) as ac:
+    async with get_async_client(build_access_token_invalid_scopes(scopes=None, version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Token contains invalid formatted scopes'}
 
@@ -176,24 +190,28 @@ async def test_no_valid_invalid_formatted_scope(single_tenant_app, mock_openid_a
     ids=['test_malformed_token', 'test_only_header'],
 )
 @pytest.mark.anyio
-async def test_invalid_format(single_tenant_app, mock_openid_and_keys_v1_v2, jwt, expected):
+async def test_invalid_format(generate_azure_scheme_single_tenant_object, mock_openid_and_keys_v1_v2, jwt, expected):
     """A short token, that only has a broken header"""
-    async with get_ac(jwt) as ac:
+    async with get_async_client(jwt) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == expected
 
 
 @pytest.mark.anyio
-async def test_exception_raised(single_tenant_app, mock_openid_and_keys_v1_v2, mocker, current_cases):
+async def test_exception_raised(
+    generate_azure_scheme_single_tenant_object, mock_openid_and_keys_v1_v2, mocker, current_cases
+):
     test_version = current_version(current_cases)
     mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
-    async with get_ac(build_access_token_expired(version=test_version)) as ac:
+    async with get_async_client(build_access_token_expired(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to process token'}
 
 
 @pytest.mark.anyio
-async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty_v1_v2, freezer, current_cases):
+async def test_change_of_keys_works(
+    generate_azure_scheme_single_tenant_object, mock_openid_ok_then_empty_v1_v2, freezer, current_cases
+):
     """
     * Do a successful request.
     * Set time to 25 hours later, so that a new OpenAPI config has to be fetched
@@ -202,12 +220,12 @@ async def test_change_of_keys_works(single_tenant_app, mock_openid_ok_then_empty
     * Do request
     """
     test_version = current_version(current_cases)
-    async with get_ac(build_access_token(version=test_version)) as ac:
+    async with get_async_client(build_access_token(version=test_version)) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
 
     freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
 
-    async with get_ac(build_access_token(version=test_version)) as ac:
+    async with get_async_client(build_access_token(version=test_version)) as ac:
         second_response = await ac.get('api/v1/hello')
     assert second_response.json() == {'detail': 'Unable to verify token, no signing keys found'}

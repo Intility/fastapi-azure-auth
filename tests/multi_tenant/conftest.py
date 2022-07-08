@@ -66,16 +66,19 @@ def mock_openid_and_no_valid_keys(respx_mock, mock_openid):
     yield
 
 
-def get_ac(jwt, new_headers=None):
+def get_async_client(jwt, new_headers=None):
+    """
+    Get AsyncClient
+    """
     headers = {'Authorization': 'Bearer ' + jwt}
     if new_headers:
         headers = new_headers
     return AsyncClient(app=app, base_url='http://test', headers=headers)
 
 
-def generate_obj(issuer=None):
+def generate_azure_scheme_multi_tenant_object(issuer=None):
     """
-    This method is used just to generate the B2C Obj
+    This method is used just to generate the Multi Tenant Obj
     """
 
     async def issuer_fetcher(tid):

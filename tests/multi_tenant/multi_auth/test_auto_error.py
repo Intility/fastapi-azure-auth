@@ -1,5 +1,5 @@
 import pytest
-from tests.multi_tenant.conftest import get_ac
+from tests.multi_tenant.conftest import get_async_client
 from tests.utils import build_access_token, build_access_token_expired
 
 
@@ -23,6 +23,6 @@ from tests.utils import build_access_token, build_access_token_expired
 )
 @pytest.mark.anyio
 async def test_auto_error(multi_tenant_app, mock_openid_and_keys, freezer, headers, expected):
-    async with get_ac('', headers) as ac:
+    async with get_async_client('', headers) as ac:
         response = await ac.get('api/v1/hello-multi-auth')
         assert response.json() == expected
