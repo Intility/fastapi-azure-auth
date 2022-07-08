@@ -14,7 +14,7 @@ from tests.utils import (
 
 
 def current_version(current_cases) -> int:
-    return current_cases['single_tenant_app']['token_version'].params['version']
+    return current_cases['generate_azure_scheme_single_tenant_object']['token_version'].params['version']
 
 
 @pytest.mark.anyio
