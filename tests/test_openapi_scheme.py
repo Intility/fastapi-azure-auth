@@ -64,7 +64,7 @@ openapi_schema = {
                     'scp': {'description': 'Scope', 'title': 'Scp', 'type': 'string'},
                     'tid': {'description': 'Tenant ' 'ID', 'title': 'Tid', 'type': 'string'},
                 },
-                'required': ['aud', 'tid', 'claims', 'access_token'],
+                'required': ['aud', 'claims', 'access_token'],
                 'title': 'User',
                 'type': 'object',
             },
