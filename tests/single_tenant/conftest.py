@@ -19,7 +19,7 @@ def token_version(version):
 
 @pytest.fixture
 @parametrize_with_cases('token_version', cases=token_version)
-def single_tenant_app(token_version):
+def generate_azure_scheme_single_tenant_object(token_version):
     """
     Single tenant app fixture, which also inherits token_version. Every single tenant test is run twice,
     either with v1 or v2 tokens

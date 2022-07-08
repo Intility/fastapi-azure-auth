@@ -3,6 +3,7 @@ import pytest
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from demo_project.main import app
+from httpx import AsyncClient
 from tests.utils import build_openid_keys, keys_url, openid_config_url, openid_configuration
 
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
@@ -10,7 +11,18 @@ from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 
 @pytest.fixture
 def multi_tenant_app():
-    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object()
+    async def issuer_fetcher(tid):
+        tids = {'intility_tenant_id': 'https://login.microsoftonline.com/intility_tenant/v2.0'}
+        return tids[tid]
+
+    azure_scheme_overrides = MultiTenantAzureAuthorizationCodeBearer(
+        app_client_id=settings.APP_CLIENT_ID,
+        scopes={
+            f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
+        },
+        validate_iss=True,
+        iss_callable=issuer_fetcher,
+    )
     app.dependency_overrides[azure_scheme] = azure_scheme_overrides
     yield
 
@@ -52,6 +64,16 @@ def mock_openid_ok_then_empty(respx_mock, mock_openid):
 def mock_openid_and_no_valid_keys(respx_mock, mock_openid):
     respx_mock.get(keys_url(version=2)).respond(json=build_openid_keys(no_valid_keys=True))
     yield
+
+
+def get_async_client(jwt, new_headers=None):
+    """
+    Get AsyncClient
+    """
+    headers = {'Authorization': 'Bearer ' + jwt}
+    if new_headers:
+        headers = new_headers
+    return AsyncClient(app=app, base_url='http://test', headers=headers)
 
 
 def generate_azure_scheme_multi_tenant_object(issuer=None):
