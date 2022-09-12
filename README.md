@@ -48,7 +48,7 @@
 
 ## 🚀 Description
 
-> FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.  
+> FastAPI is a modern, fast (high-performance), web framework for building APIs with Python, based on standard Python type hints.
 
 At Intility we use FastAPI for both internal (single-tenant) and customer-facing (multi-tenant) APIs. This package enables our developers (and you 😊) to create features without worrying about authentication and authorization.
 
@@ -56,10 +56,10 @@ Also, [we're hiring!](https://intility.no/en/career/)
 
 ## 📚 Resources
 
-The [documentation](https://intility.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure AD 
+The [documentation](https://intility.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure AD
 and FastAPI for both single- and multi-tenant applications. It includes examples on how to lock down
-your APIs to certain scopes, tenants, roles etc. For first time users it's strongly advised to set up your 
-application exactly how it's described there, and then alter it to your needs later. 
+your APIs to certain scopes, tenants, roles etc. For first time users it's strongly advised to set up your
+application exactly how it's described there, and then alter it to your needs later.
 
 [**MIT License**](https://github.com/Intility/fastapi-azure-auth/blob/main/LICENSE)
 | [**Documentation**](https://intility.github.io/fastapi-azure-auth/)
@@ -68,8 +68,8 @@ application exactly how it's described there, and then alter it to your needs la
 
 ## ⚡ Setup
 
-This is a tl;dr intended to give you an idea of what this package does and how to use it. 
-For a more in-depth tutorial and settings reference you should read the 
+This is a tl;dr intended to give you an idea of what this package does and how to use it.
+For a more in-depth tutorial and settings reference you should read the
 [documentation](https://intility.github.io/fastapi-azure-auth/).
 
 
@@ -96,7 +96,7 @@ app = FastAPI(
 ```
 
 #### 3. Setup CORS
-Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`. 
+Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`.
 
 #### 4. Configure FastAPI-Azure-Auth
 Configure either your [`SingleTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/single_tenant)
@@ -124,12 +124,12 @@ azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     scopes={
         f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
-    },    
+    },
     validate_iss=False
 )
 ```
-To validate the `iss`, configure an 
-[`iss_callable`](https://intility.github.io/fastapi-azure-auth/multi-tenant/accept_specific_tenants_only). 
+To validate the `iss`, configure an
+[`iss_callable`](https://intility.github.io/fastapi-azure-auth/multi-tenant/accept_specific_tenants_only).
 
 #### 5. Configure dependencies
 
@@ -138,12 +138,12 @@ Add `azure_scheme` as a dependency for your views/routers, using either `Securit
 # file: main.py
 from demoproj.api.dependencies import azure_scheme
 
-app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Security(azure_scheme, scopes='user_impersonation')])
+app.include_router(api_router, prefix=settings.API_V1_STR, dependencies=[Security(azure_scheme, scopes=['user_impersonation'])])
 ```
 
 #### 6. Load config on startup
 
-Optional but recommended. 
+Optional but recommended.
 
 ```python
 # file: main.py
