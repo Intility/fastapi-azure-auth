@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fastapi-azure-auth"
-version = "3.5.0"  # Remember to change in __init__.py as well
+version = "3.5.1"  # Remember to change in __init__.py as well
 description = "Easy and secure implementation of Azure AD for your FastAPI APIs"
 authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
 readme = "README.md"
@@ -32,7 +32,7 @@ classifiers = [
     'License :: OSI Approved :: MIT License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
-    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.11',
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
@@ -42,7 +42,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 fastapi = ">0.68.0"
-cryptography = ">35.0.0"
+cryptography = ">=38.0.3"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 httpx = ">0.18.2"
 

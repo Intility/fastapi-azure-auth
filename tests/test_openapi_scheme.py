@@ -1,3 +1,4 @@
+import fastapi
 import pytest
 from demo_project.main import app
 from fastapi.testclient import TestClient
@@ -71,6 +72,20 @@ openapi_schema = {
         },
         'securitySchemes': {
             'APIKeyHeader': {'in': 'header', 'name': 'TEST-API-KEY', 'type': 'apiKey'},
+            'Azure AD - PKCE, B2C Multi-tenant': {
+                'description': '`Leave ' 'client_secret ' 'blank`',
+                'flows': {
+                    'authorizationCode': {
+                        'authorizationUrl': 'https://dummy.com/',
+                        'scopes': {
+                            'api://oauth299-9999-9999-abcd-efghijkl1234567890/user_impersonation': 'User '
+                            'impersonation'
+                        },
+                        'tokenUrl': 'https://dummy.com/',
+                    }
+                },
+                'type': 'oauth2',
+            },
             'Azure AD - PKCE, Multi-tenant': {
                 'description': '`Leave ' 'client_secret ' 'blank`',
                 'flows': {
@@ -84,19 +99,6 @@ openapi_schema = {
                     }
                 },
                 'type': 'oauth2',
-            },
-            'Azure AD - PKCE, B2C Multi-tenant': {
-                'type': 'oauth2',
-                'description': '`Leave client_secret blank`',
-                'flows': {
-                    'authorizationCode': {
-                        'scopes': {
-                            'api://oauth299-9999-9999-abcd-efghijkl1234567890/user_impersonation': 'User impersonation'
-                        },
-                        'authorizationUrl': 'https://dummy.com/',
-                        'tokenUrl': 'https://dummy.com/',
-                    }
-                },
             },
             'Azure AD - PKCE, Single-tenant': {
                 'description': '`Leave ' 'client_secret ' 'blank`',
@@ -125,21 +127,6 @@ openapi_schema = {
     },
     'openapi': '3.0.2',
     'paths': {
-        '/api/v1/hello-multi-auth-b2c': {
-            'get': {
-                'description': 'Wonder how ' 'this auth is ' 'done?',
-                'operationId': 'helloWorldApiKey',
-                'responses': {
-                    '200': {
-                        'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
-                        'description': 'Successful ' 'Response',
-                    }
-                },
-                'security': [{'Azure AD - PKCE, B2C Multi-tenant': []}, {'APIKeyHeader': []}],
-                'summary': 'Say hello with an ' 'API key',
-                'tags': ['hello'],
-            }
-        },
         '/api/v1/hello': {
             'get': {
                 'description': 'Wonder who we say hello ' 'to?',
@@ -152,7 +139,7 @@ openapi_schema = {
                         'description': 'Successful ' 'Response',
                     }
                 },
-                'security': [{'Azure AD - PKCE, Single-tenant': []}],
+                'security': [{'Azure AD - PKCE, Single-tenant': []}, {'Azure AD - PKCE, Single-tenant': []}],
                 'summary': 'Say hello',
                 'tags': ['hello'],
             }
@@ -189,6 +176,21 @@ openapi_schema = {
                 'tags': ['hello'],
             }
         },
+        '/api/v1/hello-multi-auth-b2c': {
+            'get': {
+                'description': 'Wonder how ' 'this auth ' 'is done?',
+                'operationId': 'helloWorldApiKey',
+                'responses': {
+                    '200': {
+                        'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
+                        'description': 'Successful ' 'Response',
+                    }
+                },
+                'security': [{'Azure AD - PKCE, B2C Multi-tenant': []}, {'APIKeyHeader': []}],
+                'summary': 'Say hello with ' 'an API key',
+                'tags': ['hello'],
+            }
+        },
     },
 }
 
@@ -202,6 +204,7 @@ def test_client():
     yield TestClient(app=app)
 
 
+@pytest.mark.skipif(fastapi.__version__ < ('0.86.0'), reason='Different schema in older version')
 def test_openapi_schema(test_client):
     response = test_client.get('api/v1/openapi.json')
     assert response.status_code == 200, response.text
