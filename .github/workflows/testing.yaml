@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: 3.11
       - uses: actions/cache@v3.0.11
         with:
           path: |
@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8", "3.9", "3.10" ]
+        python-version: [ "3.8.15", "3.9.15", "3.10.8", "3.11.0" ]
         fastapi-version: [ "0.68.0", "0.70.0", "0.71.0" ]
     steps:
       - name: Check out repository
