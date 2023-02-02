@@ -47,9 +47,9 @@ python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 httpx = ">0.18.2"
 
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 pre-commit = "^2.9.3"
-black = "^20.8b1"
+black = "^22.1.0"
 pytest = "^7.0.1"
 pytest-cov = "^3.0.0"
 pytest-asyncio = "^0.18.2"
@@ -63,13 +63,13 @@ pytest-freezegun = "^0.4.2"
 pytest-cases = "^3.6.3"
 anyio = "^3.3.4"
 trio = "^0.19.0"
-respx = "^0.19.1"
+respx = "^0.20.1"
 ipython = "^8.2.0"
 
 [tool.black]
 line-length = 120
 skip-string-normalization = true
-target-version = ['py37']
+target-version = ['py38']
 include = '\.pyi?$'
 exclude = '''
 (
