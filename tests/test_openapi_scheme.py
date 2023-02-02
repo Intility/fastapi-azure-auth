@@ -154,7 +154,10 @@ openapi_schema = {
                 'from graph.',
                 'operationId': 'helloGraph',
                 'responses': {
-                    '200': {'content': {'application/json': {'schema': {}}}, 'description': 'Successful ' 'Response'}
+                    '200': {
+                        'content': {'application/json': {'schema': {'title': 'Response ' 'Hellograph'}}},
+                        'description': 'Successful ' 'Response',
+                    }
                 },
                 'security': [{'Azure AD - PKCE, Single-tenant': []}],
                 'summary': 'Fetch graph API using ' 'OBO',
@@ -204,7 +207,7 @@ def test_client():
     yield TestClient(app=app)
 
 
-@pytest.mark.skipif(fastapi.__version__ < ('0.86.0'), reason='Different schema in older version')
+@pytest.mark.skipif(fastapi.__version__ < ('0.89.0'), reason='Different schema in older version')
 def test_openapi_schema(test_client):
     response = test_client.get('api/v1/openapi.json')
     assert response.status_code == 200, response.text
