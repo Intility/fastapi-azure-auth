@@ -1627,14 +1627,14 @@ test = ["fixtures", "mock", "purl", "pytest", "requests-futures", "sphinx", "tes
 
 [[package]]
 name = "respx"
-version = "0.19.3"
+version = "0.20.1"
 description = "A utility for mocking out the Python HTTPX and HTTP Core libraries."
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
 files = [
-    {file = "respx-0.19.3-py2.py3-none-any.whl", hash = "sha256:ea3049468bfcf95c7827436230e05b85a037050dc569dbeaecdaa08fa0de5750"},
-    {file = "respx-0.19.3.tar.gz", hash = "sha256:6dab3a19dfb0ea07cef996198c12bf8a34e6fc3573a24b184d714f765e8b5e57"},
+    {file = "respx-0.20.1-py2.py3-none-any.whl", hash = "sha256:372f06991c03d1f7f480a420a2199d01f1815b6ed5a802f4e4628043a93bd03e"},
+    {file = "respx-0.20.1.tar.gz", hash = "sha256:cc47a86d7010806ab65abdcf3b634c56337a737bb5c4d74c19a0dfca83b3bc73"},
 ]
 
 [package.dependencies]
@@ -1987,4 +1987,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "ab89745991f8ba2367e8f9ab181b8bb3fe5acdd038f97858c903de56b539cfa5"
+content-hash = "8448f94888bfd288af944ad90a7a9c375736d02d295096eb78d7ac4854909c27"
