@@ -27,8 +27,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.8.13", "3.9.15", "3.10.8", "3.11.0" ]
-        fastapi-version: [ "0.68.0", "0.86.0", "0.89.1"]
+        python-version: [ "3.8.13", "3.11.2", "3.12.0-alpha.5" ]
+        fastapi-version: [ "0.68.0", "0.86.0", "0.92.0"]
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
