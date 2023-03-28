@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-from cryptography.hazmat.primitives.asymmetric.types import PUBLIC_KEY_TYPES as KeyTypes
+from cryptography.hazmat.primitives.asymmetric.types import PublicKeyTypes as KeyTypes
 from fastapi import HTTPException, status
 from httpx import AsyncClient
 from jose import jwk
