@@ -4,7 +4,7 @@ sidebar_position: 3
 ---
 
 By default, guest users in your tenant will be able to access your APIs. You can block this in code by checking
-the users `tid` is equal to yours, or preferably by configuring Azure AD. If you're using Azure AD to limit
+the users claim **does not contain** the `idp` key, or preferably by configuring Azure AD. If you're using Azure AD to limit
 guest user access, the user will be denied access on sign in, instead of getting a 403 when using the API.
 
 Go to **all** your [Enterprise Applications](https://portal.azure.com/#blade/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade/AllApps/menuId/)
@@ -18,6 +18,22 @@ clicking the `Managed application in local directory` link:
 Under **Properties**, enable `User assignment required?` and **Save**.
 
 Then, go to **Users and groups**, and **add user/group**. Find users or a fitting group and assign it to the role Default Access.
+
+Code example on how to check for the `idp` key:
+
+```python title="security.py"
+from fastapi import Depends
+from fastapi_azure_auth.exceptions import InvalidAuth
+from fastapi_azure_auth.user import User
+
+async def block_guest_users(user: User = Depends(azure_scheme)) -> None:
+    """
+    Check the claim for the `idp` key - if it exist, deny the user
+    """
+    if 'idp' in user.claims:
+        raise InvalidAuth('Guest user not allowed')
+```
+
 
 :::note
 Groups you select should have all users as direct members of the group. Nested groups does not work with Enterprise Applications.
