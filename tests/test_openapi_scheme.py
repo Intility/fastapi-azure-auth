@@ -54,6 +54,12 @@ openapi_schema = {
                     },
                     'aud': {'description': 'Audience', 'title': 'Aud', 'type': 'string'},
                     'claims': {'description': 'The ' 'entire ' 'decoded ' 'token', 'title': 'Claims', 'type': 'object'},
+                    'is_guest': {
+                        'default': False,
+                        'description': 'The ' 'user ' 'is ' 'a ' 'guest ' 'user ' 'in ' 'the ' 'tenant',
+                        'title': 'Is ' 'Guest',
+                        'type': 'boolean',
+                    },
                     'name': {'description': 'Name', 'title': 'Name', 'type': 'string'},
                     'roles': {
                         'default': [],

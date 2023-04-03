@@ -59,6 +59,7 @@ async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
                     'ver': '2.0',
                     'wids': ['some long val'],
                 },
+                'is_guest': False,
                 'name': 'Jonas Krüger Svensson / Intility AS',
                 'roles': ['AdminUser'],
                 'scp': 'user_impersonation',

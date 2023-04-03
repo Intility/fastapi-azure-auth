@@ -141,6 +141,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
 
             for scope in security_scopes.scopes:
                 token_scope_string = claims.get('scp', '')
+                log.debug('Scopes: %s', token_scope_string)
                 if not isinstance(token_scope_string, str):
                     raise InvalidAuth('Token contains invalid formatted scopes')
 

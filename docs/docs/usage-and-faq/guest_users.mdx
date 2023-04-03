@@ -1,0 +1,75 @@
+---
+title: Guest Users
+sidebar_position: 2
+---
+
+By default, guest users in your tenant will be able to access your APIs. You can block guest users from accessing
+your APIs by creating a dependency, or by configuring Azure AD. If you're using Azure AD to deny
+guest users access, the user will be denied access on sign in, instead of getting a 403 when using the API. This
+works great for single-tenant applications, but can be hassle for multi-tenant applications, since you need to do this
+in every tenant.
+
+
+### User assignment required
+
+Go to **all** your [Enterprise Applications](https://portal.azure.com/#blade/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade/AllApps/menuId/)
+and do the following steps. You can find your Enterprise Application either by searching on the Client ID in the
+[Enterprise Applications](https://portal.azure.com/#blade/Microsoft_AAD_IAM/StartboardApplicationsMenuBlade/AllApps/menuId/) menu,
+or by first navigating to your [App registration](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) and
+clicking the `Managed application in local directory` link:
+
+![guest_1_link_from_appreg](../../static/img/single-tenant/guest_1_link_from_appreg.png)
+
+Under **Properties**, enable `User assignment required?` and **Save**.
+
+Then, go to **Users and groups**, and **add user/group**. Find users or a fitting group and assign it to the role Default Access.
+
+
+### Creating a dependency in code
+
+Sometimes, especially for multi-tenant applications, doing in-code checks are beneficial.
+
+```python title="security.py"
+from fastapi import Depends
+from fastapi_azure_auth.exceptions import InvalidAuth
+from fastapi_azure_auth.user import User
+
+async def block_guest_users(user: User = Depends(azure_scheme)) -> None:
+    """
+    Check the claim for the `idp` key - if it exist, deny the user
+    """
+    if user.is_guest:
+        raise InvalidAuth('Guest user not allowed')
+```
+
+
+Alternatively, after [FastAPI 0.95.0](https://github.com/tiangolo/fastapi/releases/tag/0.95.0) you can create an
+``Annotated`` dependency.
+
+```python title="security.py"
+from typing import Annotated
+from fastapi import Depends
+from fastapi_azure_auth.exceptions import InvalidAuth
+from fastapi_azure_auth.user import User
+
+async def block_guest_users(user: User = Depends(azure_scheme)) -> None:
+    """
+    Check the claim for the `idp` key - if it exist, deny the user
+    """
+    if user.is_guest:
+        raise InvalidAuth('Guest user not allowed')
+
+NonGuestUser = Annotated[User, Depends(block_guest_users)]
+```
+and in your view:
+
+```python title="my_view.py"
+@app.get("/items/")
+def read_items(user: NonGuestUser):
+    ...
+```
+
+:::note
+You can configure the `acct` claim in AzureAD if you'd like a specific claim to indicate if the user
+is a guest or tenant member
+:::
