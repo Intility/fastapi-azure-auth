@@ -14,7 +14,7 @@ class User(BaseModel):
     is_guest: bool = Field(False, description='The user is a guest user in the tenant')
 
     @root_validator(pre=True)
-    def set_is_guest(cls, values: dict) -> dict:
+    def set_is_guest(cls, values: Dict) -> Dict:
         """
         Ensures that we set the `is_guest` property before model is created.
         """
