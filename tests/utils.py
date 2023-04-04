@@ -32,7 +32,7 @@ def build_access_token_guest_user(version: int = 2):
     """
     Build an access token, coming from the tenant ID we expect, but not an admin user. (Only used to test dependency)
     """
-    return do_build_access_token(tenant_id='intility_tenant_id', admin=False, version=version, guest_user=True)
+    return do_build_access_token(tenant_id='intility_tenant_id', admin=True, version=version, guest_user=True)
 
 
 def build_evil_access_token(version: int = 2):
