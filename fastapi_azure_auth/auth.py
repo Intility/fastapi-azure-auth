@@ -1,6 +1,7 @@
 import inspect
 import logging
 from typing import Any, Awaitable, Callable, Dict, Literal, Optional
+from warnings import warn
 
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
@@ -104,7 +105,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         self.iss_callable: Optional[Callable[..., Any]] = iss_callable
         self.token_version: int = token_version
         if self.token_version == 1:
-            DeprecationWarning('v1 token support will be removed in a future release. Please migrate to v2 tokens.')
+            warn(
+                'v1 token support will be removed in a future release. Please migrate to v2 tokens.', DeprecationWarning
+            )
         self.allow_guest_users = allow_guest_users
         # Define settings for `OAuth2AuthorizationCodeBearer` and OpenAPI Authorization
         self.authorization_url = openapi_authorization_url
