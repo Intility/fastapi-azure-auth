@@ -28,6 +28,13 @@ def build_access_token_normal_user(version: int = 2):
     return do_build_access_token(tenant_id='intility_tenant_id', admin=False, version=version)
 
 
+def build_access_token_guest_user(version: int = 2):
+    """
+    Build an access token, coming from the tenant ID we expect, but not an admin user. (Only used to test dependency)
+    """
+    return do_build_access_token(tenant_id='intility_tenant_id', admin=False, version=version, guest_user=True)
+
+
 def build_evil_access_token(version: int = 2):
     """
     Build an access token, but signed with an invalid key (not matching it's `kid`
@@ -64,6 +71,7 @@ def do_build_access_token(
     admin: bool = True,
     scopes: str = 'user_impersonation',
     version: int = 2,
+    guest_user=False,
 ):
     """
     Build the access token and encode it with the signing key.
@@ -125,6 +133,9 @@ def do_build_access_token(
             'wids': ['some long val'],
             'roles': ['AdminUser' if admin else 'NormalUser'],
         }
+    if guest_user:  # same for v1 and v2
+        claims['idp'] = 'https://sts.windows.net/e49ee8b0-4ec8-486f-93f3-bedaa281a154/'
+
     signing_key = signing_key_a if evil else signing_key_b
     return jwt.encode(
         claims,
