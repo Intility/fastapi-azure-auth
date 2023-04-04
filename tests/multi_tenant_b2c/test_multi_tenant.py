@@ -95,14 +95,17 @@ async def test_normal_user_rejected(multi_tenant_app, mock_openid_and_keys):
 
 
 @pytest.mark.anyio
-async def test_guest_user_rejected(multi_tenant_app, mock_openid_and_keys):
+async def test_guest_user_allowed_in_b2c(multi_tenant_app, mock_openid_and_keys):
+    """
+    In b2c, we want to allow guest users, as all users will be guests.
+    """
     async with AsyncClient(
         app=app,
         base_url='http://test',
         headers={'Authorization': 'Bearer ' + build_access_token_guest_user(version=2)},
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Guest users not allowed'}
+    assert response.status_code == 200
 
 
 @pytest.mark.anyio

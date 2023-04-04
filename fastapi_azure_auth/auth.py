@@ -409,6 +409,7 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             validate_iss=validate_iss,
             iss_callable=iss_callable,
             multi_tenant=True,
+            allow_guest_users=True,
             openid_config_use_app_id=openid_config_use_app_id,
             openid_config_url=openid_config_url,
             openapi_authorization_url=openapi_authorization_url,
