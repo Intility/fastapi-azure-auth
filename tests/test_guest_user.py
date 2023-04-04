@@ -1,6 +1,6 @@
 import pytest
 
-from fastapi_azure_auth.user import User
+from fastapi_azure_auth.utils import is_guest
 
 
 @pytest.mark.parametrize(
@@ -45,7 +45,7 @@ from fastapi_azure_auth.user import User
             False,
         ],
         [
-            {  # v1 tenant member user
+            {  # v2 tenant member user
                 'iss': 'https://login.microsoftonline.com/9b5ff18e-53c0-45a2-8bc2-9c0c8f60b2c6/v2.0',
                 'ver': '2.0',
             },
@@ -76,5 +76,4 @@ from fastapi_azure_auth.user import User
     ],
 )
 def test_guest_user(claims: dict[str, str], expected: bool):
-    user = User(aud='aud', tid='tid', roles=[], claims=claims, scp=None, name='name', access_token='access_token')
-    assert user.is_guest == expected
+    assert is_guest(claims=claims) == expected

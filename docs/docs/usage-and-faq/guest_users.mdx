@@ -3,12 +3,18 @@ title: Guest Users
 sidebar_position: 2
 ---
 
-By default, guest users in your tenant will be able to access your APIs. You can block guest users from accessing
-your APIs by creating a dependency, or by configuring Azure AD. If you're using Azure AD to deny
-guest users access, the user will be denied access on sign in, instead of getting a 403 when using the API. This
-works great for single-tenant applications, but can be hassle for multi-tenant applications, since you need to do this
-in every tenant.
+In ``FastAPI-Azure-Auth`` version 4 and above, guest users in single- and multi-tenant applications (not B2C) will no longer
+be able to access your APIs by default. Most developers do not intend to give access to guest users which appear
+in the tenant because of other applications (such as users invited into Teams channels), and this can lead to a security
+concerns if not handled.
 
+In single-tenant applications, it is recommended to deny the user on Azure login, instead of after they're calling the APIs,
+please check out the [tutorial below](#user-assignment-required).
+In multi-tenant applications, this can be hard to manage, as you'd have to fix this in every tenant.
+
+If you want to allow guest users into your tenant, you can change the ``allow_guest_users`` setting to ``True``.
+If you want to lock down a specific endpoint from guest users, you can do so by creating a
+[dependency](#creating-a-dependency-in-code).
 
 ### User assignment required
 
@@ -27,16 +33,18 @@ Then, go to **Users and groups**, and **add user/group**. Find users or a fittin
 
 ### Creating a dependency in code
 
-Sometimes, especially for multi-tenant applications, doing in-code checks are beneficial.
+Sometimes, especially for multi-tenant applications, doing in-code checks are beneficial. Please note that guest
+users are denied by default, so you only need this if you configure ``allow_guest_users`` setting to ``True``, but
+would like to lock down specific endpoints.
 
 ```python title="security.py"
 from fastapi import Depends
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.user import User
 
-async def block_guest_users(user: User = Depends(azure_scheme)) -> None:
+async def deny_guest_users(user: User = Depends(azure_scheme)) -> None:
     """
-    Check the claim for the `idp` key - if it exist, deny the user
+    Deny guest users
     """
     if user.is_guest:
         raise InvalidAuth('Guest user not allowed')
@@ -52,14 +60,14 @@ from fastapi import Depends
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.user import User
 
-async def block_guest_users(user: User = Depends(azure_scheme)) -> None:
+async def deny_guest_users(user: User = Depends(azure_scheme)) -> None:
     """
-    Check the claim for the `idp` key - if it exist, deny the user
+    Deny guest users
     """
     if user.is_guest:
         raise InvalidAuth('Guest user not allowed')
 
-NonGuestUser = Annotated[User, Depends(block_guest_users)]
+NonGuestUser = Annotated[User, Depends(deny_guest_users)]
 ```
 and in your view:
 

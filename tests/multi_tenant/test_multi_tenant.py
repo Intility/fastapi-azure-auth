@@ -10,6 +10,7 @@ from tests.multi_tenant.conftest import generate_azure_scheme_multi_tenant_objec
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
+    build_access_token_guest_user,
     build_access_token_invalid_claims,
     build_access_token_invalid_scopes,
     build_access_token_normal_user,
@@ -118,6 +119,17 @@ async def test_normal_user_rejected(multi_tenant_app, mock_openid_and_keys):
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'User is not an AdminUser'}
+
+
+@pytest.mark.anyio
+async def test_guest_user_rejected(multi_tenant_app, mock_openid_and_keys):
+    async with AsyncClient(
+        app=app,
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token_guest_user(version=2)},
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Guest users not allowed'}
 
 
 @pytest.mark.anyio
