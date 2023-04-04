@@ -12,6 +12,7 @@ from starlette.requests import Request
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.openid_config import OpenIdConfig
 from fastapi_azure_auth.user import User
+from fastapi_azure_auth.utils import is_guest
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -27,6 +28,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         token_version: Literal[1, 2] = 2,
+        allow_guest_users: bool = False,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
@@ -60,6 +62,10 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
              raise an InvalidIssuer exception
             This is required when validate_iss is set to `True`.
 
+        :param allow_guest_users: bool
+            Whether to allow guest users or not. Guest users can be added manually, or by other services, such as
+            inviting them to a teams channel. Most developers do _not_ want guest users in their applications.
+
         :param token_version: int
             Version of the token expected from the token endpoint. Defaults to `2`, but can be set to `1` for single
             tenant applications.
@@ -75,7 +81,6 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             Override OpenID config URL (used for B2C tenants)
         :param openapi_description: str
             Override OpenAPI description
-
         """
         self.auto_error = auto_error
         # Validate settings, making sure there's no misconfigured dependencies out there
@@ -98,7 +103,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         self.validate_iss: bool = validate_iss
         self.iss_callable: Optional[Callable[..., Any]] = iss_callable
         self.token_version: int = token_version
-
+        if self.token_version == 1:
+            DeprecationWarning('v1 token support will be removed in a future release. Please migrate to v2 tokens.')
+        self.allow_guest_users = allow_guest_users
         # Define settings for `OAuth2AuthorizationCodeBearer` and OpenAPI Authorization
         self.authorization_url = openapi_authorization_url
         self.token_url = openapi_token_url
@@ -138,6 +145,11 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             except Exception as error:
                 log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
                 raise InvalidAuth(detail='Invalid token format') from error
+
+            user_is_guest: bool = is_guest(claims=claims)
+            if not self.allow_guest_users and user_is_guest:
+                log.info('User denied, is a guest user', claims)
+                raise InvalidAuth(detail='Guest users not allowed')
 
             for scope in security_scopes.scopes:
                 token_scope_string = claims.get('scp', '')
@@ -190,7 +202,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                         options=options,
                     )
                     # Attach the user to the request. Can be accessed through `request.state.user`
-                    user: User = User(**{**token, 'claims': token, 'access_token': access_token})
+                    user: User = User(
+                        **{**token, 'claims': token, 'access_token': access_token, 'is_guest': user_is_guest}
+                    )
                     request.state.user = user
                     return user
             except JWTClaimsError as error:
@@ -221,6 +235,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         tenant_id: str,
         auto_error: bool = True,
         scopes: Optional[Dict[str, str]] = None,
+        allow_guest_users: bool = False,
         token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
@@ -242,7 +257,9 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
                 }
-
+        :param allow_guest_users: bool
+            Whether to allow guest users or not. Guest users can be added manually, or by other services, such as
+            inviting them to a teams channel. Most developers do _not_ want guest users in their applications.
         :param token_version: int
             Version of the token expected from the token endpoint. Defaults to `2`, but can be set to `1` for single
             tenant applications.
@@ -262,6 +279,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             auto_error=auto_error,
             tenant_id=tenant_id,
             scopes=scopes,
+            allow_guest_users=allow_guest_users,
             token_version=token_version,
             openid_config_use_app_id=openid_config_use_app_id,
             openapi_authorization_url=openapi_authorization_url,
@@ -279,6 +297,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         scopes: Optional[Dict[str, str]] = None,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
+        allow_guest_users: bool = False,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
@@ -305,6 +324,10 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
              raise an InvalidIssuer exception
             This is required when validate_iss is set to `True`.
 
+        :param allow_guest_users: bool
+            Whether to allow guest users or not. Guest users can be added manually, or by other services, such as
+            inviting them to a teams channel. Most developers do _not_ want guest users in their applications.
+
         :param openid_config_use_app_id: bool
             Set this to True if you're using claims-mapping. If you're unsure, leave at False.
             https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response
@@ -322,6 +345,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             scopes=scopes,
             validate_iss=validate_iss,
             iss_callable=iss_callable,
+            allow_guest_users=allow_guest_users,
             multi_tenant=True,
             openid_config_use_app_id=openid_config_use_app_id,
             openapi_authorization_url=openapi_authorization_url,

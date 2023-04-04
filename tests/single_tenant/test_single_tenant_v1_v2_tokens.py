@@ -7,6 +7,7 @@ from httpx import AsyncClient
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
+    build_access_token_guest_user,
     build_access_token_invalid_claims,
     build_access_token_invalid_scopes,
     build_access_token_normal_user,
@@ -129,6 +130,18 @@ async def test_normal_user_rejected(single_tenant_app, mock_openid_and_keys_v1_v
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'User is not an AdminUser'}
+
+
+@pytest.mark.anyio
+async def test_guest_user_rejected(single_tenant_app, mock_openid_and_keys_v1_v2, current_cases):
+    test_version = current_version(current_cases)
+    async with AsyncClient(
+        app=app,
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token_guest_user(version=test_version)},
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Guest users not allowed'}
 
 
 @pytest.mark.anyio
