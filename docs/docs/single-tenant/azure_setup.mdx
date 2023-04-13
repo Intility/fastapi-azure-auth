@@ -211,7 +211,7 @@ Allows the app to access the API as you.
  
  Now enter `http://localhost:8000/oauth2-redirect` as the `Redirect URLs` and click on Configure as shown below:
   
-![7_authentication_method_congire_single_page_app](../../static/img/single-tenant/`12_signle_tenant_redirect_url_configure.png ) 
+![12_authentication_method_congire_single_page_app](../../static/img/single-tenant/12_signle_tenant_redirect_url_configure.png) 
   
   
  #### Step 6 -  Allow OpenAPI to talk to the backend
@@ -230,5 +230,17 @@ Now if you click on the manifest you should see the changes you have made as sho
   
  ![10_updated_manifest](../../static/img/single-tenant/13_updated_manifest.png) updated_manifest.png
   
+#### Step 7 - Note down your application IDs
+Go back to the `Overview`, found in the left menu.
+
+Copy the `Application (Client) ID` and save it as your `OPENAPI_CLIENT_ID`:
+
+```bash title=".env" {3}
+TENANT_ID=
+APP_CLIENT_ID=
+OPENAPI_CLIENT_ID=
+````
+Now both of the  `APP_CLIENT_ID` and `OPENAPI_CLIENT_ID` will have the same value.
+
   
 That's it! Next step is to configure the FastAPI application.
