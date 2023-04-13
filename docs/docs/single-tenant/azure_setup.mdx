@@ -177,6 +177,9 @@ Press **Save**
 
 ![2_manifest](../../static/img/single-tenant/2_manifest.png)
  
+ if tiy scroll down you will see the above `Redirect Url` in the manifest file as well.
+  
+ ![3_manifest_oneapp](../../static/img/single-tenant/10_manifest_one_app.jpg) 
  
 #### Step 4 - Add an application scope
 
@@ -201,14 +204,14 @@ Allows the app to access the API as you.
 
  #### Step 5 - Add a new authentication method
   
- Now, if you click on the Authentication on the left side bar, you will see the Redirect web URL that we just added (shown by the green rectangular). Now, click on the ~Add a platform~ and then on the `Single-page application` as shown below.
+ Now, if you click on the Authentication on the left side bar, you will see the Redirect web URL that we just added (shown by the green rectangular). Now, click on the `Add a platform` and then on the `Single-page application` as shown below.
   
-![6_authentication_method](../../static/img/single-tenant/Authentication_Add_a_platform.png)  
+![6_authentication_method](../../static/img/single-tenant/11_Authentication_Add_a_platform.png)  
   
  
- Now enter `http://localhost:8000/oauth2-redirect` as the Redirect URLs and click on Configure as shown below:
+ Now enter `http://localhost:8000/oauth2-redirect` as the `Redirect URLs` and click on Configure as shown below:
   
-![7_authentication_method_congire_single_page_app](../../static/img/single-tenant/signle_tenant_redirect_url_configure.png ) 
+![7_authentication_method_congire_single_page_app](../../static/img/single-tenant/`12_signle_tenant_redirect_url_configure.png ) 
   
   
  #### Step 6 -  Allow OpenAPI to talk to the backend
@@ -225,7 +228,7 @@ Your view should now look something like this:
 
 Now if you click on the manifest you should see the changes you have made as shown below:
   
- ![10_updated_manifest](../../static/img/single-tenant/updated_manifest.png) updated_manifest.png
+ ![10_updated_manifest](../../static/img/single-tenant/13_updated_manifest.png) updated_manifest.png
   
   
 That's it! Next step is to configure the FastAPI application.
