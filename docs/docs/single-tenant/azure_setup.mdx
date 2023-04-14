@@ -5,11 +5,11 @@ sidebar_position: 1
 
 We'll need to create two authentication methods for Azure AD authentication to cover both direct API use and usage from the OpenAPI (swagger) documentation. We can achieve this goal in two ways:
 <ol>
-<li> *Create two different Azure Apps*
-<li> *Create one Azure App with two (an App can have mutile authentication method) authentication methods
+<li> **Create two different Azure Apps**
+<li> **Create one Azure App with two (an App can have mutile authentication method) authentication methods**
 <\ol>
 
-  We will start with the first method (i.e. create two different apps) and then we will achieve the same goal with creating one app with two authentication methods:
+We will start with the first method (i.e. create two different apps) and then we will achieve the same goal with creating one app with two authentication methods:
 We'll start with the API.
 
 ## Two Dirfferent Azure Apps
@@ -181,13 +181,13 @@ Press **Save**
   
  ![3_manifest_oneapp](../../static/img/single-tenant/10_manifest_one_app.jpg) 
  
-#### Step 4 - Add an application scope
+#### Step 3 - Add an application scope
 
 1. Go to **Expose an API** in the left menu bar under your app registration.
 2. Press **+ Add a scope**
 3. You'll be prompted to set an Application ID URI, leave the suggested one and press **Save and continue**
 
-![4_add_scope](../../static/img/single-tenant/4_add_scope.png)
+![3_add_scope](../../static/img/single-tenant/4_add_scope.png)
 
 Add a scope named `user_impersonation` that can be consented by `Admins and users`.
 
@@ -200,9 +200,9 @@ Allows the app to access the API as the user.
 Access API as you
 Allows the app to access the API as you.
 ```
-![5_add_scope_props](../../static/img/single-tenant/5_add_scope_props.png)
+![3_add_scope_props](../../static/img/single-tenant/5_add_scope_props.png)
 
- #### Step 5 - Add a new authentication method
+ #### Step 4 - Add a new authentication method
   
  Now, if you click on the Authentication on the left side bar, you will see the Redirect web URL that we just added (shown by the green rectangular). Now, click on the `Add a platform` and then on the `Single-page application` as shown below.
   
@@ -211,10 +211,10 @@ Allows the app to access the API as you.
  
  Now enter `http://localhost:8000/oauth2-redirect` as the `Redirect URLs` and click on Configure as shown below:
   
-![12_authentication_method_congire_single_page_app](../../static/img/single-tenant/12_signle_tenant_redirect_url_configure.png) 
+![4_authentication_method_congire_single_page_app](../../static/img/single-tenant/12_signle_tenant_redirect_url_configure.png) 
   
   
- #### Step 6 -  Allow OpenAPI to talk to the backend
+ #### Step 5 -  Allow OpenAPI to talk to the backend
  To allow OpenAPI to talk to the backend API, you must add API permissions to the OpenAPI app registration.
 In the left menu, go to **API Permissions** and **Add a permission**.
 
@@ -224,11 +224,11 @@ Select the `user_impersonation` scope, and press **Add a permission**.
 
 Your view should now look something like this:
 
-![9_api_permissions_finish](../../static/img/single-tenant/9_api_permissions_finish.png)
+![5_api_permissions_finish](../../static/img/single-tenant/9_api_permissions_finish.png)
 
 Now if you click on the manifest you should see the changes you have made as shown below:
   
- ![10_updated_manifest](../../static/img/single-tenant/13_updated_manifest.png) updated_manifest.png
+ ![5_updated_manifest](../../static/img/single-tenant/13_updated_manifest.png) updated_manifest.png
   
 #### Step 7 - Note down your application IDs
 Go back to the `Overview`, found in the left menu.
