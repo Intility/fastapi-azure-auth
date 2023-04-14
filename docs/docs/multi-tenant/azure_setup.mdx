@@ -3,14 +3,20 @@ title: Azure configuration
 sidebar_position: 1
 ---
 
-We'll need to create two application registrations for Azure AD authentication to cover both direct API
-use and usage from the OpenAPI (swagger) documentation.
+We'll need to create two authentication methods for Azure AD authentication to cover both direct API use and usage from the OpenAPI (swagger) documentation. We can achieve this goal in two ways:
+<ol>
+<li> **Create two different Azure Apps**
+<li> **Create one Azure App with two (an App can have mutile authentication method) authentication methods**
+<\ol>
 
+We will start with the first method (i.e. create two different apps) and then we will achieve the same goal with creating one app with two authentication methods:
 We'll start with the API.
 
-## Backend API
+## Two Dirfferent Azure Apps
 
-### Step 1 - Create app registration
+### Backend API
+
+#### Step 1 - Create app registration
 Head over to
 [Azure -> Azure Active Directory -> App registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps),
 and create a new registration.
@@ -25,7 +31,7 @@ should head over to the [multi-tenant documentation](../multi-tenant/azure_setup
 
 Press **Register**
 
-### Step 2 - Change token version to `v2`
+#### Step 2 - Change token version to `v2`
 
 First we'll change the token version to version 2. In the left menu bar, click `Manifest` and find the line
 that says `accessTokenAcceptedVersion`. Change its value from `null` to `2`.
@@ -37,7 +43,7 @@ Press **Save**
 (This change can take some time to happen, which is why we do this first.)
 
 
-### Step 3 - Note down your application IDs
+#### Step 3 - Note down your application IDs
 Go back to the `Overview`, found in the left menu.
 
 ![3_overview](../../static/img/multi-tenant/3_overview.png)
@@ -50,7 +56,7 @@ store variables like these:
 APP_CLIENT_ID=
 ````
 
-### Step 4 - Add an application scope
+#### Step 4 - Add an application scope
 
 1. Go to **Expose an API** in the left menu bar under your app registration.
 2. Press **+ Add a scope**
@@ -71,7 +77,7 @@ Access API as you
 Allows the app to access the API as you.
 ```
 
-## OpenAPI Documentation
+### OpenAPI Documentation
 Our OpenAPI documentation will use the `Authorization Code Grant Flow, with Proof Key for Code Exchange` flow.
 It's a flow that enables a user of a Single-Page Application to safely log in, consent to permissions and fetch an `access_token`
 in the `JWT` format. When the user clicks `Try out` on the APIs, the `access_token` is attached to the header as a `Bearer ` token.
@@ -79,7 +85,7 @@ This is the token the backend will validate.
 
 So, let's set it up!
 
-### Step 1 - Create app registration
+#### Step 1 - Create app registration
 Just like in the previous chapter, we have to create an application registration for our OpenAPI.
 
 Head over to
@@ -95,7 +101,7 @@ Use the same name, but with `- OpenAPI` appended to it.
 
 Press **Register**
 
-### Step 2 - Change token version to `v2`
+#### Step 2 - Change token version to `v2`
 
 Like last time, we'll change the token version to version 2. In the left menu bar, click `Manifest` and find the line
 that says `accessTokenAcceptedVersion`. Change its value from `null` to `2`.
@@ -104,7 +110,7 @@ that says `accessTokenAcceptedVersion`. Change its value from `null` to `2`.
 
 Press **Save**
 
-### Step 3 - Note down your application IDs
+#### Step 3 - Note down your application IDs
 You should now be redirected to the `Overview`.
 
 ![7_overview_openapi](../../static/img/multi-tenant/7_overview_openapi.png)
@@ -117,7 +123,7 @@ APP_CLIENT_ID=
 OPENAPI_CLIENT_ID=
 ````
 
-### Step 4 - Allow OpenAPI to talk to the backend
+#### Step 4 - Allow OpenAPI to talk to the backend
 
 To allow OpenAPI to talk to the backend API, you must add API permissions to the OpenAPI app registration.
 In the left menu, go to **API Permissions** and **Add a permission**.
@@ -130,4 +136,50 @@ Your view should now look something like this:
 
 ![9_api_permissions_finish](../../static/img/multi-tenant/9_api_permissions_finish.png)
 
+  
+  
+ ## One Azure App with two dirfferent authentication methods  
+ 
+#### Step 1 - Create app registration
+Head over to
+[Azure -> Azure Active Directory -> App registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps),
+and create a new registration.
+
+Select a fitting name for your project; Azure will present the name to the user during consent.
+
+* `Supported account types`: `Multitenant` -  If you want to create a multi-tenant application, you
+should head over to the [multi-tenant documentation](../multi-tenant/azure_setup.mdx)
+* `Redirect URI`: Choose `Web` and `http://localhost:8000` as a value
+
+![1_application_registration](../../static/img/multi-tenant/1_application_registration.png)
+
+Press **Register**
+
+#### Step 2 - Change token version to `v2`
+
+First we'll change the token version to version 2. In the left menu bar, click `Manifest` and find the line
+that says `accessTokenAcceptedVersion`. Change its value from `null` to `2`.
+
+![2_manifest](../../static/img/single-tenant/2_manifest.png)
+
+Press **Save**
+
+(This change can take some time to happen, which is why we do this first.)
+
+ 
+  
+ #### Step 4 - Allow OpenAPI to talk to the backend
+
+To allow OpenAPI to talk to the backend API, you must add API permissions to the OpenAPI app registration.
+In the left menu, go to **API Permissions** and **Add a permission**.
+
+![8_api_permissions](../../static/img/multi-tenant/8_api_permissions.png)
+
+Select the `user_impersonation` scope, and press **Add a permission**.
+
+Your view should now look something like this:
+
+![9_api_permissions_finish](../../static/img/multi-tenant/9_api_permissions_finish.png)
+ 
+  
 That's it! Next step is to configure the FastAPI application.
