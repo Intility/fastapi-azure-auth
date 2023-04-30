@@ -52,6 +52,11 @@ openapi_schema = {
                         'type': 'boolean',
                     },
                     'name': {'description': 'Name', 'title': 'Name', 'type': 'string'},
+                    'oid': {
+                        'description': 'Immutable ' 'identifier ' 'for ' 'the ' 'requestor',
+                        'title': 'Oid',
+                        'type': 'string',
+                    },
                     'roles': {
                         'default': [],
                         'description': 'Roles (Groups) the user has for this app',
@@ -60,9 +65,14 @@ openapi_schema = {
                         'type': 'array',
                     },
                     'scp': {'description': 'Scope', 'title': 'Scp', 'type': 'string'},
+                    'sub': {
+                        'description': 'Principal ' 'associated ' 'with ' 'the ' 'token.',
+                        'title': 'Sub',
+                        'type': 'string',
+                    },
                     'tid': {'description': 'Tenant ID', 'title': 'Tid', 'type': 'string'},
                 },
-                'required': ['aud', 'claims', 'access_token'],
+                'required': ['aud', 'claims', 'access_token', 'sub', 'oid'],
                 'title': 'User',
                 'type': 'object',
             },

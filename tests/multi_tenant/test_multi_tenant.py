@@ -65,6 +65,8 @@ async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
                 'roles': ['AdminUser'],
                 'scp': 'user_impersonation',
                 'tid': 'intility_tenant_id',
+                'oid': '22222222-2222-2222-2222-222222222222',
+                'sub': 'some long val',
             },
         }
 

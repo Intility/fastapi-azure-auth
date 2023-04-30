@@ -12,3 +12,5 @@ class User(BaseModel):
     name: Optional[str] = Field(default=None, description='Name')
     access_token: str = Field(..., description='The access_token. Can be used for fetching the Graph API')
     is_guest: bool = Field(False, description='The user is a guest user in the tenant')
+    sub: str = Field(..., description='Principal associated with the token.')
+    oid: str = Field(..., description='Immutable identifier for the requestor')
