@@ -66,6 +66,8 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freeze
                 'tid': 'intility_tenant_id',
                 'access_token': access_token,
                 'name': 'Jonas Krüger Svensson / Intility AS',
+                'oid': '22222222-2222-2222-2222-222222222222',
+                'sub': 'some long val',
             },
         }
     elif test_version == 2:
@@ -106,6 +108,8 @@ async def test_normal_user(single_tenant_app, mock_openid_and_keys_v1_v2, freeze
                 'roles': ['AdminUser'],
                 'scp': 'user_impersonation',
                 'tid': 'intility_tenant_id',
+                'oid': '22222222-2222-2222-2222-222222222222',
+                'sub': 'some long val',
             },
         }
 
