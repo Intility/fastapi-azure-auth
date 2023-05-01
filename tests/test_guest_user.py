@@ -1,3 +1,5 @@
+from typing import Dict
+
 import pytest
 
 from fastapi_azure_auth.utils import is_guest
@@ -75,5 +77,5 @@ from fastapi_azure_auth.utils import is_guest
         'acct tenant member',
     ],
 )
-def test_guest_user(claims: dict[str, str], expected: bool):
+def test_guest_user(claims: Dict[str, str], expected: bool):
     assert is_guest(claims=claims) == expected
