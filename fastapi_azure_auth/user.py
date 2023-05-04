@@ -34,8 +34,8 @@ class AccessTokenV2(BaseModel):
         ...,
         description='The set of scopes exposed by the application for which the client application has requested (and received) consent. Only included for user tokens.',
     )
-    roles: Optional[List[str]] = Field(
-        default=None,
+    roles: List[str] = Field(
+        default=[],
         description='The set of permissions exposed by the application that the requesting application or user has been given permission to call.',
     )
     wids: Optional[List[str]] = Field(
