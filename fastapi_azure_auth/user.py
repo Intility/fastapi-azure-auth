@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-class AccessTokenV2(BaseModel):
+class AccessToken(BaseModel):
     aud: str = Field(..., description='Identifies the intended audience of the token.')
     iss: str = Field(
         ...,
@@ -21,11 +21,6 @@ class AccessTokenV2(BaseModel):
     aio: str = Field(
         ...,
         description="An internal claim used by Azure AD to record data for token reuse. Resources shouldn't use this claim.",
-    )
-    azp: str = Field(..., description='The application ID of the client using the token.')
-    azpacr: Literal['0', '1', '2'] = Field(..., description='Indicates the authentication method of the client.')
-    preferred_username: Optional[str] = Field(
-        default=None, description='The primary username that represents the user.'
     )
     name: Optional[str] = Field(
         default=None, description='Provides a human-readable value that identifies the subject of the token.'
@@ -104,8 +99,50 @@ class AccessTokenV2(BaseModel):
     xms_tpl: Optional[str] = Field(default=None, description='Tenant-preferred language')
     ztdid: Optional[str] = Field(default=None, description='Zero-touch Deployment ID')
 
+    # V1.0 only
+    acr: Optional[Literal["0", "1"]] = Field(
+        default=None,
+        description="Indicates the authentication method used to sign in the user. Only available in V1.0 tokens",
+    )
+    # V1.0 only
+    amr: Optional[List[str]] = Field(
+        default=None,
+        description="Identifies the authentication method of the subject of the token. Only available in V1.0 tokens",
+    )
+    # V1.0 only
+    appid: Optional[str] = Field(
+        default=None,
+        description="The application ID of the client using the token. Only available in V1.0 tokens",
+    )
+    # V1.0 only
+    appidacr: Optional[Literal["0", "1", "2"]] = Field(
+        default=None,
+        description="Indicates authentication method of the client. Only available in V1.0 tokens",
+    )
+    # V1.0 only
+    unique_name: Optional[str] = Field(
+        default=None,
+        description="Provides a human readable value that identifies the subject of the token. Only available in V1.0 tokens",
+    )
 
-class User(AccessTokenV2):
+    # V2.0 only
+    azp: Optional[str] = Field(
+        default=None,
+        description="The application ID of the client using the token. Only available in V2.0 tokens",
+    )
+    # V2.0 only
+    azpacr: Optional[Literal["0", "1", "2"]] = Field(
+        default=None,
+        description="Indicates the authentication method of the client. Only available in V2.0 tokens",
+    )
+    # V2.0 only
+    preferred_username: Optional[str] = Field(
+        default=None,
+        description="The primary username that represents the user. Only available in V2.0 tokens",
+    )
+
+
+class User(AccessToken):
     claims: Dict[Any, Any] = Field(..., description='The entire decoded token')
     access_token: str = Field(..., description='The access_token. Can be used for fetching the Graph API')
     is_guest: bool = Field(False, description='The user is a guest user in the tenant')
