@@ -232,12 +232,18 @@ class AccessToken(BaseModel):
 
     @validator('acr', 'amr', 'appid', 'appidacr', 'unique_name', pre=True)
     def validate_v2(cls, v: Union[str, List[str], None], values: Dict[Any, Any]) -> Union[str, List[str], None]:
+        """
+        Validates that the field is only available in V2.0 tokens, and a V1.0 token was provided
+        """
         if v is not None and values['ver'] == '2.0':
             raise ValueError('The field is only available in V1.0 tokens, and a V2.0 token was provided')
         return v
 
     @validator('azp', 'azpacr', 'preferred_username', pre=True)
     def validate_v1(cls, v: Union[str, None], values: Dict[Any, Any]) -> Union[str, None]:
+        """
+        Validates that the field is only available in V2.0 tokens, and a V1.0 token was provided
+        """
         if v is not None and values['ver'] == '1.0':
             raise ValueError('The field is only available in V2.0 tokens, and a V1.0 token was provided')
         return v
