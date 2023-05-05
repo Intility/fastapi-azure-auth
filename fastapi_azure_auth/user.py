@@ -4,6 +4,10 @@ from pydantic import BaseModel, Field, validator
 
 
 class AccessToken(BaseModel):
+    """A more complete overview of the claims available in an access token can be found here:
+    https://learn.microsoft.com/en-us/azure/active-directory/develop/access-tokens#payload-claims
+    """
+
     aud: str = Field(
         ...,
         description='Identifies the intended audience of the token. In v2.0 tokens, this value is always the client ID'
