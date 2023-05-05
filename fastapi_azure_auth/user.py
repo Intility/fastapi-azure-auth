@@ -6,15 +6,19 @@ from pydantic import BaseModel, Field, validator
 class AccessToken(BaseModel):
     aud: str = Field(
         ...,
-        description='Identifies the intended audience of the token.',
+        description='Identifies the intended audience of the token. In v2.0 tokens, this value is always the client ID'
+        ' of the API. In v1.0 tokens, it can be the client ID or the resource URI used in the request.',
     )
     iss: str = Field(
         ...,
-        description='Identifies the STS that constructs and returns the token, and the Azure AD tenant of the authenticated user. ',
+        description='Identifies the STS that constructs and returns the token, and the Azure AD tenant of the'
+        ' authenticated user. If the token issued is a v2.0 token (see the ver claim), the URI ends in /v2.0.',
     )
     idp: Optional[str] = Field(
         default=None,
-        description="Records the identity provider that authenticated the subject of the token. Use iss if the claim isn't present.",
+        description='Records the identity provider that authenticated the subject of the token. This value is identical'
+        " to the value of the Issuer claim unless the user account isn't in the same tenant as the issuer, such as"
+        " guests. Use the value of iss if the claim isn't present.",
     )
     iat: int = Field(
         ...,
