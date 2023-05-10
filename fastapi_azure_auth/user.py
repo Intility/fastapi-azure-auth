@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Literal, Optional, Union
 from pydantic import BaseModel, Field, validator
 
 
-class AccessToken(BaseModel):
+class Claims(BaseModel):
     """A more complete overview of the claims available in an access token can be found here:
     https://learn.microsoft.com/en-us/azure/active-directory/develop/access-tokens#payload-claims
     """
@@ -249,7 +249,7 @@ class AccessToken(BaseModel):
         return v
 
 
-class User(AccessToken):
+class User(Claims):
     claims: Dict[Any, Any] = Field(
         ...,
         description='The entire decoded token',
