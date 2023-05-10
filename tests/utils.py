@@ -63,19 +63,15 @@ def build_access_token_expired(version: int = 2):
     return do_build_access_token(tenant_id='intility_tenant_id', expired=True, version=version)
 
 
-def do_build_access_token(
+def do_build_claims(
     tenant_id: Optional[str] = None,
     aud: Optional[str] = None,
     expired: bool = False,
-    evil: bool = False,
     admin: bool = True,
     scopes: str = 'user_impersonation',
     version: int = 2,
     guest_user=False,
 ):
-    """
-    Build the access token and encode it with the signing key.
-    """
     issued_at = int(time.time())
     expires = issued_at - 1 if expired else issued_at + 3600
     if version == 1:
@@ -135,6 +131,32 @@ def do_build_access_token(
         }
     if guest_user:  # same for v1 and v2
         claims['idp'] = 'https://sts.windows.net/e49ee8b0-4ec8-486f-93f3-bedaa281a154/'
+
+    return claims
+
+
+def do_build_access_token(
+    tenant_id: Optional[str] = None,
+    aud: Optional[str] = None,
+    expired: bool = False,
+    evil: bool = False,
+    admin: bool = True,
+    scopes: str = 'user_impersonation',
+    version: int = 2,
+    guest_user=False,
+):
+    """
+    Build the access token and encode it with the signing key.
+    """
+    claims = do_build_claims(
+        tenant_id=tenant_id,
+        aud=aud,
+        expired=expired,
+        admin=admin,
+        scopes=scopes,
+        version=version,
+        guest_user=guest_user,
+    )
 
     signing_key = signing_key_a if evil else signing_key_b
     return jwt.encode(
