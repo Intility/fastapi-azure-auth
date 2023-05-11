@@ -4,7 +4,8 @@ from pydantic import BaseModel, Field, validator
 
 
 class Claims(BaseModel):
-    """A more complete overview of the claims available in an access token can be found here:
+    """
+    A more complete overview of the claims available in an access token can be found here:
     https://learn.microsoft.com/en-us/azure/active-directory/develop/access-tokens#payload-claims
     """
 
