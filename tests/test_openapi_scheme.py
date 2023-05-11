@@ -70,7 +70,7 @@ openapi_schema = {
                     'idp': {
                         'title': 'Idp',
                         'type': 'string',
-                        'description': "Records the identity provider that authenticated the subject of the token. This value is identical to the value of the Issuer claim unless the user account isn't in the same tenant as the issuer, such as guests. Use the value of iss if the claim isn't present.",
+                        'description': 'Records the identity provider that authenticated the subject of the token. This value is identical to the value of the Issuer claim unless the user account is not in the same tenant as the issuer, such as guests. Use the value of iss if the claim is not present.',
                     },
                     'iat': {
                         'title': 'Iat',
@@ -90,7 +90,7 @@ openapi_schema = {
                     'aio': {
                         'title': 'Aio',
                         'type': 'string',
-                        'description': "An internal claim used by Azure AD to record data for token reuse. Resources shouldn't use this claim.",
+                        'description': 'An internal claim used by Azure AD to record data for token reuse. Resources should not use this claim.',
                     },
                     'name': {
                         'title': 'Name',
@@ -144,7 +144,7 @@ openapi_schema = {
                     'rh': {
                         'title': 'Rh',
                         'type': 'string',
-                        'description': "An internal claim used by Azure to revalidate tokens. Resources shouldn't use this claim.",
+                        'description': 'An internal claim used by Azure to revalidate tokens. Resources should not use this claim.',
                     },
                     'ver': {
                         'title': 'Ver',
@@ -183,7 +183,7 @@ openapi_schema = {
                     'in_corp': {
                         'title': 'In Corp',
                         'type': 'string',
-                        'description': "Signals if the client is logging in from the corporate network; if they're not, the claim isn't included",
+                        'description': 'Signals if the client is logging in from the corporate network; if they are not, the claim is not included',
                     },
                     'ipaddr': {
                         'title': 'Ipaddr',
