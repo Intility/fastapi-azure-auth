@@ -233,7 +233,7 @@ class Claims(BaseModel):
 
 
 class User(Claims):
-    claims: Dict[Any, Any] = Field(
+    claims: Dict[str, Any] = Field(
         ...,
         description='The entire decoded token',
     )
