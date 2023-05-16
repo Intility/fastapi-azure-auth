@@ -53,12 +53,12 @@ class Claims(BaseModel):
         default=[],
         description='The set of permissions exposed by the application that the requesting application or user has been given permission to call.',
     )
-    wids: Optional[List[str]] = Field(
-        default=None,
+    wids: List[str] = Field(
+        default=[],
         description='Denotes the tenant-wide roles assigned to this user, from the section of roles present in Azure AD built-in roles.',
     )
-    groups: Optional[List[str]] = Field(
-        default=None,
+    groups: List[str] = Field(
+        default=[],
         description='Provides object IDs that represent the group memberships of the subject.',
     )
     sub: str = Field(
@@ -159,12 +159,12 @@ class Claims(BaseModel):
         default=None,
         description='An identifier for the user that can be used with the username_hint parameter; not a durable identifier for the user and should not be used to key data',
     )
-    verified_primary_email: Optional[List[str]] = Field(
-        default=None,
+    verified_primary_email: List[str] = Field(
+        default=[],
         description="Sourced from the user's PrimaryAuthoritativeEmail",
     )
-    verified_secondary_email: Optional[List[str]] = Field(
-        default=None,
+    verified_secondary_email: List[str] = Field(
+        default=[],
         description="Sourced from the user's SecondaryAuthoritativeEmail",
     )
     vnet: Optional[str] = Field(
@@ -195,8 +195,8 @@ class Claims(BaseModel):
         'did not meet the requirements of ISO/IEC 29115. Only available in V1.0 tokens',
     )
     # V1.0 only
-    amr: Optional[List[str]] = Field(
-        default=None,
+    amr: List[str] = Field(
+        default=[],
         description='Identifies the authentication method of the subject of the token. Only available in V1.0 tokens',
     )
     # V1.0 only
