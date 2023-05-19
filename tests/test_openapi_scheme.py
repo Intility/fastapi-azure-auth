@@ -110,12 +110,14 @@ openapi_schema = {
                         'default': [],
                     },
                     'wids': {
+                        'default': [],
                         'title': 'Wids',
                         'type': 'array',
                         'items': {'type': 'string'},
                         'description': 'Denotes the tenant-wide roles assigned to this user, from the section of roles present in Azure AD built-in roles.',
                     },
                     'groups': {
+                        'default': [],
                         'title': 'Groups',
                         'type': 'array',
                         'items': {'type': 'string'},
@@ -227,12 +229,14 @@ openapi_schema = {
                         'description': 'An identifier for the user that can be used with the username_hint parameter; not a durable identifier for the user and should not be used to key data',
                     },
                     'verified_primary_email': {
+                        'default': [],
                         'title': 'Verified Primary Email',
                         'type': 'array',
                         'items': {'type': 'string'},
                         'description': "Sourced from the user's PrimaryAuthoritativeEmail",
                     },
                     'verified_secondary_email': {
+                        'default': [],
                         'title': 'Verified Secondary Email',
                         'type': 'array',
                         'items': {'type': 'string'},
@@ -250,6 +254,7 @@ openapi_schema = {
                         'description': "A value of 0 for the \"Authentication context class\" claim indicates the end-user authentication did not meet the requirements of ISO/IEC 29115. Only available in V1.0 tokens",
                     },
                     'amr': {
+                        'default': [],
                         'title': 'Amr',
                         'type': 'array',
                         'items': {'type': 'string'},
