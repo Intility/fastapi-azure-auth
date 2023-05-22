@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 
 
 class Claims(BaseModel):
@@ -45,8 +45,8 @@ class Claims(BaseModel):
         default=None,
         description='Provides a human-readable value that identifies the subject of the token.',
     )
-    scp: str = Field(
-        default='',
+    scp: List[str] = Field(
+        default=[],
         description='The set of scopes exposed by the application for which the client application has requested (and received) consent. Only included for user tokens.',
     )
     roles: List[str] = Field(
@@ -230,6 +230,16 @@ class Claims(BaseModel):
         default=None,
         description='The primary username that represents the user. Only available in V2.0 tokens',
     )
+
+    @validator('scp', pre=True)
+    def scopes_to_list(cls, v: object) -> object:
+        """
+        Validator on the scope attribute that convert the space separated list
+        of scope into an actual list of scope.
+        """
+        if isinstance(v, str):
+            return v.split(' ')
+        return v
 
 
 class User(Claims):
