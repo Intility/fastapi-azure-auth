@@ -46,7 +46,7 @@ class Claims(BaseModel):
         description='Provides a human-readable value that identifies the subject of the token.',
     )
     scp: str = Field(
-        ...,
+        default='',
         description='The set of scopes exposed by the application for which the client application has requested (and received) consent. Only included for user tokens.',
     )
     roles: List[str] = Field(
