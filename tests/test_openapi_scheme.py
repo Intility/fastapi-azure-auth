@@ -45,7 +45,6 @@ openapi_schema = {
                     'nbf',
                     'exp',
                     'aio',
-                    'scp',
                     'sub',
                     'oid',
                     'tid',
@@ -101,6 +100,7 @@ openapi_schema = {
                         'title': 'Scp',
                         'type': 'string',
                         'description': 'The set of scopes exposed by the application for which the client application has requested (and received) consent. Only included for user tokens.',
+                        'default': '',
                     },
                     'roles': {
                         'title': 'Roles',
