@@ -98,9 +98,10 @@ openapi_schema = {
                     },
                     'scp': {
                         'title': 'Scp',
-                        'type': 'string',
+                        'type': 'array',
                         'description': 'The set of scopes exposed by the application for which the client application has requested (and received) consent. Only included for user tokens.',
-                        'default': '',
+                        'default': [],
+                        'items': {'type': 'string'},
                     },
                     'roles': {
                         'title': 'Roles',
