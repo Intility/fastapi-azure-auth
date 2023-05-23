@@ -20,7 +20,6 @@ from fastapi_azure_auth.exceptions import InvalidAuth
 
 
 class Settings(BaseSettings):
-    SECRET_KEY: str = Field('my super secret key', env='SECRET_KEY')
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
