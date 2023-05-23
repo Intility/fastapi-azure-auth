@@ -37,13 +37,13 @@ $ yarn build
 or
 
 ```
-npm build
+npm run build
 ```
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
-It's important that you build the documentation using `yarn build` **before pushing to `main`**. After building, 
-check that everything works, such as syntax highlighting etc. 
+It's important that you build the documentation using `yarn build` **before pushing to `main`**. After building,
+check that everything works, such as syntax highlighting etc.
 
 If there are issues, please try
 * to run `npm run clear` or `yarn clear`
