@@ -17,8 +17,23 @@ from demo_project.main import app as fastapi_app
 async def normal_user_client():
     async def mock_normal_user(request: Request):
         user = User(
-            claims={"preferred_username": 'NormalUser'}, roles=['role1'],
-            aud="aud", tid="tid", access_token="123"
+            claims={},
+            preferred_username="NormalUser",
+            roles=["role1"],
+            aud="aud",
+            tid="tid",
+            access_token="123",
+            is_guest=False,
+            iat=1537231048,
+            nbf=1537231048,
+            exp=1537234948,
+            iss="iss",
+            aio="aio",
+            sub="sub",
+            oid="oid",
+            uti="uti",
+            rh="rh",
+            ver="2.0",
         )
         request.state.user = user
         return user
