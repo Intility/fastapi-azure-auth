@@ -144,7 +144,7 @@ openapi_schema = {
                     'rh': {
                         'title': 'Rh',
                         'type': 'string',
-                        'description': 'An internal claim used by Azure to revalidate tokens. Resources should not use this claim.',
+                        'description': 'Token identifier claim, equivalent to jti in the JWT specification. Unique, per-token identifier that is case-sensitive.',
                     },
                     'ver': {
                         'title': 'Ver',
