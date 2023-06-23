@@ -79,7 +79,7 @@ class Claims(BaseModel):
     )
     rh: Optional[str] = Field(
         default=None,
-        description='An internal claim used by Azure to revalidate tokens. Resources should not use this claim.',
+        description='Token identifier claim, equivalent to jti in the JWT specification. Unique, per-token identifier that is case-sensitive.',
     )
     ver: Literal['1.0', '2.0'] = Field(
         ...,
