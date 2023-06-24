@@ -1,7 +1,10 @@
+import calendar
+import datetime
 from typing import Dict
 
 import pytest
 
+from fastapi_azure_auth.user import User
 from fastapi_azure_auth.utils import is_guest
 
 
@@ -79,3 +82,26 @@ from fastapi_azure_auth.utils import is_guest
 )
 def test_guest_user(claims: Dict[str, str], expected: bool):
     assert is_guest(claims=claims) == expected
+
+
+def get_utc_now_as_unix_timestamp() -> int:
+    date = datetime.datetime.utcnow()
+    return calendar.timegm(date.utctimetuple())
+
+
+def test_user_missing_optionals():
+    user = User(
+        aud='Dummy',
+        tid='Dummy',
+        access_token='Dummy',
+        claims={'oid': 'Dummy oid'},
+        iss='https://dummy-platform.dummylogin.com/dummy-uid/v2.0/',
+        iat=get_utc_now_as_unix_timestamp(),
+        nbf=get_utc_now_as_unix_timestamp(),
+        exp=get_utc_now_as_unix_timestamp(),
+        sub='dummy-sub',
+        oid='dummy-oid',
+        ver='1.0',
+        scp='AccessAsUser',
+    )
+    assert user is not None
