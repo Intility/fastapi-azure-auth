@@ -3,13 +3,13 @@ from typing import List, Optional, Union
 from pydantic import AnyHttpUrl, BaseSettings, Field, HttpUrl
 
 
-class AzureActiveDirectory(BaseSettings):
+class AzureActiveDirectory(BaseSettings):  # type: ignore
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    AUTH_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='AUTH_URL')
-    CONFIG_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='CONFIG_URL')
-    TOKEN_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='TOKEN_URL')
+    AUTH_URL: Union[str, AnyHttpUrl] = Field(default='https://dummy.com/', env='AUTH_URL')
+    CONFIG_URL: Union[str, AnyHttpUrl] = Field(default='https://dummy.com/', env='CONFIG_URL')
+    TOKEN_URL: Union[str, AnyHttpUrl] = Field(default='https://dummy.com/', env='TOKEN_URL')
     GRAPH_SECRET: str = Field(default='', env='GRAPH_SECRET')
     CLIENT_SECRET: str = Field(default='', env='CLIENT_SECRET')
 
@@ -25,7 +25,7 @@ class Settings(AzureActiveDirectory):
     PROJECT_NAME: str = 'My Project'
     SENTRY_DSN: Optional[HttpUrl] = None
 
-    class Config:  # noqa
+    class Config:  # noqa: D106
         env_file = 'demo_project/.env'
         env_file_encoding = 'utf-8'
         case_sensitive = True
