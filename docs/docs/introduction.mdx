@@ -20,14 +20,14 @@ import GitHubButton from 'react-github-btn';
 
 
 
-**FastAPI-Azure-Auth** implements Azure AD authentication and authorization for your FastAPI APIs and OpenAPI
-documentation.
+**FastAPI-Azure-Auth** implements Azure AD and Azure AD B2C authentication and authorization
+for your FastAPI APIs and OpenAPI documentation.
 
 In the sidebar to the left you'll be able to find information on how to configure both Azure and your FastAPI application.
 If you need an example project, one can be found on GitHub [here](https://github.com/Intility/fastapi-azure-auth/tree/main/demo_project).
 
-The first step is to decide whether your application should be single- or multi-tenant. You can always change this later,
-so if you're unsure, you should chose **single-tenant**.
+The first step is to decide whether your application should be single- or multi-tenant or using B2C.
+You can always change this later, so if you're unsure, you should choose **single-tenant**.
 
 Even though FastAPI-Azure-Auth supports both `v1` and `v2` tokens,
 if you're creating a new project, you should use `v2` tokens. We'll walk you through all the steps in this tutorial.
