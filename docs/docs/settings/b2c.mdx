@@ -1,0 +1,81 @@
+---
+title: B2C settings
+sidebar_position: 3
+---
+
+### app_client_id: `str`
+**Default**: `None`
+
+Your applications client ID. This will be the `Web app` in Azure AD
+
+-----------------
+
+### openid_config_url: `str`
+**Default**: `None`
+
+Override OpenID config URL (used for B2C tenants)
+
+-----------------
+
+### scopes: `Optional[dict[str, str]]`
+**Default:** `None`
+
+Scopes, these are the ones you've configured in Azure AD B2C. Key is scope, value is a description.
+
+```python
+    {
+        f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation'
+    }
+```
+
+### validate_iss: bool
+**Default:** `True`
+
+Whether to validate the token issuer or not. This can be skipped to allow anyone to log in.
+
+-----------------
+
+### iss_callable: Callable
+**Default:** `None`
+
+Async function that has to accept a `tid` and return a `iss` / raise an InvalidIssuer exception
+This is required when validate_iss is set to `True`. For examples, see
+[Accept specific tenants only](../multi-tenant/accept_specific_tenants_only)
+
+-----------------
+
+### openid_config_use_app_id: `bool`
+**Default:** `False`
+
+Set this to True if you're using claims-mapping. If you're unsure, leave at False. Read more in the
+[Azure docs](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response).
+
+-----------------
+
+
+### openapi_authorization_url: `Optional[str]`
+**Default:** `None`
+
+Override OpenAPI authorization URL
+
+-----------------
+
+### openapi_token_url: `Optional[str]`
+**Default:** `None`
+
+Override OpenAPI token URL
+
+-----------------
+
+### openapi_description: `Optional[str]`
+**Default:** `None`
+
+Override OpenAPI description
+
+-----------------
+
+### auto_error: `bool`
+**Default:** `True`
+
+Set this to False if you are using multiple authentication libraries.  This will return rather than
+throwing authentication exceptions.
