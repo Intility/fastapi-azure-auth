@@ -65,12 +65,12 @@ class Claims(BaseModel):
         ...,
         description='The principal associated with the token.',
     )
-    oid: str = Field(
-        ...,
+    oid: Optional[str] = Field(
+        default=None,
         description='The immutable identifier for the requestor, which is the verified identity of the user or service principal',
     )
-    tid: str = Field(
-        ...,
+    tid: Optional[str] = Field(
+        default=None,
         description='Represents the tenant that the user is signing in to',
     )
     uti: Optional[str] = Field(
