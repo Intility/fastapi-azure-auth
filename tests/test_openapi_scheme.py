@@ -2,6 +2,7 @@ import fastapi
 import pytest
 from demo_project.main import app
 from fastapi.testclient import TestClient
+from packaging import version
 
 openapi_schema = {
     'components': {
@@ -443,7 +444,9 @@ def test_client():
     yield TestClient(app=app)
 
 
-@pytest.mark.skipif(fastapi.__version__ < ('0.89.0'), reason='Different schema in older version')
+@pytest.mark.skipif(
+    version.parse(fastapi.__version__) < version.parse('0.89.0'), reason='Different schema in older version'
+)
 def test_openapi_schema(test_client):
     response = test_client.get('api/v1/openapi.json')
     assert response.status_code == 200, response.text
