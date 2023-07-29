@@ -1,9 +1,15 @@
 from typing import List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, Field, HttpUrl
+import pydantic
+from pydantic import AnyHttpUrl, Field, HttpUrl
+
+if pydantic.VERSION.startswith('1.'):
+    from pydantic import BaseSettings
+else:
+    from pydantic_settings import BaseSettings
 
 
-class AzureActiveDirectory(BaseSettings):
+class AzureActiveDirectory(BaseSettings):  # type: ignore[misc, valid-type]
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
