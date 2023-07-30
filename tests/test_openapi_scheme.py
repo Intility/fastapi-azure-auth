@@ -4,7 +4,13 @@ from demo_project.main import app
 from fastapi.testclient import TestClient
 from packaging import version
 
+if version.parse(fastapi.__version__) >= version.parse('0.99.0'):
+    openapi_version = '3.1.0'
+else:
+    openapi_version = '3.0.2'
+
 openapi_schema = {
+    'openapi': openapi_version,
     'components': {
         'schemas': {
             'HelloWorldResponse': {
@@ -362,7 +368,6 @@ openapi_schema = {
         'title': 'My Project',
         'version': '1.0.0',
     },
-    'openapi': '3.0.2',
     'paths': {
         '/api/v1/hello': {
             'get': {
