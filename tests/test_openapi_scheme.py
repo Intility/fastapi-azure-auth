@@ -316,7 +316,7 @@ openapi_schema = {
         },
         'securitySchemes': {
             'APIKeyHeader': {'in': 'header', 'name': 'TEST-API-KEY', 'type': 'apiKey'},
-            'Azure AD - PKCE, B2C Multi-tenant': {
+            'AzureAD_PKCE_B2C_multi_tenant': {
                 'description': '`Leave client_secret blank`',
                 'flows': {
                     'authorizationCode': {
@@ -330,7 +330,7 @@ openapi_schema = {
                 },
                 'type': 'oauth2',
             },
-            'Azure AD - PKCE, Multi-tenant': {
+            'AzureAD_PKCE_multi_tenant': {
                 'description': '`Leave client_secret blank`',
                 'flows': {
                     'authorizationCode': {
@@ -344,7 +344,7 @@ openapi_schema = {
                 },
                 'type': 'oauth2',
             },
-            'Azure AD - PKCE, Single-tenant': {
+            'AzureAD_PKCE_single_tenant': {
                 'description': '`Leave client_secret blank`',
                 'flows': {
                     'authorizationCode': {
@@ -382,7 +382,7 @@ openapi_schema = {
                         'description': 'Successful Response',
                     }
                 },
-                'security': [{'Azure AD - PKCE, Single-tenant': []}, {'Azure AD - PKCE, Single-tenant': []}],
+                'security': [{'AzureAD_PKCE_single_tenant': []}, {'AzureAD_PKCE_single_tenant': []}],
                 'summary': 'Say hello',
                 'tags': ['hello'],
             }
@@ -402,7 +402,7 @@ openapi_schema = {
                         'description': 'Successful Response',
                     }
                 },
-                'security': [{'Azure AD - PKCE, Single-tenant': []}],
+                'security': [{'AzureAD_PKCE_single_tenant': []}],
                 'summary': 'Fetch graph API using OBO',
                 'tags': ['graph'],
             }
@@ -410,14 +410,14 @@ openapi_schema = {
         '/api/v1/hello-multi-auth': {
             'get': {
                 'description': 'Wonder how this auth is done?',
-                'operationId': 'helloWorldApiKey',
+                'operationId': 'helloWorldApiKeyMultiAuth',
                 'responses': {
                     '200': {
                         'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
                         'description': 'Successful Response',
                     }
                 },
-                'security': [{'Azure AD - PKCE, Multi-tenant': []}, {'APIKeyHeader': []}],
+                'security': [{'AzureAD_PKCE_multi_tenant': []}, {'APIKeyHeader': []}],
                 'summary': 'Say hello with an API key',
                 'tags': ['hello'],
             }
@@ -425,14 +425,14 @@ openapi_schema = {
         '/api/v1/hello-multi-auth-b2c': {
             'get': {
                 'description': 'Wonder how this auth is done?',
-                'operationId': 'helloWorldApiKey',
+                'operationId': 'helloWorldApiKeyMultiAuthB2C',
                 'responses': {
                     '200': {
                         'content': {'application/json': {'schema': {'$ref': '#/components/schemas/TokenType'}}},
                         'description': 'Successful Response',
                     }
                 },
-                'security': [{'Azure AD - PKCE, B2C Multi-tenant': []}, {'APIKeyHeader': []}],
+                'security': [{'AzureAD_PKCE_B2C_multi_tenant': []}, {'APIKeyHeader': []}],
                 'summary': 'Say hello with an API key',
                 'tags': ['hello'],
             }

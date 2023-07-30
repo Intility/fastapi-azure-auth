@@ -289,7 +289,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name: str = 'Azure AD - PKCE, Single-tenant'
+        self.scheme_name: str = 'AzureAD_PKCE_single_tenant'
 
 
 class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
@@ -355,7 +355,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name: str = 'Azure AD - PKCE, Multi-tenant'
+        self.scheme_name: str = 'AzureAD_PKCE_multi_tenant'
 
 
 class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
@@ -416,4 +416,4 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             openapi_token_url=openapi_token_url,
             openapi_description=openapi_description,
         )
-        self.scheme_name: str = 'Azure AD - PKCE, B2C Multi-tenant'
+        self.scheme_name: str = 'AzureAD_PKCE_B2C_multi_tenant'
