@@ -65,14 +65,14 @@ jobs:
         if: steps.cache-venv.outputs.cache-hit != 'true'
       - name: Install package
         run: poetry install --no-interaction
-      - name: Install FastAPI ${{ matrix.fastapi-version }}
-        run: |
-          source .venv/bin/activate
-          poetry add "fastapi==${{ matrix.fastapi-version }}"
       - name: Install Pydantic ${{ matrix.pydantic-version }}
         run: |
           source .venv/bin/activate
           poetry add "pydantic==${{ matrix.pydantic-version }}"
+      - name: Install FastAPI ${{ matrix.fastapi-version }}
+        run: |
+          source .venv/bin/activate
+          poetry add "fastapi==${{ matrix.fastapi-version }}"
       - name: Run tests
         run: |
           source .venv/bin/activate
