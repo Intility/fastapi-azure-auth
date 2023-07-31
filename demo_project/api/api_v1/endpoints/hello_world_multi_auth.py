@@ -14,7 +14,7 @@ router = APIRouter()
     response_model=TokenType,
     summary='Say hello with an API key',
     name='hello_world_api_key',
-    operation_id='helloWorldApiKey',
+    operation_id='helloWorldApiKeyMultiAuth',
 )
 async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) -> Dict[str, bool]:
     """
@@ -31,7 +31,7 @@ async def world(request: Request, auth: Union[str, User] = Depends(multi_auth)) 
     response_model=TokenType,
     summary='Say hello with an API key',
     name='hello_world_api_key',
-    operation_id='helloWorldApiKey',
+    operation_id='helloWorldApiKeyMultiAuthB2C',
 )
 async def world_b2c(request: Request, auth: Union[str, User] = Depends(multi_auth_b2c)) -> Dict[str, bool]:
     """

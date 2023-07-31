@@ -46,6 +46,7 @@ cryptography = ">=40.0.1"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 httpx = ">0.18.2"
 pydantic-settings = "^2.0.2"
+openapi-spec-validator = "^0.6.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -66,6 +67,7 @@ anyio = "^3.3.4"
 trio = "^0.22.2"
 respx = "^0.20.1"
 ipython = "^8.2.0"
+openapi-spec-validator = "^0.6.0"
 
 [tool.black]
 line-length = 120
