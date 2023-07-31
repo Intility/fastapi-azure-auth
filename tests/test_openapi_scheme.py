@@ -173,12 +173,12 @@ openapi_schema = {
                         'description': 'The principal associated with the token.',
                     },
                     'oid': {
-                        'type': 'string',
+                        'anyOf': [{'type': 'string'}, {'type': 'null'}],
                         'title': 'Oid',
                         'description': 'The immutable identifier for the requestor, which is the verified identity of the user or service principal',
                     },
                     'tid': {
-                        'type': 'string',
+                        'anyOf': [{'type': 'string'}, {'type': 'null'}],
                         'title': 'Tid',
                         'description': 'Represents the tenant that the user is signing in to',
                     },
@@ -383,7 +383,7 @@ openapi_schema = {
                     },
                 },
                 'type': 'object',
-                'required': ['aud', 'iss', 'iat', 'nbf', 'exp', 'sub', 'oid', 'tid', 'ver', 'claims', 'access_token'],
+                'required': ['aud', 'iss', 'iat', 'nbf', 'exp', 'sub', 'ver', 'claims', 'access_token'],
                 'title': 'User',
             },
         },
