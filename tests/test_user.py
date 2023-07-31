@@ -92,7 +92,6 @@ def get_utc_now_as_unix_timestamp() -> int:
 def test_user_missing_optionals():
     user = User(
         aud='Dummy',
-        tid='Dummy',
         access_token='Dummy',
         claims={'oid': 'Dummy oid'},
         iss='https://dummy-platform.dummylogin.com/dummy-uid/v2.0/',
@@ -100,7 +99,6 @@ def test_user_missing_optionals():
         nbf=get_utc_now_as_unix_timestamp(),
         exp=get_utc_now_as_unix_timestamp(),
         sub='dummy-sub',
-        oid='dummy-oid',
         ver='1.0',
         scp='AccessAsUser',
     )
