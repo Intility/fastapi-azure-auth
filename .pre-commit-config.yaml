@@ -49,6 +49,7 @@ repos:
           [
             fastapi,
             pydantic,
+            pydantic-settings,
             starlette,
             httpx
           ]

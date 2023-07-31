@@ -68,8 +68,8 @@ def generate_azure_scheme_multi_tenant_b2c_object(issuer=None):
         current_issuer = issuer
     return B2CMultiTenantAuthorizationCodeBearer(
         app_client_id=settings.APP_CLIENT_ID,
-        openapi_authorization_url=settings.AUTH_URL,
-        openapi_token_url=settings.TOKEN_URL,
+        openapi_authorization_url=str(settings.AUTH_URL),
+        openapi_token_url=str(settings.TOKEN_URL),
         # The value below is used only for testing purpose you should use:
         # https://login.microsoftonline.com/common/v2.0/oauth2/token
         openid_config_url='https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',

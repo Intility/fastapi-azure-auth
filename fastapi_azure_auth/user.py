@@ -239,7 +239,7 @@ class Claims(BaseModel):
         """
         if isinstance(v, str):
             return v.split(' ')
-        return v
+        return v  # pragma: no cover
 
 
 class User(Claims):
