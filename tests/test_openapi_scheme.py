@@ -1,4 +1,5 @@
 import fastapi
+import openapi_spec_validator
 import pytest
 from demo_project.main import app
 from fastapi.testclient import TestClient
@@ -456,6 +457,12 @@ def test_openapi_schema(test_client):
     response = test_client.get('api/v1/openapi.json')
     assert response.status_code == 200, response.text
     assert response.json() == openapi_schema
+
+
+def test_validate_openapi_spec(test_client):
+    response = test_client.get('api/v1/openapi.json')
+    assert response.status_code == 200, response.text
+    openapi_spec_validator.validate_spec(response.json())
 
 
 def test_no_token(test_client):
