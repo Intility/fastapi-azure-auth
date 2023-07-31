@@ -1,15 +1,21 @@
 from typing import List, Optional, Union
 
-from pydantic import AnyHttpUrl, BaseSettings, Field, HttpUrl
+import pydantic
+from pydantic import AnyHttpUrl, Field, HttpUrl
+
+if pydantic.VERSION.startswith('1.'):
+    from pydantic import BaseSettings
+else:
+    from pydantic_settings import BaseSettings
 
 
-class AzureActiveDirectory(BaseSettings):  # type: ignore
+class AzureActiveDirectory(BaseSettings):  # type: ignore[misc, valid-type]
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    AUTH_URL: Union[str, AnyHttpUrl] = Field(default='https://dummy.com/', env='AUTH_URL')
-    CONFIG_URL: Union[str, AnyHttpUrl] = Field(default='https://dummy.com/', env='CONFIG_URL')
-    TOKEN_URL: Union[str, AnyHttpUrl] = Field(default='https://dummy.com/', env='TOKEN_URL')
+    AUTH_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='AUTH_URL')
+    CONFIG_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='CONFIG_URL')
+    TOKEN_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='TOKEN_URL')
     GRAPH_SECRET: str = Field(default='', env='GRAPH_SECRET')
     CLIENT_SECRET: str = Field(default='', env='CLIENT_SECRET')
 
