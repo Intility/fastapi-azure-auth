@@ -75,9 +75,9 @@ azure_scheme_auto_error_false = MultiTenantAzureAuthorizationCodeBearer(
 
 azure_scheme_auto_error_false_b2c = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
-    openapi_authorization_url=settings.AUTH_URL,
-    openapi_token_url=settings.TOKEN_URL,
-    openid_config_url=settings.CONFIG_URL,
+    openapi_authorization_url=str(settings.AUTH_URL),
+    openapi_token_url=str(settings.TOKEN_URL),
+    openid_config_url=str(settings.CONFIG_URL),
     scopes={
         f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'User impersonation',
     },
