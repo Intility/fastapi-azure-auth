@@ -57,7 +57,7 @@ Also, [we're hiring!](https://intility.no/en/career/)
 ## 📚 Resources
 
 The [documentation](https://intility.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure AD
-and FastAPI for both single- and multi-tenant applications. It includes examples on how to lock down
+and FastAPI for single- and multi-tenant applications as well as B2C apps. It includes examples on how to lock down
 your APIs to certain scopes, tenants, roles etc. For first time users it's strongly advised to set up your
 application exactly how it's described there, and then alter it to your needs later.
 
@@ -99,8 +99,7 @@ app = FastAPI(
 Ensure you have CORS enabled for your local environment, such as `http://localhost:8000`.
 
 #### 4. Configure FastAPI-Azure-Auth
-Configure either your [`SingleTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/single_tenant)
-or [`MultiTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/multi_tenant).
+Configure either [`SingleTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/single_tenant), [`MultiTenantAzureAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/multi_tenant) or [`B2CMultiTenantAuthorizationCodeBearer`](https://intility.github.io/fastapi-azure-auth/settings/b2c)
 
 
 ```python
