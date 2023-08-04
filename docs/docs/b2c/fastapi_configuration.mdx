@@ -198,7 +198,7 @@ Now, the fun part begins! 🚀
 Import the `B2CMultiTenantAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it:
 
 
-```python {7,42-49} title="main.py"
+```python {7,42-51} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -243,6 +243,8 @@ if settings.BACKEND_CORS_ORIGINS:
 azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     openid_config_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration',
+    openapi_authorization_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize',
+    openapi_token_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token',
     scopes={
         f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
     },
@@ -270,7 +272,7 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {52-57} title="main.py"
+```python {54-59} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -315,6 +317,8 @@ if settings.BACKEND_CORS_ORIGINS:
 azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     openid_config_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration',
+    openapi_authorization_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize',
+    openapi_token_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token',
     scopes={
         f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
     },
@@ -346,7 +350,7 @@ views based on the scope.
 
 Let's do that:
 
-```python {4,59} title="main.py"
+```python {4,61} title="main.py"
 from typing import Union
 
 import uvicorn
@@ -390,6 +394,8 @@ if settings.BACKEND_CORS_ORIGINS:
 azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     openid_config_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration',
+    openapi_authorization_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize',
+    openapi_token_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token',
     scopes={
         f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
     },
