@@ -47,5 +47,4 @@ exclude =
     .idea,
     __pycache__,
     tests/*,
-    venv,
-    manage.py
+    venv

@@ -15,7 +15,6 @@ repos:
       - id: check-json
       - id: check-merge-conflict
       - id: detect-private-key
-      - id: double-quote-string-fixer
   - repo: https://github.com/pycqa/flake8
     rev: 6.1.0
     hooks:
