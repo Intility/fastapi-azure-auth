@@ -49,16 +49,15 @@ You need to run the application on the configured port in Azure AD for the next 
 First, add your settings to the application. We'll need these later. The way I've set it up will look for a `.env`-file
 to populate your settings, but you can also just set a `default` value directly.
 
-```python {1,5,8-18,20} title="main.py"
-from typing import Union
-
+```python {3-4,7-16,18} title="main.py"
 import uvicorn
 from fastapi import FastAPI
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl, Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
@@ -85,17 +84,16 @@ if __name__ == '__main__':
 
 Now, let's configure our `CORS`. Without `CORS` your OpenAPI docs won't work as expected:
 
-```python {5,25-32} title="main.py"
-from typing import Union
-
+```python {3,23-30} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl, Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
@@ -118,7 +116,6 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=['*'],
     )
 
-
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
@@ -131,17 +128,16 @@ if __name__ == '__main__':
 ## Configure OpenAPI Documentation
 In order for our OpenAPI documentation to work, we have to configure a few settings directly in the `FastAPI` application.
 
-```python {23-29} title="main.py"
-from typing import Union
-
+```python {21-27} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl, Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
@@ -169,7 +165,6 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_methods=['*'],
         allow_headers=['*'],
     )
-
 
 @app.get("/")
 async def root():
@@ -193,19 +188,17 @@ Now, the fun part begins! 🚀
 Import the `SingleTenantAzureAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it:
 
 
-```python {7,42-48} title="main.py"
-from typing import Union
-
+```python {4,40-46} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
-
+from pydantic import AnyHttpUrl, Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
@@ -233,6 +226,7 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_methods=['*'],
         allow_headers=['*'],
     )
+
 
 azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
@@ -262,19 +256,17 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {51-56} title="main.py"
-from typing import Union
-
+```python {48-53} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
-
+from pydantic import AnyHttpUrl, Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
@@ -303,6 +295,7 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=['*'],
     )
 
+
 azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     tenant_id=settings.TENANT_ID,
@@ -311,14 +304,12 @@ azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     }
 )
 
-
 @app.on_event('startup')
 async def load_config() -> None:
     """
     Load OpenID config on startup.
     """
     await azure_scheme.openid_config.load_config()
-
 
 @app.get("/")
 async def root():
@@ -336,19 +327,17 @@ views based on the scope.
 
 Let's do that:
 
-```python {4,59} title="main.py"
-from typing import Union
-
+```python {2,55} title="main.py"
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
-
+from pydantic import AnyHttpUrl, Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     TENANT_ID: str = Field(default='', env='TENANT_ID')
@@ -377,6 +366,7 @@ if settings.BACKEND_CORS_ORIGINS:
         allow_headers=['*'],
     )
 
+
 azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     tenant_id=settings.TENANT_ID,
@@ -385,14 +375,12 @@ azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     }
 )
 
-
 @app.on_event('startup')
 async def load_config() -> None:
     """
     Load OpenID config on startup.
     """
     await azure_scheme.openid_config.load_config()
-
 
 @app.get("/", dependencies=[Security(azure_scheme)])
 async def root():
