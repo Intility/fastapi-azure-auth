@@ -6,7 +6,7 @@ jobs:
   linting:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
           python-version: 3.12
@@ -28,7 +28,7 @@ jobs:
             pydantic-version: "2.1.1"
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
