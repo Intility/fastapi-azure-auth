@@ -13,7 +13,6 @@ jobs:
       - run: python -m pip install pre-commit
       - run: pre-commit run --all-files
   test:
-    needs: linting
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
