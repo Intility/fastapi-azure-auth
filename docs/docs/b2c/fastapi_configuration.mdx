@@ -51,7 +51,7 @@ revisit the previous chapter or review the Azure AD B2C configuration under `App
 First, add your settings to the application. We'll need these later. The way I've set it up will look for a `.env`-file
 to populate your settings, but you can also just set a `default` value directly.
 
-```python {1,5,8-20} title="main.py"
+```python {3-4,7-20} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from pydantic import AnyHttpUrl, Field
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
 Now, let's configure our `CORS`. Without `CORS` your OpenAPI docs won't work as expected:
 
-```python {5,25-32} title="main.py"
+```python {3,25-32} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -136,8 +136,6 @@ if __name__ == '__main__':
 In order for our OpenAPI documentation to work, we have to configure a few settings directly in the `FastAPI` application.
 
 ```python {23-29} title="main.py"
-from typing import Union
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -146,7 +144,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
     TENANT_NAME: str = Field(default='', env='TENANT_NAME')
     APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
     OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
@@ -200,7 +198,7 @@ Now, the fun part begins! 🚀
 Import the `B2CMultiTenantAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it:
 
 
-```python {7,42-51} title="main.py"
+```python {6,42-51} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -352,7 +350,7 @@ views based on the scope.
 
 Let's do that:
 
-```python {4,61} title="main.py"
+```python {2,61} title="main.py"
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
