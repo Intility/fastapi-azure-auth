@@ -52,15 +52,15 @@ to populate your settings, but you can also just set a `default` value directly.
 ```python {3-4,7-16,18} title="main.py"
 import uvicorn
 from fastapi import FastAPI
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    TENANT_ID: str = Field(default='', env='TENANT_ID')
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
+    TENANT_ID: str = ""
 
     class Config:
         env_file = '.env'
@@ -88,15 +88,15 @@ Now, let's configure our `CORS`. Without `CORS` your OpenAPI docs won't work as 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    TENANT_ID: str = Field(default='', env='TENANT_ID')
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
+    TENANT_ID: str = ""
 
     class Config:
         env_file = '.env'
@@ -132,15 +132,15 @@ In order for our OpenAPI documentation to work, we have to configure a few setti
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    TENANT_ID: str = Field(default='', env='TENANT_ID')
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
+    TENANT_ID: str = ""
 
     class Config:
         env_file = '.env'
@@ -193,15 +193,15 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    TENANT_ID: str = Field(default='', env='TENANT_ID')
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
+    TENANT_ID: str = ""
 
     class Config:
         env_file = '.env'
@@ -261,15 +261,15 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    TENANT_ID: str = Field(default='', env='TENANT_ID')
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
+    TENANT_ID: str = ""
 
     class Config:
         env_file = '.env'
@@ -332,15 +332,15 @@ import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_azure_auth import SingleTenantAzureAuthorizationCodeBearer
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    TENANT_ID: str = Field(default='', env='TENANT_ID')
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
+    TENANT_ID: str = ""
 
     class Config:
         env_file = '.env'

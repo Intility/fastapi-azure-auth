@@ -54,16 +54,16 @@ to populate your settings, but you can also just set a `default` value directly.
 ```python {3-4,7-20} title="main.py"
 import uvicorn
 from fastapi import FastAPI
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    TENANT_NAME: str = Field(default='', env='TENANT_NAME')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    AUTH_POLICY_NAME: str = Field(default='', env='AUTH_POLICY_NAME')
+    TENANT_NAME: str = ""
+    APP_CLIENT_ID: str = ""
+    OPENAPI_CLIENT_ID: str = ""
+    AUTH_POLICY_NAME: str = ""
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -92,16 +92,16 @@ Now, let's configure our `CORS`. Without `CORS` your OpenAPI docs won't work as 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    TENANT_NAME: str = Field(default='', env='TENANT_NAME')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    AUTH_POLICY_NAME: str = Field(default='', env='AUTH_POLICY_NAME')
+    TENANT_NAME: str = ""
+    APP_CLIENT_ID: str = ""
+    OPENAPI_CLIENT_ID: str = ""
+    AUTH_POLICY_NAME: str = ""
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -139,16 +139,16 @@ In order for our OpenAPI documentation to work, we have to configure a few setti
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    TENANT_NAME: str = Field(default='', env='TENANT_NAME')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    AUTH_POLICY_NAME: str = Field(default='', env='AUTH_POLICY_NAME')
+    TENANT_NAME: str = ""
+    APP_CLIENT_ID: str = ""
+    OPENAPI_CLIENT_ID: str = ""
+    AUTH_POLICY_NAME: str = ""
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -202,7 +202,7 @@ Import the `B2CMultiTenantAuthorizationCodeBearer` from `fastapi_azure_auth` and
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
 
@@ -210,10 +210,10 @@ from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    TENANT_NAME: str = Field(default='', env='TENANT_NAME')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    AUTH_POLICY_NAME: str = Field(default='', env='AUTH_POLICY_NAME')
+    TENANT_NAME: str = ""
+    APP_CLIENT_ID: str = ""
+    OPENAPI_CLIENT_ID: str = ""
+    AUTH_POLICY_NAME: str = ""
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -276,7 +276,7 @@ configuration will be considered out of date, and update when a user does a requ
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
 
@@ -284,10 +284,10 @@ from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    TENANT_NAME: str = Field(default='', env='TENANT_NAME')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    AUTH_POLICY_NAME: str = Field(default='', env='AUTH_POLICY_NAME')
+    TENANT_NAME: str = ""
+    APP_CLIENT_ID: str = ""
+    OPENAPI_CLIENT_ID: str = ""
+    AUTH_POLICY_NAME: str = ""
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -354,17 +354,17 @@ Let's do that:
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, Field
+from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
-    TENANT_NAME: str = Field(default='', env='TENANT_NAME')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    AUTH_POLICY_NAME: str = Field(default='', env='AUTH_POLICY_NAME')
+    TENANT_NAME: str = ""
+    APP_CLIENT_ID: str = ""
+    OPENAPI_CLIENT_ID: str = ""
+    AUTH_POLICY_NAME: str = ""
 
     model_config = SettingsConfigDict(
         env_file='.env',
