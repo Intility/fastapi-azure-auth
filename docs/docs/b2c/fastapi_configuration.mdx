@@ -21,7 +21,6 @@ TENANT_NAME=
 APP_CLIENT_ID=
 OPENAPI_CLIENT_ID=
 AUTH_POLICY_NAME=
-SCOPE_DESCRIPTION=
 ```
 
 Create your `main.py` file:
@@ -52,7 +51,7 @@ revisit the previous chapter or review the Azure AD B2C configuration under `App
 First, add your settings to the application. We'll need these later. The way I've set it up will look for a `.env`-file
 to populate your settings, but you can also just set a `default` value directly.
 
-```python {3-4,7-20} title="main.py"
+```python {3-4,7-19} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from pydantic import AnyHttpUrl
@@ -90,7 +89,7 @@ if __name__ == '__main__':
 
 Now, let's configure our `CORS`. Without `CORS` your OpenAPI docs won't work as expected:
 
-```python {3,25-32} title="main.py"
+```python {3,26-33} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -138,7 +137,7 @@ if __name__ == '__main__':
 ## Configure OpenAPI Documentation
 In order for our OpenAPI documentation to work, we have to configure a few settings directly in the `FastAPI` application.
 
-```python {23-29} title="main.py"
+```python {24-30} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -202,7 +201,7 @@ Now, the fun part begins! 🚀
 Import the `B2CMultiTenantAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it. You can use the `Settings` class to compute the required URLs:
 
 
-```python {4,6,16-41,68-77} title="main.py"
+```python {4,6,17-42,69-76} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -276,9 +275,7 @@ azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     openid_config_url=settings.OPENID_CONFIG_URL,
     openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
     openapi_token_url=settings.OPENAPI_TOKEN_URL,
-    scopes={
-        settings.SCOPES
-    },
+    scopes=settings.SCOPES,
     validate_iss=False,
 )
 
@@ -303,7 +300,7 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {80-85} title="main.py"
+```python {79-84} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -377,9 +374,7 @@ azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     openid_config_url=settings.OPENID_CONFIG_URL,
     openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
     openapi_token_url=settings.OPENAPI_TOKEN_URL,
-    scopes={
-        settings.SCOPES
-    },
+    scopes=settings.SCOPES,
     validate_iss=False,
 )
 
@@ -408,7 +403,7 @@ views based on the scope.
 
 Let's do that:
 
-```python {2,88} title="main.py"
+```python {2,87} title="main.py"
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
@@ -482,9 +477,7 @@ azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     openid_config_url=settings.OPENID_CONFIG_URL,
     openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
     openapi_token_url=settings.OPENAPI_TOKEN_URL,
-    scopes={
-        settings.SCOPES
-    },
+    scopes=settings.SCOPES,
     validate_iss=False,
 )
 
