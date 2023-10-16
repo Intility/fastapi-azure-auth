@@ -49,23 +49,23 @@ You need to run the application on the configured port in Azure AD for the next 
 First, add your settings to the application. We'll need these later. The way I've set it up will look for a `.env`-file
 to populate your settings, but you can also just set a `default` value directly.
 
-```python {1,5,8-17,19} title="main.py"
-from typing import Union
-
+```python {3-4,7-18} title="main.py"
 import uvicorn
 from fastapi import FastAPI
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        case_sensitive=True
+    )
 
 settings = Settings()
 
@@ -84,24 +84,24 @@ if __name__ == '__main__':
 
 Now, let's configure our `CORS`. Without `CORS` your OpenAPI docs won't work as expected:
 
-```python {5,24-31} title="main.py"
-from typing import Union
-
+```python {3,23-30} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        case_sensitive=True
+    )
 
 settings = Settings()
 
@@ -129,24 +129,24 @@ if __name__ == '__main__':
 ## Configure OpenAPI Documentation
 In order for our OpenAPI documentation to work, we have to configure a few settings directly in the `FastAPI` application.
 
-```python {22-28} title="main.py"
-from typing import Union
-
+```python {21-27} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        case_sensitive=True
+    )
 
 settings = Settings()
 
@@ -190,25 +190,25 @@ Now, the fun part begins! 🚀
 Import the `MultiTenantAzureAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it:
 
 
-```python {7,41-47} title="main.py"
-from typing import Union
-
+```python {6,40-46} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        case_sensitive=True
+    )
 
 settings = Settings()
 
@@ -259,24 +259,24 @@ configuration will be considered out of date, and update when a user does a requ
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
 ```python {50-55} title="main.py"
-from typing import Union
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        case_sensitive=True
+    )
 
 settings = Settings()
 
@@ -331,25 +331,25 @@ views based on the scope.
 
 Let's do that:
 
-```python {4,58} title="main.py"
-from typing import Union
-
+```python {2,58} title="main.py"
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        case_sensitive=True
+    )
 
 settings = Settings()
 

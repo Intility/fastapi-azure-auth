@@ -8,26 +8,26 @@ If your multi-tenant application only should accept a few tenants, you'll have t
 We'll take the last code snippet from [FastAPI configuration](fastapi_configuration) and change a few lines of code to make
 this happen:
 
-```python {8,42-49,56-57}
-from typing import Union
-
+```python {7,42-49,56-57}
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl, BaseSettings, Field
+from pydantic import AnyHttpUrl
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 from fastapi_azure_auth.exceptions import InvalidAuth
 
 
 class Settings(BaseSettings):
-    BACKEND_CORS_ORIGINS: list[Union[str, AnyHttpUrl]] = ['http://localhost:8000']
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
+    BACKEND_CORS_ORIGINS: list[str | AnyHttpUrl] = ['http://localhost:8000']
+    OPENAPI_CLIENT_ID: str = ""
+    APP_CLIENT_ID: str = ""
 
-    class Config:
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='.env',
+        env_file_encoding='utf-8',
+        case_sensitive=True
+    )
 
 settings = Settings()
 
