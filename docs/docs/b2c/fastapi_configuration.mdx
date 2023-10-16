@@ -201,7 +201,7 @@ Now, the fun part begins! 🚀
 Import the `B2CMultiTenantAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it. You can use the `Settings` class to compute the required URLs:
 
 
-```python {4,6,17-42,69-76} title="main.py"
+```python {4,6,17-42,70-77} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -301,7 +301,7 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {79-84} title="main.py"
+```python {80-85} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -405,7 +405,7 @@ views based on the scope.
 
 Let's do that:
 
-```python {2,87} title="main.py"
+```python {2,88} title="main.py"
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
