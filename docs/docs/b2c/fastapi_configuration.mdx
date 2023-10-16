@@ -21,6 +21,7 @@ TENANT_NAME=
 APP_CLIENT_ID=
 OPENAPI_CLIENT_ID=
 AUTH_POLICY_NAME=
+SCOPE_DESCRIPTION=
 ```
 
 Create your `main.py` file:
@@ -64,6 +65,7 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -102,6 +104,7 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -149,6 +152,7 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -213,6 +217,7 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
 
     @computed_field
     @property
@@ -313,6 +318,7 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
 
     @computed_field
     @property
@@ -417,6 +423,7 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
 
     @computed_field
     @property
