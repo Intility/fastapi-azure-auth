@@ -195,17 +195,16 @@ We've used two flags: `usePkceWithAuthorizationCodeGrant`, which is the authenti
 
 Now, the fun part begins! 🚀
 
-Import the `B2CMultiTenantAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it:
+Import the `B2CMultiTenantAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it. You can use the `Settings` class to compute the required URLs:
 
 
-```python {6,42-51} title="main.py"
+```python {4,6,16-41,68-77} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
-
 
 
 class Settings(BaseSettings):
@@ -214,6 +213,33 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+
+    @computed_field
+    @property
+    def SCOPE_NAME(self) -> str:
+        return f'https://{self.TENANT_NAME}.onmicrosoft.com/{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}'
+
+    @computed_field
+    @property
+    def SCOPES(self) -> dict:
+        return {
+            self.SCOPE_NAME: self.SCOPE_DESCRIPTION
+        }
+    
+    @computed_field
+    @property
+    def OPENID_CONFIG_URL(self) -> dict:
+        return f'https://{self.TENANT_NAME}.b2clogin.com/{self.TENANT_NAME}.onmicrosoft.com/{self.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration'
+    
+    @computed_field
+    @property
+    def OPENAPI_AUTHORIZATION_URL(self) -> dict:
+        retutn f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize'
+    
+    @computed_field
+    @property
+    def OPENAPI_TOKEN_URL(self) -> dict:
+        return f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token'
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -242,11 +268,11 @@ if settings.BACKEND_CORS_ORIGINS:
 
 azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
-    openid_config_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration',
-    openapi_authorization_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize',
-    openapi_token_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token',
+    openid_config_url=settings.OPENID_CONFIG_URL,
+    openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
+    openapi_token_url=settings.OPENAPI_TOKEN_URL,
     scopes={
-        f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
+        settings.SCOPES
     },
     validate_iss=False,
 )
@@ -272,14 +298,13 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {54-59} title="main.py"
+```python {80-85} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
-
 
 
 class Settings(BaseSettings):
@@ -288,6 +313,33 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+
+    @computed_field
+    @property
+    def SCOPE_NAME(self) -> str:
+        return f'https://{self.TENANT_NAME}.onmicrosoft.com/{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}'
+
+    @computed_field
+    @property
+    def SCOPES(self) -> dict:
+        return {
+            self.SCOPE_NAME: self.SCOPE_DESCRIPTION
+        }
+    
+    @computed_field
+    @property
+    def OPENID_CONFIG_URL(self) -> dict:
+        return f'https://{self.TENANT_NAME}.b2clogin.com/{self.TENANT_NAME}.onmicrosoft.com/{self.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration'
+    
+    @computed_field
+    @property
+    def OPENAPI_AUTHORIZATION_URL(self) -> dict:
+        retutn f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize'
+    
+    @computed_field
+    @property
+    def OPENAPI_TOKEN_URL(self) -> dict:
+        return f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token'
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -316,11 +368,11 @@ if settings.BACKEND_CORS_ORIGINS:
 
 azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
-    openid_config_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration',
-    openapi_authorization_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize',
-    openapi_token_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token',
+    openid_config_url=settings.OPENID_CONFIG_URL,
+    openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
+    openapi_token_url=settings.OPENAPI_TOKEN_URL,
     scopes={
-        f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
+        settings.SCOPES
     },
     validate_iss=False,
 )
@@ -350,11 +402,11 @@ views based on the scope.
 
 Let's do that:
 
-```python {2,61} title="main.py"
+```python {2,88} title="main.py"
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import B2CMultiTenantAuthorizationCodeBearer
 
@@ -365,6 +417,33 @@ class Settings(BaseSettings):
     APP_CLIENT_ID: str = ""
     OPENAPI_CLIENT_ID: str = ""
     AUTH_POLICY_NAME: str = ""
+
+    @computed_field
+    @property
+    def SCOPE_NAME(self) -> str:
+        return f'https://{self.TENANT_NAME}.onmicrosoft.com/{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}'
+
+    @computed_field
+    @property
+    def SCOPES(self) -> dict:
+        return {
+            self.SCOPE_NAME: self.SCOPE_DESCRIPTION
+        }
+    
+    @computed_field
+    @property
+    def OPENID_CONFIG_URL(self) -> dict:
+        return f'https://{self.TENANT_NAME}.b2clogin.com/{self.TENANT_NAME}.onmicrosoft.com/{self.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration'
+    
+    @computed_field
+    @property
+    def OPENAPI_AUTHORIZATION_URL(self) -> dict:
+        retutn f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize'
+    
+    @computed_field
+    @property
+    def OPENAPI_TOKEN_URL(self) -> dict:
+        return f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token'
 
     model_config = SettingsConfigDict(
         env_file='.env',
@@ -393,11 +472,11 @@ if settings.BACKEND_CORS_ORIGINS:
 
 azure_scheme = B2CMultiTenantAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
-    openid_config_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration',
-    openapi_authorization_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize',
-    openapi_token_url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token',
+    openid_config_url=settings.OPENID_CONFIG_URL,
+    openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
+    openapi_token_url=settings.OPENAPI_TOKEN_URL,
     scopes={
-        f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/user_impersonation': 'user_impersonation',
+        settings.SCOPES
     },
     validate_iss=False,
 )
