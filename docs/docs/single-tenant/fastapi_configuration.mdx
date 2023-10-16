@@ -206,9 +206,14 @@ class Settings(BaseSettings):
 
     @computed_field
     @property
+    def SCOPE_NAME(self) -> str:
+        return f'api://{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}'
+
+    @computed_field
+    @property
     def SCOPES(self) -> dict:
         return {
-            f'api://{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}': self.SCOPE_DESCRIPTION,
+            self.SCOPE_NAME: self.SCOPE_DESCRIPTION,
         }
     
     @computed_field
@@ -233,6 +238,7 @@ app = FastAPI(
     swagger_ui_init_oauth={
         'usePkceWithAuthorizationCodeGrant': True,
         'clientId': settings.OPENAPI_CLIENT_ID,
+        'scopes': settings.SCOPE_NAME,
     },
 )
 
@@ -288,12 +294,18 @@ class Settings(BaseSettings):
     OPENAPI_CLIENT_ID: str = ""
     APP_CLIENT_ID: str = ""
     TENANT_ID: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
+
+    @computed_field
+    @property
+    def SCOPE_NAME(self) -> str:
+        return f'api://{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}'
 
     @computed_field
     @property
     def SCOPES(self) -> dict:
         return {
-            f'api://{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}': self.SCOPE_DESCRIPTION,
+            self.SCOPE_NAME: self.SCOPE_DESCRIPTION,
         }
     
     @computed_field
@@ -318,6 +330,7 @@ app = FastAPI(
     swagger_ui_init_oauth={
         'usePkceWithAuthorizationCodeGrant': True,
         'clientId': settings.OPENAPI_CLIENT_ID,
+        'scopes': settings.SCOPE_NAME,
     },
 )
 
@@ -376,12 +389,18 @@ class Settings(BaseSettings):
     OPENAPI_CLIENT_ID: str = ""
     APP_CLIENT_ID: str = ""
     TENANT_ID: str = ""
+    SCOPE_DESCRIPTION: str = "user_impersonation"
+
+    @computed_field
+    @property
+    def SCOPE_NAME(self) -> str:
+        return f'api://{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}'
 
     @computed_field
     @property
     def SCOPES(self) -> dict:
         return {
-            f'api://{self.APP_CLIENT_ID}/{self.SCOPE_DESCRIPTION}': self.SCOPE_DESCRIPTION,
+            self.SCOPE_NAME: self.SCOPE_DESCRIPTION,
         }
     
     @computed_field
@@ -406,6 +425,7 @@ app = FastAPI(
     swagger_ui_init_oauth={
         'usePkceWithAuthorizationCodeGrant': True,
         'clientId': settings.OPENAPI_CLIENT_ID,
+        'scopes': settings.SCOPE_NAME,
     },
 )
 
