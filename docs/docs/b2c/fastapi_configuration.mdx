@@ -229,17 +229,17 @@ class Settings(BaseSettings):
         return {
             self.SCOPE_NAME: self.SCOPE_DESCRIPTION
         }
-    
+
     @computed_field
     @property
     def OPENID_CONFIG_URL(self) -> dict:
         return f'https://{self.TENANT_NAME}.b2clogin.com/{self.TENANT_NAME}.onmicrosoft.com/{self.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration'
-    
+
     @computed_field
     @property
     def OPENAPI_AUTHORIZATION_URL(self) -> dict:
         return f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize'
-    
+
     @computed_field
     @property
     def OPENAPI_TOKEN_URL(self) -> dict:
@@ -329,17 +329,17 @@ class Settings(BaseSettings):
         return {
             self.SCOPE_NAME: self.SCOPE_DESCRIPTION
         }
-    
+
     @computed_field
     @property
     def OPENID_CONFIG_URL(self) -> dict:
         return f'https://{self.TENANT_NAME}.b2clogin.com/{self.TENANT_NAME}.onmicrosoft.com/{self.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration'
-    
+
     @computed_field
     @property
     def OPENAPI_AUTHORIZATION_URL(self) -> dict:
         return f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize'
-    
+
     @computed_field
     @property
     def OPENAPI_TOKEN_URL(self) -> dict:
@@ -433,17 +433,17 @@ class Settings(BaseSettings):
         return {
             self.SCOPE_NAME: self.SCOPE_DESCRIPTION
         }
-    
+
     @computed_field
     @property
     def OPENID_CONFIG_URL(self) -> dict:
         return f'https://{self.TENANT_NAME}.b2clogin.com/{self.TENANT_NAME}.onmicrosoft.com/{self.AUTH_POLICY_NAME}/v2.0/.well-known/openid-configuration'
-    
+
     @computed_field
     @property
     def OPENAPI_AUTHORIZATION_URL(self) -> dict:
         return f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/authorize'
-    
+
     @computed_field
     @property
     def OPENAPI_TOKEN_URL(self) -> dict:
