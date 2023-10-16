@@ -258,6 +258,7 @@ app = FastAPI(
     swagger_ui_init_oauth={
         'usePkceWithAuthorizationCodeGrant': True,
         'clientId': settings.OPENAPI_CLIENT_ID,
+        'scopes': settings.SCOPE_NAME,
     },
 )
 
@@ -357,6 +358,7 @@ app = FastAPI(
     swagger_ui_init_oauth={
         'usePkceWithAuthorizationCodeGrant': True,
         'clientId': settings.OPENAPI_CLIENT_ID,
+        'scopes': settings.SCOPE_NAME,
     },
 )
 
@@ -460,6 +462,7 @@ app = FastAPI(
     swagger_ui_init_oauth={
         'usePkceWithAuthorizationCodeGrant': True,
         'clientId': settings.OPENAPI_CLIENT_ID,
+        'scopes': settings.SCOPE_NAME,
     },
 )
 
