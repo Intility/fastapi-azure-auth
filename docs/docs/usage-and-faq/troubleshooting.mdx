@@ -1,0 +1,39 @@
+---
+title: Troubleshooting
+sidebar_position: 8
+---
+
+## Logging
+
+If you run into any problems, set the logging level to `DEBUG` and check the logs for more information.
+
+Below an example:
+
+```python title="logging_config.py"
+from logging.config import dictConfig
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'fastapi_azure_auth': {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False},
+    },
+}
+
+dictConfig(LOGGING)
+```
+
+:::info
+It is recommended to call the `dictConfig()` function before the FastAPI (and `fastapi-azure-auth`) initialization.
+:::
