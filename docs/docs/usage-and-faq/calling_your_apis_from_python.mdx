@@ -3,6 +3,8 @@ title: Calling your APIs from Python
 sidebar_position: 4
 ---
 
+## Azure setup
+
 In order to call your APIs from Python (or any other backend), you should use the [Client Credential Flow](https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow).
 
 1. Navigate to [Azure -> Azure Active Directory -> App registrations](https://portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps)
@@ -13,8 +15,8 @@ and find your **OpenAPI application registration***
 5. Click `Add`
 
 :::info
-*In this example, we used the already created OpenAPI app registration in order to keep it short,
-but in reality you should create a new app registration for _every_ application talking to your backend.
+In this example, we used the already created OpenAPI app registration in order to keep it short,
+but in reality you should **create a new app registration** for _every_ application talking to your backend.
 In other words, if someone wants to use your API, they should create their own app registration and their own secret.
 :::
 
@@ -29,33 +31,71 @@ You can use client certificates too, but we won't cover this here.
 
 ![copy_secret](../../static/img/usage-and-faq/copy_secret.png)
 
+## FastAPI setup
 
-7. Fetch the token from Azure, and then call your own API endpoint:
+The basic process is to first fetch the access token from Azure, and then call your own API endpoint.
+
+
+### Single- and multi-tenant
 
 ```python title="my_script.py"
+import asyncio
 from httpx import AsyncClient
 from demo_project.core.config import settings
 
-async with AsyncClient() as client:
-    azure_response = await client.post(
-        url=f'https://login.microsoftonline.com/{settings.TENANT_ID}/oauth2/v2.0/token',
-        data={
-            'grant_type': 'client_credentials',
-            'client_id': settings.OPENAPI_CLIENT_ID,  # the ID of the app reg you created the secret for
-            'client_secret': settings.CLIENT_SECRET,  # the secret you created
-            'scope': f'api://{settings.APP_CLIENT_ID}/.default',  # note: NOT .user_impersonation
-        }
-    )
-    token = azure_response.json()['access_token']
+async def main():
+    async with AsyncClient() as client:
+        azure_response = await client.post(
+            url=f'https://login.microsoftonline.com/{settings.TENANT_ID}/oauth2/v2.0/token',
+            data={
+                'grant_type': 'client_credentials',
+                'client_id': settings.OPENAPI_CLIENT_ID,  # the ID of the app reg you created the secret for
+                'client_secret': settings.CLIENT_SECRET,  # the secret you created
+                'scope': f'api://{settings.APP_CLIENT_ID}/.default',  # note: NOT .user_impersonation
+            }
+        )
+        token = azure_response.json()['access_token']
 
-    my_api_response = await client.get(
-        'http://localhost:8000/api/v1/hello-graph',
-        headers={'Authorization': f'Bearer {token}'},
-    )
-    print(my_api_response.json())
+        my_api_response = await client.get(
+            'http://localhost:8000/api/v1/hello-graph',
+            headers={'Authorization': f'Bearer {token}'},
+        )
+        print(my_api_response.json())
+
+if __name__ == '__main__':
+    asyncio.run(main())
 ```
 
-:::info
-If you install `ipython`  you can use `asyncio` code directly in your terminal.
-(`poetry add ipython --dev`)
-:::
+### B2C
+
+Compared to the above, the only differences are the `scope` and `url` parameters:
+
+```python title="my_script.py"
+import asyncio
+from httpx import AsyncClient
+from demo_project.core.config import settings
+
+async def main():
+    async with AsyncClient() as client:
+        azure_response = await client.post(
+            url=f'https://{settings.TENANT_NAME}.b2clogin.com/{settings.TENANT_NAME}.onmicrosoft.com/{settings.AUTH_POLICY_NAME}/oauth2/v2.0/token',
+            data={
+                'grant_type': 'client_credentials',
+                'client_id': settings.OPENAPI_CLIENT_ID,  # the ID of the app reg you created the secret for
+                'client_secret': settings.CLIENT_SECRET,  # the secret you created
+                'scope': f'https://{settings.TENANT_NAME}.onmicrosoft.com/{settings.APP_CLIENT_ID}/.default',
+            }
+        )
+        token = azure_response.json()['access_token']
+
+        my_api_response = await client.get(
+            'http://localhost:8000/api/v1/hello-graph',
+            headers={'Authorization': f'Bearer {token}'},
+        )
+        print(my_api_response.json())
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+```
+
