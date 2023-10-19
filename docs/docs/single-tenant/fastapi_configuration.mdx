@@ -188,7 +188,7 @@ Now, the fun part begins! 🚀
 Import the `SingleTenantAzureAuthorizationCodeBearer` from `fastapi_azure_auth` and configure it. You can use the `Settings` class to compute the required fields:
 
 
-```python {4-5,14,16-36,64-70} title="main.py"
+```python {4-5,14,16-26,54-58} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -215,16 +215,6 @@ class Settings(BaseSettings):
         return {
             self.SCOPE_NAME: self.SCOPE_DESCRIPTION,
         }
-
-    @computed_field
-    @property
-    def OPENAPI_AUTHORIZATION_URL(self) -> str:
-        return f"https://login.microsoftonline.com/{self.TENANT_ID}/oauth2/v2.0/authorize"
-
-    @computed_field
-    @property
-    def OPENAPI_TOKEN_URL(self) -> str:
-        return f"https://login.microsoftonline.com/{self.TENANT_ID}/oauth2/v2.0/token"
 
     class Config:
         env_file = '.env'
@@ -256,8 +246,6 @@ azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     tenant_id=settings.TENANT_ID,
     scopes=settings.SCOPES,
-    openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
-    openapi_token_url=settings.OPENAPI_TOKEN_URL,
 )
 
 
@@ -280,7 +268,7 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {72-77} title="main.py"
+```python {60-65} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -307,16 +295,6 @@ class Settings(BaseSettings):
         return {
             self.SCOPE_NAME: self.SCOPE_DESCRIPTION,
         }
-
-    @computed_field
-    @property
-    def OPENAPI_AUTHORIZATION_URL(self) -> str:
-        return f"https://login.microsoftonline.com/{self.TENANT_ID}/oauth2/v2.0/authorize"
-
-    @computed_field
-    @property
-    def OPENAPI_TOKEN_URL(self) -> str:
-        return f"https://login.microsoftonline.com/{self.TENANT_ID}/oauth2/v2.0/token"
 
     class Config:
         env_file = '.env'
@@ -348,8 +326,6 @@ azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     tenant_id=settings.TENANT_ID,
     scopes=settings.SCOPES,
-    openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
-    openapi_token_url=settings.OPENAPI_TOKEN_URL,
 )
 
 @app.on_event('startup')
@@ -375,7 +351,7 @@ views based on the scope.
 
 Let's do that:
 
-```python {2,79} title="main.py"
+```python {2,77} title="main.py"
 import uvicorn
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
@@ -443,8 +419,6 @@ azure_scheme = SingleTenantAzureAuthorizationCodeBearer(
     app_client_id=settings.APP_CLIENT_ID,
     tenant_id=settings.TENANT_ID,
     scopes=settings.SCOPES,
-    openapi_authorization_url=settings.OPENAPI_AUTHORIZATION_URL,
-    openapi_token_url=settings.OPENAPI_TOKEN_URL,
 )
 
 @app.on_event('startup')
