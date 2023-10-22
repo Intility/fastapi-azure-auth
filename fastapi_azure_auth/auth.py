@@ -26,6 +26,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         tenant_id: Optional[str] = None,
         scopes: Optional[Dict[str, str]] = None,
         multi_tenant: bool = False,
+        leeway: int = 0,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         token_version: Literal[1, 2] = 2,
@@ -54,6 +55,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
 
         :param multi_tenant: bool
             Whether this is a multi tenant or single tenant application.
+        :param leeway: int
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
         :param validate_iss: bool
         **Only used for multi-tenant applications**
             Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
@@ -101,6 +105,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             config_url=openid_config_url or None,
         )
 
+        self.leeway: int = leeway
         self.validate_iss: bool = validate_iss
         self.iss_callable: Optional[Callable[..., Any]] = iss_callable
         self.token_version: int = token_version
@@ -193,7 +198,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                         'require_sub': True,
                         'require_jti': False,
                         'require_at_hash': False,
-                        'leeway': 0,
+                        'leeway': self.leeway,
                     }
                     # Validate token
                     token = jwt.decode(
@@ -238,6 +243,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         tenant_id: str,
         auto_error: bool = True,
         scopes: Optional[Dict[str, str]] = None,
+        leeway: int = 0,
         allow_guest_users: bool = False,
         token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
@@ -260,6 +266,11 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
                 }
+
+        :param leeway: int
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
+
         :param allow_guest_users: bool
             Whether to allow guest users or not. Guest users can be added manually, or by other services, such as
             inviting them to a teams channel. Most developers do _not_ want guest users in their applications.
@@ -282,6 +293,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             auto_error=auto_error,
             tenant_id=tenant_id,
             scopes=scopes,
+            leeway=leeway,
             allow_guest_users=allow_guest_users,
             token_version=token_version,
             openid_config_use_app_id=openid_config_use_app_id,
@@ -298,6 +310,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         app_client_id: str,
         auto_error: bool = True,
         scopes: Optional[Dict[str, str]] = None,
+        leeway: int = 0,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         allow_guest_users: bool = False,
@@ -319,6 +332,10 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
                 }
+
+        :param leeway: int
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
 
         :param validate_iss: bool
             Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
@@ -346,6 +363,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             app_client_id=app_client_id,
             auto_error=auto_error,
             scopes=scopes,
+            leeway=leeway,
             validate_iss=validate_iss,
             iss_callable=iss_callable,
             allow_guest_users=allow_guest_users,
@@ -364,6 +382,7 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         app_client_id: str,
         auto_error: bool = True,
         scopes: Optional[Dict[str, str]] = None,
+        leeway: int = 0,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
         openid_config_use_app_id: bool = False,
@@ -386,6 +405,11 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
                 }
+
+        :param leeway: int
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
+
         :param validate_iss: bool
             Whether to validate the token `iss` (issuer) or not. This can be skipped to allow anyone to log in.
         :param iss_callable: Async Callable
@@ -406,6 +430,7 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
             app_client_id=app_client_id,
             auto_error=auto_error,
             scopes=scopes,
+            leeway=leeway,
             validate_iss=validate_iss,
             iss_callable=iss_callable,
             multi_tenant=True,

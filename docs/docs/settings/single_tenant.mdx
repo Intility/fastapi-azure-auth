@@ -39,6 +39,14 @@ Scopes, these are the ones you've configured in Azure AD. Key is scope, value is
 
 -----------------
 
+### leeway: int
+**Default:** `0`
+
+By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
+
+-----------------
+
 ### token_version: `Literal[1, 2]`
 **Default:** `2`
 
