@@ -56,7 +56,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         :param multi_tenant: bool
             Whether this is a multi tenant or single tenant application.
         :param leeway: int
-            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be
             considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
         :param validate_iss: bool
         **Only used for multi-tenant applications**
@@ -268,7 +268,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
                 }
 
         :param leeway: int
-            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be
             considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
 
         :param allow_guest_users: bool
@@ -334,7 +334,7 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
                 }
 
         :param leeway: int
-            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be
             considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
 
         :param validate_iss: bool
@@ -407,7 +407,7 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
                 }
 
         :param leeway: int
-            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be 
+            By adding leeway, you define a tolerance window in terms of seconds, allowing the token to be
             considered valid even if it falls within the leeway time before or after the "exp" or "nbf" times.
 
         :param validate_iss: bool
