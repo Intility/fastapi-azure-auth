@@ -91,7 +91,7 @@ class Claims(BaseModel):
         default=None,
         description="User's account status in tenant",
     )
-    auth_time: Optional[str] = Field(
+    auth_time: Optional[int] = Field(
         default=None,
         description='Time when the user last authenticated; See OpenID Connect spec',
     )
