@@ -204,7 +204,7 @@ openapi_schema = {
                         'description': "User's account status in tenant",
                     },
                     'auth_time': {
-                        'anyOf': [{'type': 'string'}, {'type': 'null'}],
+                        'anyOf': [{'type': 'integer'}, {'type': 'null'}],
                         'title': 'Auth Time',
                         'description': 'Time when the user last authenticated; See OpenID Connect spec',
                     },
