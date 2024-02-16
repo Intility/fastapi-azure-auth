@@ -87,7 +87,7 @@ class Claims(BaseModel):
     )
 
     # Optional claims, configured in Azure AD
-    acct: Optional[str] = Field(
+    acct: Optional[int] = Field(
         default=None,
         description="User's account status in tenant",
     )
