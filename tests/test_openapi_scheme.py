@@ -199,7 +199,7 @@ openapi_schema = {
                         'description': 'Indicates the version of the access token.',
                     },
                     'acct': {
-                        'anyOf': [{'type': 'string'}, {'type': 'null'}],
+                        'anyOf': [{'type': 'integer'}, {'type': 'null'}],
                         'title': 'Acct',
                         'description': "User's account status in tenant",
                     },
