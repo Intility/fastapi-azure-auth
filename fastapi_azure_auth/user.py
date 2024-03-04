@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, Field, validator
+import pydantic
+from pydantic import BaseModel, Field
 
 
 class Claims(BaseModel):
@@ -231,15 +232,29 @@ class Claims(BaseModel):
         description='The primary username that represents the user. Only available in V2.0 tokens',
     )
 
-    @validator('scp', pre=True)
-    def scopes_to_list(cls, v: object) -> object:
-        """
-        Validator on the scope attribute that convert the space separated list
-        of scope into an actual list of scope.
-        """
-        if isinstance(v, str):
-            return v.split(' ')
-        return v  # pragma: no cover
+    if pydantic.VERSION.startswith('1.'):
+
+        @pydantic.validator("scp", pre=True)
+        def scopes_to_list(cls, v: object) -> object:
+            """
+            Validator on the scope attribute that convert the space separated list
+            of scope into an actual list of scope.
+            """
+            if isinstance(v, str):
+                return v.split(' ')
+            return v  # pragma: no cover
+
+    else:
+
+        @pydantic.field_validator('scp', mode="before")
+        def scopes_to_list(cls, v: object) -> object:
+            """
+            Validator on the scope attribute that convert the space separated list
+            of scope into an actual list of scope.
+            """
+            if isinstance(v, str):
+                return v.split(' ')
+            return v  # pragma: no cover
 
 
 class User(Claims):
