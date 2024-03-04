@@ -446,7 +446,7 @@ def test_client():
     version.parse(fastapi.__version__) < version.parse('0.99.0'), reason='Different schema in older fastapi version'
 )
 @pytest.mark.skipif(
-    version.parse(pydantic.__version__) < version.parse('2.0.0'), reason='Different schema with older pydantic version'
+    version.parse(pydantic.__version__) < version.parse('2.6.2'), reason='Different schema with older pydantic version'
 )
 def test_openapi_schema(test_client):
     response = test_client.get('api/v1/openapi.json')
