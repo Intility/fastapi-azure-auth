@@ -28,10 +28,10 @@ app = FastAPI(
 if settings.BACKEND_CORS_ORIGINS:  # pragma: no cover
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
-        allow_credentials=True,
-        allow_methods=['*'],
-        allow_headers=['*'],
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],  # type: ignore
+        allow_credentials=True,  # type: ignore
+        allow_methods=['*'],  # type: ignore
+        allow_headers=['*'],  # type: ignore
     )
 
 
