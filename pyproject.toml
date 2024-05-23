@@ -43,8 +43,8 @@ classifiers = [
 python = "^3.8"
 fastapi = ">0.68.0"
 cryptography = ">=40.0.1"
-python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 httpx = ">0.18.2"
+pyjwt = "^2.8.0"
 
 
 [tool.poetry.group.dev.dependencies]

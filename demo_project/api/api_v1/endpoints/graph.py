@@ -1,11 +1,11 @@
 from typing import Any
 
 import httpx
+import jwt
 from demo_project.api.dependencies import azure_scheme
 from demo_project.core.config import settings
 from fastapi import APIRouter, Depends, Request
 from httpx import AsyncClient
-from jose import jwt
 
 router = APIRouter()
 
@@ -47,7 +47,7 @@ async def graph_world(request: Request) -> Any:  # noqa: ANN401
 
         # Return all the information to the end user
         return (
-            {'claims': jwt.get_unverified_claims(token=request.state.user.access_token)}
+            {'claims': jwt.decode(request.state.user.access_token, options={'verify_signature': False})}
             | {'obo_response': obo_response.json()}
             | {'graph_response': graph}
         )

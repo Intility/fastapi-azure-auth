@@ -14,6 +14,8 @@ from tests.utils import (
     build_evil_access_token,
 )
 
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
+
 
 def current_version(current_cases) -> int:
     return current_cases['single_tenant_app']['token_version'].params['version']
@@ -347,9 +349,22 @@ async def test_only_header(single_tenant_app, mock_openid_and_keys_v1_v2):
 
 
 @pytest.mark.anyio
+async def test_none_token(single_tenant_app, mock_openid_and_keys_v1_v2, mocker, current_cases):
+    test_version = current_version(current_cases)
+    mocker.patch.object(AzureAuthorizationCodeBearerBase, 'extract_access_token', return_value=None)
+    async with AsyncClient(
+        app=app,
+        base_url='http://test',
+        headers={'Authorization': 'Bearer ' + build_access_token_expired(version=test_version)},
+    ) as ac:
+        response = await ac.get('api/v1/hello')
+    assert response.json() == {'detail': 'Invalid token format'}
+
+
+@pytest.mark.anyio
 async def test_exception_raised(single_tenant_app, mock_openid_and_keys_v1_v2, mocker, current_cases):
     test_version = current_version(current_cases)
-    mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
+    mocker.patch.object(AzureAuthorizationCodeBearerBase, 'validate', side_effect=ValueError('lol'))
     async with AsyncClient(
         app=app,
         base_url='http://test',

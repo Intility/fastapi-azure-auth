@@ -18,6 +18,7 @@ from tests.utils import (
 )
 
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
 from fastapi_azure_auth.exceptions import InvalidAuth
 
 
@@ -283,7 +284,7 @@ async def test_only_header(multi_tenant_app, mock_openid_and_keys):
 
 @pytest.mark.anyio
 async def test_exception_raised(multi_tenant_app, mock_openid_and_keys, mocker):
-    mocker.patch('fastapi_azure_auth.auth.jwt.decode', side_effect=ValueError('lol'))
+    mocker.patch.object(AzureAuthorizationCodeBearerBase, 'validate', side_effect=ValueError('lol'))
     async with AsyncClient(
         app=app,
         base_url='http://test',

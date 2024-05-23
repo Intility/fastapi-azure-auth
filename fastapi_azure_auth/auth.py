@@ -1,19 +1,33 @@
 import inspect
 import logging
-from typing import Any, Awaitable, Callable, Dict, Literal, Optional
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, Literal, Optional
 from warnings import warn
 
+import jwt
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2AuthorizationCodeBearer, SecurityScopes
 from fastapi.security.base import SecurityBase
-from jose import jwt
-from jose.exceptions import ExpiredSignatureError, JWTClaimsError, JWTError
+from jwt.exceptions import (
+    ExpiredSignatureError,
+    ImmatureSignatureError,
+    InvalidAlgorithmError,
+    InvalidAudienceError,
+    InvalidIssuedAtError,
+    InvalidIssuerError,
+    InvalidTokenError,
+    MissingRequiredClaimError,
+)
 from starlette.requests import Request
 
 from fastapi_azure_auth.exceptions import InvalidAuth
 from fastapi_azure_auth.openid_config import OpenIdConfig
 from fastapi_azure_auth.user import User
-from fastapi_azure_auth.utils import is_guest
+from fastapi_azure_auth.utils import get_unverified_claims, get_unverified_header, is_guest
+
+if TYPE_CHECKING:  # pragma: no cover
+    from jwt.algorithms import AllowedPublicKeys
+else:
+    AllowedPublicKeys = Any
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -145,11 +159,13 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         Extends call to also validate the token.
         """
         try:
-            access_token = await self.oauth(request=request)
+            access_token = await self.extract_access_token(request)
             try:
+                if access_token is None:
+                    raise Exception('No access token provided')
                 # Extract header information of the token.
-                header: dict[str, str] = jwt.get_unverified_header(token=access_token) or {}
-                claims: dict[str, Any] = jwt.get_unverified_claims(token=access_token) or {}
+                header: dict[str, Any] = get_unverified_header(access_token)
+                claims: dict[str, Any] = get_unverified_claims(access_token)
             except Exception as error:
                 log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
                 raise InvalidAuth(detail='Invalid token format') from error
@@ -180,6 +196,10 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             try:
                 if key := self.openid_config.signing_keys.get(header.get('kid', '')):
                     # We require and validate all fields in an Azure AD token
+                    required_claims = ['exp', 'aud', 'iat', 'nbf', 'sub']
+                    if self.validate_iss:
+                        required_claims.append('iss')
+
                     options = {
                         'verify_signature': True,
                         'verify_aud': True,
@@ -187,41 +207,30 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                         'verify_exp': True,
                         'verify_nbf': True,
                         'verify_iss': self.validate_iss,
-                        'verify_sub': True,
-                        'verify_jti': True,
-                        'verify_at_hash': True,
-                        'require_aud': True,
-                        'require_iat': True,
-                        'require_exp': True,
-                        'require_nbf': True,
-                        'require_iss': self.validate_iss,
-                        'require_sub': True,
-                        'require_jti': False,
-                        'require_at_hash': False,
-                        'leeway': self.leeway,
+                        'require': required_claims,
                     }
                     # Validate token
-                    token = jwt.decode(
-                        access_token,
-                        key=key,
-                        algorithms=['RS256'],
-                        audience=self.app_client_id if self.token_version == 2 else f'api://{self.app_client_id}',
-                        issuer=iss,
-                        options=options,
-                    )
+                    token = self.validate(access_token=access_token, iss=iss, key=key, options=options)
                     # Attach the user to the request. Can be accessed through `request.state.user`
                     user: User = User(
                         **{**token, 'claims': token, 'access_token': access_token, 'is_guest': user_is_guest}
                     )
                     request.state.user = user
                     return user
-            except JWTClaimsError as error:
+            except (
+                InvalidAudienceError,
+                InvalidIssuerError,
+                InvalidIssuedAtError,
+                ImmatureSignatureError,
+                InvalidAlgorithmError,
+                MissingRequiredClaimError,
+            ) as error:
                 log.info('Token contains invalid claims. %s', error)
                 raise InvalidAuth(detail='Token contains invalid claims') from error
             except ExpiredSignatureError as error:
                 log.info('Token signature has expired. %s', error)
                 raise InvalidAuth(detail='Token signature has expired') from error
-            except JWTError as error:
+            except InvalidTokenError as error:
                 log.warning('Invalid token. Error: %s', error, exc_info=True)
                 raise InvalidAuth(detail='Unable to validate token') from error
             except Exception as error:
@@ -234,6 +243,30 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             if not self.auto_error:
                 return None
             raise
+
+    async def extract_access_token(self, request: Request) -> Optional[str]:
+        """
+        Extracts the access token from the request.
+        """
+        return await self.oauth(request=request)
+
+    def validate(self, access_token: str, key: AllowedPublicKeys, iss: str, options: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validates the token using the provided key and options.
+        """
+        alg = 'RS256'
+        aud = self.app_client_id if self.token_version == 2 else f'api://{self.app_client_id}'
+        return dict(
+            jwt.decode(
+                access_token,
+                key=key,
+                algorithms=[alg],
+                audience=aud,
+                issuer=iss,
+                leeway=self.leeway,
+                options=options,
+            )
+        )
 
 
 class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
