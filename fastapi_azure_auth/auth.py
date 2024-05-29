@@ -10,7 +10,6 @@ from fastapi.security.base import SecurityBase
 from jwt.exceptions import (
     ExpiredSignatureError,
     ImmatureSignatureError,
-    InvalidAlgorithmError,
     InvalidAudienceError,
     InvalidIssuedAtError,
     InvalidIssuerError,
@@ -220,7 +219,6 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 InvalidIssuerError,
                 InvalidIssuedAtError,
                 ImmatureSignatureError,
-                InvalidAlgorithmError,
                 MissingRequiredClaimError,
             ) as error:
                 log.info('Token contains invalid claims. %s', error)
