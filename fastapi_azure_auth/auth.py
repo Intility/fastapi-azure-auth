@@ -26,8 +26,6 @@ from fastapi_azure_auth.utils import get_unverified_claims, get_unverified_heade
 
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys
-else:
-    AllowedPublicKeys = Any
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -250,7 +248,9 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         """
         return await self.oauth(request=request)
 
-    def validate(self, access_token: str, key: AllowedPublicKeys, iss: str, options: Dict[str, Any]) -> Dict[str, Any]:
+    def validate(
+        self, access_token: str, key: 'AllowedPublicKeys', iss: str, options: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Validates the token using the provided key and options.
         """

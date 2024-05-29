@@ -8,8 +8,6 @@ from httpx import AsyncClient
 
 if TYPE_CHECKING:  # pragma: no cover
     from jwt.algorithms import AllowedPublicKeys
-else:
-    AllowedPublicKeys = Any
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -31,7 +29,7 @@ class OpenIdConfig:
         self.config_url = config_url
 
         self.authorization_endpoint: str
-        self.signing_keys: dict[str, AllowedPublicKeys]
+        self.signing_keys: dict[str, 'AllowedPublicKeys']
         self.token_endpoint: str
         self.issuer: str
 
