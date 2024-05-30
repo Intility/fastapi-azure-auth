@@ -1,11 +1,13 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-from cryptography.hazmat.primitives.asymmetric.types import PublicKeyTypes as KeyTypes
+import jwt
 from fastapi import HTTPException, status
 from httpx import AsyncClient
-from jose import jwk
+
+if TYPE_CHECKING:  # pragma: no cover
+    from jwt.algorithms import AllowedPublicKeys
 
 log = logging.getLogger('fastapi_azure_auth')
 
@@ -27,7 +29,7 @@ class OpenIdConfig:
         self.config_url = config_url
 
         self.authorization_endpoint: str
-        self.signing_keys: dict[str, KeyTypes]
+        self.signing_keys: dict[str, 'AllowedPublicKeys']
         self.token_endpoint: str
         self.issuer: str
 
@@ -98,6 +100,6 @@ class OpenIdConfig:
         for key in keys:
             if key.get('use') == 'sig':  # Only care about keys that are used for signatures, not encryption
                 log.debug('Loading public key from certificate: %s', key)
-                cert_obj = jwk.construct(key, 'RS256')
+                cert_obj = jwt.PyJWK(key, 'RS256')
                 if kid := key.get('kid'):  # In case a key would not have a thumbprint we can match, we don't want it.
-                    self.signing_keys[kid] = cert_obj
+                    self.signing_keys[kid] = cert_obj.key

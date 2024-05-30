@@ -1,10 +1,10 @@
 import time
 from typing import Optional
 
+import jwt
 from cryptography.hazmat.backends import default_backend as crypto_default_backend
-from cryptography.hazmat.primitives import serialization, serialization as crypto_serialization
+from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
-from jose import jwk, jwt
 
 
 def generate_private_key():
@@ -162,14 +162,10 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
                     'use': 'sig',
                     'kid': 'dummythumbprint',
                     'x5t': 'dummythumbprint',
-                    **jwk.construct(
-                        signing_key_a.private_bytes(
-                            encoding=serialization.Encoding.PEM,
-                            format=serialization.PrivateFormat.TraditionalOpenSSL,
-                            encryption_algorithm=serialization.NoEncryption(),
-                        ),
-                        'RS256',
-                    ).to_dict(),
+                    **jwt.algorithms.RSAAlgorithm.to_jwk(
+                        signing_key_a,
+                        as_dict=True,
+                    ),
                 }
             ]
         }
@@ -180,31 +176,19 @@ def build_openid_keys(empty_keys: bool = False, no_valid_keys: bool = False) -> 
                     'use': 'sig',
                     'kid': 'dummythumbprint',
                     'x5t': 'dummythumbprint',
-                    **jwk.construct(
-                        signing_key_a.private_bytes(
-                            encoding=serialization.Encoding.PEM,
-                            format=serialization.PrivateFormat.TraditionalOpenSSL,
-                            encryption_algorithm=serialization.NoEncryption(),
-                        ),
-                        'RS256',
-                    )
-                    .public_key()
-                    .to_dict(),
+                    **jwt.algorithms.RSAAlgorithm.to_jwk(
+                        signing_key_a.public_key(),
+                        as_dict=True,
+                    ),
                 },
                 {
                     'use': 'sig',
                     'kid': 'real thumbprint',
                     'x5t': 'real thumbprint',
-                    **jwk.construct(
-                        signing_key_b.private_bytes(
-                            encoding=serialization.Encoding.PEM,
-                            format=serialization.PrivateFormat.TraditionalOpenSSL,
-                            encryption_algorithm=serialization.NoEncryption(),
-                        ),
-                        'RS256',
-                    )
-                    .public_key()
-                    .to_dict(),
+                    **jwt.algorithms.RSAAlgorithm.to_jwk(
+                        signing_key_b.public_key(),
+                        as_dict=True,
+                    ),
                 },
             ]
         }
