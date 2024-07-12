@@ -21,6 +21,7 @@ from tests.utils import (
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
 from fastapi_azure_auth.auth import AzureAuthorizationCodeBearerBase
 from fastapi_azure_auth.exceptions import InvalidAuthWebSocket
+from fastapi_azure_auth.openid_config import OpenIdConfig
 from fastapi_azure_auth.user import User
 
 
@@ -204,3 +205,13 @@ async def test_exception_raised(multi_tenant_app, mock_openid_and_keys, mocker):
         with client.websocket_connect("/ws", headers={'Authorization': 'Bearer ' + build_access_token()}):
             pass
     assert error.value.reason == 'Unable to process token'
+
+
+@pytest.mark.anyio
+async def test_exception_raised_unknown(multi_tenant_app, mock_openid_and_keys, mocker):
+    mocker.patch.object(OpenIdConfig, 'load_config', side_effect=ValueError('lol'))
+
+    with pytest.raises(WebSocketDisconnect) as error:
+        with client.websocket_connect("/ws", headers={'Authorization': 'Bearer ' + build_access_token()}):
+            pass
+    assert error.value.reason == 'Unable to validate token'

@@ -31,5 +31,4 @@ def InvalidAuth(detail: str, request: HTTPConnection) -> InvalidAuthHttp | Inval
     """
     if request.scope['type'] == 'http':
         return InvalidAuthHttp(detail)
-    else:
-        return InvalidAuthWebSocket(detail)
+    return InvalidAuthWebSocket(detail)
