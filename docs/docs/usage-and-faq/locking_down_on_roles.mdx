@@ -3,6 +3,29 @@ title: Locking down on roles
 sidebar_position: 3
 ---
 
+## Azure setup
+Go to your application registration, click `Groups`:
+![manifest](../../static/img/usage-and-faq/role_1.png)
+
+Create a role:
+![manifest](../../static/img/usage-and-faq/role_2.png)
+
+Go to Overview and click the Enterprise application link:
+![manifest](../../static/img/usage-and-faq/role_3.png)
+
+Go to `Users and groups` and add a user/group:
+![manifest](../../static/img/usage-and-faq/role_4.png)
+
+Add the user/group that you want to have this role (if you use a group, the users must be a direct member of that group. Nested membership does not work):
+![manifest](../../static/img/usage-and-faq/role_5.png)
+
+Click `select role` and assign the user/role to your application role:
+![manifest](../../static/img/usage-and-faq/role_6.png)
+
+Finish by clicking `Assign`. The user will now have that group in their token.
+
+## App code
+
 You can lock down on roles by creating your own wrapper dependency:
 
 ```python title="dependencies.py"
