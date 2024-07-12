@@ -258,13 +258,15 @@ the first user authenticates. This isn't required, but makes things a bit quicke
 configuration will be considered out of date, and update when a user does a request. You can use
 [background tasks](https://fastapi.tiangolo.com/tutorial/background-tasks/) to refresh it before that happens if you'd like.
 
-```python {50-55} title="main.py"
+```python {7-8,24-30} title="main.py"
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 
 class Settings(BaseSettings):
@@ -279,6 +281,14 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    Load OpenID config on startup.
+    """
+    await azure_scheme.openid_config.load_config()
+    yield
 
 app = FastAPI(
     swagger_ui_oauth2_redirect_url='/oauth2-redirect',
@@ -305,15 +315,6 @@ azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
     },
     validate_iss=False
 )
-
-
-@app.on_event('startup')
-async def load_config() -> None:
-    """
-    Load OpenID config on startup.
-    """
-    await azure_scheme.openid_config.load_config()
-
 
 @app.get("/")
 async def root():
@@ -338,6 +339,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import AnyHttpUrl
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from fastapi_azure_auth import MultiTenantAzureAuthorizationCodeBearer
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 
 class Settings(BaseSettings):
@@ -352,6 +355,14 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    Load OpenID config on startup.
+    """
+    await azure_scheme.openid_config.load_config()
+    yield
 
 app = FastAPI(
     swagger_ui_oauth2_redirect_url='/oauth2-redirect',
@@ -378,15 +389,6 @@ azure_scheme = MultiTenantAzureAuthorizationCodeBearer(
     },
     validate_iss=False
 )
-
-
-@app.on_event('startup')
-async def load_config() -> None:
-    """
-    Load OpenID config on startup.
-    """
-    await azure_scheme.openid_config.load_config()
-
 
 @app.get("/", dependencies=[Security(azure_scheme)])
 async def root():
