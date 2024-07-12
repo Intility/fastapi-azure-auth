@@ -17,9 +17,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ "3.11.4", "3.12.2" ]
-        fastapi-version: [ "0.103.2", "0.110.0"]
-        pydantic-version: [ "1.10.13", "2.6.2"]
+        python-version: [ "3.11.4", "3.12.4" ]
+        fastapi-version: [ "0.103.2", "0.111.0"]
+        pydantic-version: [ "1.10.13", "2.8.2"]
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
