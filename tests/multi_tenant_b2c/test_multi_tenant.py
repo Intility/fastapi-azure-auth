@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 import pytest
 from demo_project.main import app
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from tests.utils import (
     build_access_token,
     build_access_token_expired,
@@ -23,7 +23,9 @@ async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
     issued_at = int(time.time())
     expires = issued_at + 3600
     access_token = build_access_token()
-    async with AsyncClient(app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + access_token}) as ac:
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url='http://test', headers={'Authorization': 'Bearer ' + access_token}
+    ) as ac:
         response = await ac.get('api/v1/hello')
         assert response.json() == {
             'hello': 'world',

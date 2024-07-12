@@ -85,7 +85,7 @@ def test_guest_user(claims: Dict[str, str], expected: bool):
 
 
 def get_utc_now_as_unix_timestamp() -> int:
-    date = datetime.datetime.utcnow()
+    date = datetime.datetime.now(datetime.UTC)
     return calendar.timegm(date.utctimetuple())
 
 
