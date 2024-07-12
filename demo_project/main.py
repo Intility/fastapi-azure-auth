@@ -1,5 +1,7 @@
 import logging
 from argparse import ArgumentParser
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 import uvicorn
 from demo_project.api.api_v1.api import api_router_azure_auth, api_router_graph, api_router_multi_auth
@@ -9,6 +11,16 @@ from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
 
 log = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+    """
+    Load OpenID config on startup.
+    """
+    await azure_scheme.openid_config.load_config()
+    yield
+
 
 app = FastAPI(
     openapi_url=f'{settings.API_V1_STR}/openapi.json',
@@ -21,6 +33,7 @@ app = FastAPI(
     version='1.0.0',
     description='## Welcome to my API! \n This is my description, written in `markdown`',
     title=settings.PROJECT_NAME,
+    lifespan=lifespan,
 )
 
 
@@ -33,14 +46,6 @@ if settings.BACKEND_CORS_ORIGINS:  # pragma: no cover
         allow_methods=['*'],  # type: ignore
         allow_headers=['*'],  # type: ignore
     )
-
-
-@app.on_event('startup')
-async def load_config() -> None:
-    """
-    Load OpenID config on startup.
-    """
-    await azure_scheme.openid_config.load_config()
 
 
 app.include_router(
