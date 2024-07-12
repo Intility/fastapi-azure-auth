@@ -157,6 +157,20 @@ files = [
 ]
 
 [[package]]
+name = "asgi-lifespan"
+version = "2.1.0"
+description = "Programmatic startup/shutdown of ASGI apps."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "asgi-lifespan-2.1.0.tar.gz", hash = "sha256:5e2effaf0bfe39829cf2d64e7ecc47c7d86d676a6599f7afba378c31f5e3a308"},
+    {file = "asgi_lifespan-2.1.0-py3-none-any.whl", hash = "sha256:ed840706680e28428c01e14afb3875d7d76d3206f3d5b2f2294e059b5c23804f"},
+]
+
+[package.dependencies]
+sniffio = "*"
+
+[[package]]
 name = "asgiref"
 version = "3.8.1"
 description = "ASGI specs, helper code, and adapters"
@@ -597,20 +611,6 @@ sdist = ["build"]
 ssh = ["bcrypt (>=3.1.5)"]
 test = ["certifi", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-xdist"]
 test-randomorder = ["pytest-randomly"]
-
-[[package]]
-name = "decopatch"
-version = "1.4.10"
-description = "Create decorators easily in python."
-optional = false
-python-versions = "*"
-files = [
-    {file = "decopatch-1.4.10-py2.py3-none-any.whl", hash = "sha256:e151f7f93de2b1b3fd3f3272dcc7cefd1a69f68ec1c2d8e288ecd9deb36dc5f7"},
-    {file = "decopatch-1.4.10.tar.gz", hash = "sha256:957f49c93f4150182c23f8fb51d13bb3213e0f17a79e09c8cca7057598b55720"},
-]
-
-[package.dependencies]
-makefun = ">=1.5.0"
 
 [[package]]
 name = "decorator"
@@ -1189,17 +1189,6 @@ files = [
     {file = "lazy_object_proxy-1.10.0-cp39-cp39-win32.whl", hash = "sha256:30b339b2a743c5288405aa79a69e706a06e02958eab31859f7f3c04980853b70"},
     {file = "lazy_object_proxy-1.10.0-cp39-cp39-win_amd64.whl", hash = "sha256:a899b10e17743683b293a729d3a11f2f399e8a90c73b089e29f5d0fe3509f0dd"},
     {file = "lazy_object_proxy-1.10.0-pp310.pp311.pp312.pp38.pp39-none-any.whl", hash = "sha256:80fa48bd89c8f2f456fc0765c11c23bf5af827febacd2f523ca5bc1893fcc09d"},
-]
-
-[[package]]
-name = "makefun"
-version = "1.15.3"
-description = "Small library to dynamically create python functions."
-optional = false
-python-versions = "*"
-files = [
-    {file = "makefun-1.15.3-py2.py3-none-any.whl", hash = "sha256:2d692b46c284db54a54897fa3df3b2443b39eb6711bd7c7d2149322bffca0cc3"},
-    {file = "makefun-1.15.3.tar.gz", hash = "sha256:72039743135dd44ba5037d08e9c6fe4b29dfee7f2eb8106951f9a20ca7d6d1fa"},
 ]
 
 [[package]]
@@ -1963,22 +1952,6 @@ pytest = ">=6.1.0"
 
 [package.extras]
 testing = ["coverage (==6.2)", "flaky (>=3.5.0)", "hypothesis (>=5.7.1)", "mypy (==0.931)", "pytest-trio (>=0.7.0)"]
-
-[[package]]
-name = "pytest-cases"
-version = "3.8.5"
-description = "Separate test code from test cases in pytest."
-optional = false
-python-versions = "*"
-files = [
-    {file = "pytest-cases-3.8.5.tar.gz", hash = "sha256:c92054187847a7d30d8ab6709fb1670a830e4e19234be700c85c96b6d7102c16"},
-    {file = "pytest_cases-3.8.5-py2.py3-none-any.whl", hash = "sha256:0c8e3727f6494e65b47321adbd94c767277c7b5de1bd40dd518a13f7443b1fff"},
-]
-
-[package.dependencies]
-decopatch = "*"
-makefun = ">=1.15.1"
-packaging = "*"
 
 [[package]]
 name = "pytest-cov"
@@ -2945,4 +2918,4 @@ test = ["big-O", "importlib-resources", "jaraco.functools", "jaraco.itertools", 
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "97b187a4ab4872665a3469bc0714d42f3b5c8acb9a5cc9c96c169a881c9073fd"
+content-hash = "7602712a361731fc116892f3406d6f01dbb5ed0a1486291cd397ecffc05018ee"

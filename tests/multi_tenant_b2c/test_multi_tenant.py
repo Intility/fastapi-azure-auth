@@ -22,7 +22,7 @@ from fastapi_azure_auth.openid_config import OpenIdConfig
 async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
     issued_at = int(time.time())
     expires = issued_at + 3600
-    access_token = build_access_token(version=2)
+    access_token = build_access_token()
     async with AsyncClient(app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + access_token}) as ac:
         response = await ac.get('api/v1/hello')
         assert response.json() == {
@@ -115,7 +115,7 @@ async def test_normal_user(multi_tenant_app, mock_openid_and_keys, freezer):
 @pytest.mark.anyio
 async def test_no_keys_to_decode_with(multi_tenant_app, mock_openid_and_empty_keys):
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=2)}
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
@@ -126,7 +126,7 @@ async def test_normal_user_rejected(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_normal_user(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_normal_user()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'User is not an AdminUser'}
@@ -140,7 +140,7 @@ async def test_guest_user_allowed_in_b2c(multi_tenant_app, mock_openid_and_keys)
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_guest_user(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_guest_user()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
@@ -151,7 +151,7 @@ async def test_invalid_token_claims(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Token contains invalid claims'}
@@ -162,7 +162,7 @@ async def test_no_valid_keys_for_token(multi_tenant_app, mock_openid_and_no_vali
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_invalid_claims()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to verify token, no signing keys found'}
@@ -173,7 +173,7 @@ async def test_no_valid_scopes(multi_tenant_app, mock_openid_and_no_valid_keys):
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Required scope missing'}
@@ -184,7 +184,7 @@ async def test_no_valid_invalid_scope(multi_tenant_app, mock_openid_and_no_valid
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Required scope missing'}
@@ -195,7 +195,7 @@ async def test_no_valid_invalid_formatted_scope(multi_tenant_app, mock_openid_an
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(scopes=None, version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_invalid_scopes(scopes=None)},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Token contains invalid formatted scopes'}
@@ -206,7 +206,7 @@ async def test_expired_token(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_expired(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Token signature has expired'}
@@ -218,7 +218,7 @@ async def test_evil_token(multi_tenant_app, mock_openid_and_keys):
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_evil_access_token(version=2)},
+        headers={'Authorization': 'Bearer ' + build_evil_access_token()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to validate token'}
@@ -256,7 +256,7 @@ async def test_exception_raised(multi_tenant_app, mock_openid_and_keys, mocker):
     async with AsyncClient(
         app=app,
         base_url='http://test',
-        headers={'Authorization': 'Bearer ' + build_access_token_expired(version=2)},
+        headers={'Authorization': 'Bearer ' + build_access_token_expired()},
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Unable to process token'}
@@ -272,7 +272,7 @@ async def test_change_of_keys_works(multi_tenant_app, mock_openid_ok_then_empty,
     * Do request
     """
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=2)}
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.status_code == 200
@@ -280,7 +280,7 @@ async def test_change_of_keys_works(multi_tenant_app, mock_openid_ok_then_empty,
     freezer.move_to(datetime.now() + timedelta(hours=25))  # The keys fetched are now outdated
 
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token(version=2)}
+        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
     ) as ac:
         second_resonse = await ac.get('api/v1/hello')
     assert second_resonse.json() == {'detail': 'Unable to verify token, no signing keys found'}

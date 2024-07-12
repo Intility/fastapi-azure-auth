@@ -11,7 +11,7 @@ from fastapi_azure_auth import (
     MultiTenantAzureAuthorizationCodeBearer,
     SingleTenantAzureAuthorizationCodeBearer,
 )
-from fastapi_azure_auth.exceptions import InvalidAuth
+from fastapi_azure_auth.exceptions import InvalidAuthHttp
 from fastapi_azure_auth.user import User
 
 log = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ async def validate_is_admin_user(user: User = Depends(azure_scheme)) -> None:
     Raises a 401 authentication error if not.
     """
     if 'AdminUser' not in user.roles:
-        raise InvalidAuth('User is not an AdminUser')
+        raise InvalidAuthHttp('User is not an AdminUser')
 
 
 class IssuerFetcher:
@@ -58,7 +58,7 @@ class IssuerFetcher:
             return self.tid_to_iss[tid]
         except Exception as error:
             log.exception('`iss` not found for `tid` %s. Error %s', tid, error)
-            raise InvalidAuth('You must be an Intility customer to access this resource')
+            raise InvalidAuthHttp('You must be an Intility customer to access this resource')
 
 
 issuer_fetcher = IssuerFetcher()
@@ -101,7 +101,7 @@ async def multi_auth(
         return azure_auth
     if api_key == 'JonasIsCool':
         return api_key
-    raise InvalidAuth('You must either provide a valid bearer token or API key')
+    raise InvalidAuthHttp('You must either provide a valid bearer token or API key')
 
 
 async def multi_auth_b2c(
@@ -115,4 +115,4 @@ async def multi_auth_b2c(
         return azure_auth
     if api_key == 'JonasIsCool':
         return api_key
-    raise InvalidAuth('You must either provide a valid bearer token or API key')
+    raise InvalidAuthHttp('You must either provide a valid bearer token or API key')
