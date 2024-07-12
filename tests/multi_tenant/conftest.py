@@ -16,6 +16,13 @@ def multi_tenant_app():
 
 
 @pytest.fixture
+def multi_tenant_app_auto_error_false():
+    azure_scheme_overrides = generate_azure_scheme_multi_tenant_object(auto_error=False)
+    app.dependency_overrides[azure_scheme] = azure_scheme_overrides
+    yield
+
+
+@pytest.fixture
 def mock_openid(respx_mock):
     respx_mock.get(openid_config_url(multi_tenant=True)).respond(json=openid_configuration())
     yield
@@ -54,7 +61,7 @@ def mock_openid_and_no_valid_keys(respx_mock, mock_openid):
     yield
 
 
-def generate_azure_scheme_multi_tenant_object(issuer=None):
+def generate_azure_scheme_multi_tenant_object(issuer=None, auto_error=True):
     """
     This method is used just to generate the Multi Tenant Obj
     """
@@ -73,4 +80,5 @@ def generate_azure_scheme_multi_tenant_object(issuer=None):
         },
         validate_iss=True,
         iss_callable=current_issuer,
+        auto_error=auto_error,
     )

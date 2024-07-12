@@ -58,6 +58,13 @@ async def websocket_endpoint_scope(
     await websocket.close()
 
 
+@app.websocket("/ws/no-error")
+async def websocket_endpoint_scope(websocket: WebSocket, no_user=Depends(azure_scheme)):
+    await websocket.accept()
+    await websocket.send_text("Hello. User will be None! Do not use this example for production!")
+    await websocket.close()
+
+
 client = TestClient(app)
 
 
@@ -215,3 +222,14 @@ async def test_exception_raised_unknown(multi_tenant_app, mock_openid_and_keys, 
         with client.websocket_connect("/ws", headers={'Authorization': 'Bearer ' + build_access_token()}):
             pass
     assert error.value.reason == 'Unable to validate token'
+
+
+@pytest.mark.anyio
+async def test_no_error_pass_through(multi_tenant_app_auto_error_false, mock_openid_and_keys, mocker):
+    """Has a auto_error_true in pytest param, to make any random exception just return None. Used with multi-auth"""
+    mocker.patch.object(OpenIdConfig, 'load_config', side_effect=ValueError('lol'))
+    with client.websocket_connect(
+        "/ws/no-error", headers={'Authorization': 'Bearer ' + build_access_token()}
+    ) as websocket:
+        data = websocket.receive_text()
+        assert data == "Hello. User will be None! Do not use this example for production!"
