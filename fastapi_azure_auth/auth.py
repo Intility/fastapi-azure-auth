@@ -1,7 +1,6 @@
 import inspect
 import logging
-from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, Literal, Optional
-from warnings import warn
+from typing import TYPE_CHECKING, Any, Awaitable, Callable, Dict, Optional
 
 import jwt
 from fastapi.exceptions import HTTPException
@@ -16,9 +15,9 @@ from jwt.exceptions import (
     InvalidTokenError,
     MissingRequiredClaimError,
 )
-from starlette.requests import Request
+from starlette.requests import HTTPConnection
 
-from fastapi_azure_auth.exceptions import InvalidAuth
+from fastapi_azure_auth.exceptions import InvalidAuth, InvalidAuthHttp, InvalidAuthWebSocket
 from fastapi_azure_auth.openid_config import OpenIdConfig
 from fastapi_azure_auth.user import User
 from fastapi_azure_auth.utils import get_unverified_claims, get_unverified_header, is_guest
@@ -40,7 +39,6 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         leeway: int = 0,
         validate_iss: bool = True,
         iss_callable: Optional[Callable[[str], Awaitable[str]]] = None,
-        token_version: Literal[1, 2] = 2,
         allow_guest_users: bool = False,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
@@ -82,9 +80,6 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             Whether to allow guest users or not. Guest users can be added manually, or by other services, such as
             inviting them to a teams channel. Most developers do _not_ want guest users in their applications.
 
-        :param token_version: int
-            Version of the token expected from the token endpoint. Defaults to `2`, but can be set to `1` for single
-            tenant applications.
         :param openid_config_use_app_id: bool
             Set this to True if you're using claims-mapping. If you're unsure, leave at False.
             https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response
@@ -111,7 +106,6 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         self.openid_config: OpenIdConfig = OpenIdConfig(
             tenant_id=tenant_id,
             multi_tenant=self.multi_tenant,
-            token_version=token_version,
             app_id=app_client_id if openid_config_use_app_id else None,
             config_url=openid_config_url or None,
         )
@@ -119,11 +113,6 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         self.leeway: int = leeway
         self.validate_iss: bool = validate_iss
         self.iss_callable: Optional[Callable[..., Any]] = iss_callable
-        self.token_version: int = token_version
-        if self.token_version == 1:
-            warn(
-                'v1 token support will be removed in a future release. Please migrate to v2 tokens.', DeprecationWarning
-            )
         self.allow_guest_users = allow_guest_users
         # Define settings for `OAuth2AuthorizationCodeBearer` and OpenAPI Authorization
         self.authorization_url = openapi_authorization_url
@@ -151,7 +140,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         )
         self.model = self.oauth.model
 
-    async def __call__(self, request: Request, security_scopes: SecurityScopes) -> Optional[User]:
+    async def __call__(self, request: HTTPConnection, security_scopes: SecurityScopes) -> Optional[User]:
         """
         Extends call to also validate the token.
         """
@@ -159,28 +148,28 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             access_token = await self.extract_access_token(request)
             try:
                 if access_token is None:
-                    raise Exception('No access token provided')
+                    raise InvalidAuth('No access token provided', request=request)
                 # Extract header information of the token.
                 header: dict[str, Any] = get_unverified_header(access_token)
                 claims: dict[str, Any] = get_unverified_claims(access_token)
             except Exception as error:
                 log.warning('Malformed token received. %s. Error: %s', access_token, error, exc_info=True)
-                raise InvalidAuth(detail='Invalid token format') from error
+                raise InvalidAuth(detail='Invalid token format', request=request) from error
 
             user_is_guest: bool = is_guest(claims=claims)
             if not self.allow_guest_users and user_is_guest:
                 log.info('User denied, is a guest user', claims)
-                raise InvalidAuth(detail='Guest users not allowed')
+                raise InvalidAuth(detail='Guest users not allowed', request=request)
 
             for scope in security_scopes.scopes:
                 token_scope_string = claims.get('scp', '')
                 log.debug('Scopes: %s', token_scope_string)
                 if not isinstance(token_scope_string, str):
-                    raise InvalidAuth('Token contains invalid formatted scopes')
+                    raise InvalidAuth('Token contains invalid formatted scopes', request=request)
 
                 token_scopes = token_scope_string.split(' ')
                 if scope not in token_scopes:
-                    raise InvalidAuth('Required scope missing')
+                    raise InvalidAuth('Required scope missing', request=request)
             # Load new config if old
             await self.openid_config.load_config()
 
@@ -222,29 +211,33 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
                 MissingRequiredClaimError,
             ) as error:
                 log.info('Token contains invalid claims. %s', error)
-                raise InvalidAuth(detail='Token contains invalid claims') from error
+                raise InvalidAuth(detail='Token contains invalid claims', request=request) from error
             except ExpiredSignatureError as error:
                 log.info('Token signature has expired. %s', error)
-                raise InvalidAuth(detail='Token signature has expired') from error
+                raise InvalidAuth(detail='Token signature has expired', request=request) from error
             except InvalidTokenError as error:
                 log.warning('Invalid token. Error: %s', error, exc_info=True)
-                raise InvalidAuth(detail='Unable to validate token') from error
+                raise InvalidAuth(detail='Unable to validate token', request=request) from error
             except Exception as error:
                 # Extra failsafe in case of a bug in a future version of the jwt library
                 log.exception('Unable to process jwt token. Uncaught error: %s', error)
-                raise InvalidAuth(detail='Unable to process token') from error
+                raise InvalidAuth(detail='Unable to process token', request=request) from error
             log.warning('Unable to verify token. No signing keys found')
-            raise InvalidAuth(detail='Unable to verify token, no signing keys found')
-        except (HTTPException, InvalidAuth):
+            raise InvalidAuth(detail='Unable to verify token, no signing keys found', request=request)
+        except (InvalidAuthHttp, InvalidAuthWebSocket, HTTPException):
             if not self.auto_error:
                 return None
             raise
+        except Exception as error:
+            if not self.auto_error:
+                return None
+            raise InvalidAuth(detail='Unable to validate token', request=request) from error
 
-    async def extract_access_token(self, request: Request) -> Optional[str]:
+    async def extract_access_token(self, request: HTTPConnection) -> Optional[str]:
         """
         Extracts the access token from the request.
         """
-        return await self.oauth(request=request)
+        return await self.oauth(request=request)  # type: ignore[arg-type]
 
     def validate(
         self, access_token: str, key: 'AllowedPublicKeys', iss: str, options: Dict[str, Any]
@@ -253,13 +246,12 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         Validates the token using the provided key and options.
         """
         alg = 'RS256'
-        aud = self.app_client_id if self.token_version == 2 else f'api://{self.app_client_id}'
         return dict(
             jwt.decode(
                 access_token,
                 key=key,
                 algorithms=[alg],
-                audience=aud,
+                audience=self.app_client_id,
                 issuer=iss,
                 leeway=self.leeway,
                 options=options,
@@ -276,7 +268,6 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         scopes: Optional[Dict[str, str]] = None,
         leeway: int = 0,
         allow_guest_users: bool = False,
-        token_version: Literal[1, 2] = 2,
         openid_config_use_app_id: bool = False,
         openapi_authorization_url: Optional[str] = None,
         openapi_token_url: Optional[str] = None,
@@ -305,9 +296,7 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         :param allow_guest_users: bool
             Whether to allow guest users or not. Guest users can be added manually, or by other services, such as
             inviting them to a teams channel. Most developers do _not_ want guest users in their applications.
-        :param token_version: int
-            Version of the token expected from the token endpoint. Defaults to `2`, but can be set to `1` for single
-            tenant applications.
+
         :param openid_config_use_app_id: bool
             Set this to True if you're using claims-mapping. If you're unsure, leave at False.
             https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-protocols-oidc#sample-response
@@ -326,7 +315,6 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
             scopes=scopes,
             leeway=leeway,
             allow_guest_users=allow_guest_users,
-            token_version=token_version,
             openid_config_use_app_id=openid_config_use_app_id,
             openapi_authorization_url=openapi_authorization_url,
             openapi_token_url=openapi_token_url,

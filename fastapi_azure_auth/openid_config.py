@@ -17,14 +17,12 @@ class OpenIdConfig:
         self,
         tenant_id: Optional[str] = None,
         multi_tenant: bool = False,
-        token_version: int = 2,
         app_id: Optional[str] = None,
         config_url: Optional[str] = None,
     ) -> None:
         self.tenant_id: Optional[str] = tenant_id
         self._config_timestamp: Optional[datetime] = None
         self.multi_tenant: bool = multi_tenant
-        self.token_version: int = token_version
         self.app_id = app_id
         self.config_url = config_url
 
@@ -69,10 +67,8 @@ class OpenIdConfig:
 
         if self.config_url:
             config_url = self.config_url
-        elif self.token_version == 2:
-            config_url = f'https://login.microsoftonline.com/{path}/v2.0/.well-known/openid-configuration'
         else:
-            config_url = f'https://login.microsoftonline.com/{path}/.well-known/openid-configuration'
+            config_url = f'https://login.microsoftonline.com/{path}/v2.0/.well-known/openid-configuration'
         if self.app_id:
             config_url += f'?appid={self.app_id}'
 
