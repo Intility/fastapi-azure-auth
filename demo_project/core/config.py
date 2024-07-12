@@ -6,18 +6,18 @@ from pydantic import AnyHttpUrl, Field, HttpUrl
 if pydantic.VERSION.startswith('1.'):
     from pydantic import BaseSettings
 else:
-    from pydantic_settings import BaseSettings
+    from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AzureActiveDirectory(BaseSettings):  # type: ignore[misc, valid-type]
-    OPENAPI_CLIENT_ID: str = Field(default='', env='OPENAPI_CLIENT_ID')
-    TENANT_ID: str = Field(default='', env='TENANT_ID')
-    APP_CLIENT_ID: str = Field(default='', env='APP_CLIENT_ID')
-    AUTH_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='AUTH_URL')
-    CONFIG_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='CONFIG_URL')
-    TOKEN_URL: AnyHttpUrl = Field(default='https://dummy.com/', env='TOKEN_URL')
-    GRAPH_SECRET: str = Field(default='', env='GRAPH_SECRET')
-    CLIENT_SECRET: str = Field(default='', env='CLIENT_SECRET')
+    OPENAPI_CLIENT_ID: str = Field(default='')
+    TENANT_ID: str = Field(default='')
+    APP_CLIENT_ID: str = Field(default='')
+    AUTH_URL: AnyHttpUrl = Field(default='https://dummy.com/')
+    CONFIG_URL: AnyHttpUrl = Field(default='https://dummy.com/')
+    TOKEN_URL: AnyHttpUrl = Field(default='https://dummy.com/')
+    GRAPH_SECRET: str = Field(default='')
+    CLIENT_SECRET: str = Field(default='')
 
 
 class Settings(AzureActiveDirectory):
@@ -31,10 +31,9 @@ class Settings(AzureActiveDirectory):
     PROJECT_NAME: str = 'My Project'
     SENTRY_DSN: Optional[HttpUrl] = None
 
-    class Config:  # noqa
-        env_file = 'demo_project/.env'
-        env_file_encoding = 'utf-8'
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file='demo_project/.env', env_file_encoding='utf-8', extra='ignore', case_sensitive=True
+    )
 
 
 settings = Settings()

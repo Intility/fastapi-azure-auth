@@ -16,9 +16,8 @@ async def test_http_error_old_config_found(respx_mock, mock_config_timestamp):
     respx_mock.get('https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration').respond(
         status_code=500
     )
-    LifespanManager
     async with AsyncClient(
-        app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+        app=app, base_url='http://test', headers={'Authorization': f'Bearer {build_access_token()}'}
     ) as ac:
         response = await ac.get('api/v1/hello')
     assert response.json() == {'detail': 'Connection to Azure AD is down. Unable to fetch provider configuration'}
@@ -32,7 +31,7 @@ async def test_http_error_no_config_cause_crash_on_startup(respx_mock):
     with pytest.raises(RuntimeError):
         async with LifespanManager(app=app):
             async with AsyncClient(
-                app=app, base_url='http://test', headers={'Authorization': 'Bearer ' + build_access_token()}
+                app=app, base_url='http://test', headers={'Authorization': f'Bearer {build_access_token()}'}
             ) as ac:
                 await ac.get('api/v1/hello')
 
