@@ -43,6 +43,9 @@
     <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/single-and-multi-tenant-apps">
         <img src="https://img.shields.io/badge/Multi--tenant-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
     </a>
+    <a href="https://learn.microsoft.com/en-us/azure/active-directory-b2c/overview">
+        <img src="https://img.shields.io/badge/B2C-Supported-blue?logo=Microsoft%20Azure&logoColor=white">
+    </a>
 </p>
 
 
