@@ -1,5 +1,4 @@
 from __future__ import annotations
-
 from fastapi import HTTPException, WebSocketException, status
 from starlette.requests import HTTPConnection
 
@@ -11,7 +10,7 @@ class InvalidAuthHttp(HTTPException):
 
     def __init__(self, detail: str) -> None:
         super().__init__(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail=detail, headers={"WWW-Authenticate": "Bearer"}
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=detail, headers={'WWW-Authenticate': 'Bearer'}
         )
 
 
@@ -31,6 +30,6 @@ def InvalidAuth(detail: str, request: HTTPConnection) -> InvalidAuthHttp | Inval
     """
     Returns the correct exception based on the connection type
     """
-    if request.scope["type"] == "http":
+    if request.scope['type'] == 'http':
         return InvalidAuthHttp(detail)
     return InvalidAuthWebSocket(detail)
