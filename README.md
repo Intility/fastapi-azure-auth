@@ -5,7 +5,7 @@
 </h1>
 
 <p align="center">
-    <em>Azure AD Authentication for FastAPI apps made easy.</em>
+    <em>Azure Entra ID Authentication for FastAPI apps made easy.</em>
 </p>
 <p align="center">
     <!-- Line 1 -->
@@ -59,7 +59,7 @@ Also, [we're hiring!](https://intility.no/en/career/)
 
 ## 📚 Resources
 
-The [documentation](https://intility.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure AD
+The [documentation](https://intility.github.io/fastapi-azure-auth/) contains a full tutorial on how to configure Azure Entra ID
 and FastAPI for single- and multi-tenant applications as well as B2C apps. It includes examples on how to lock down
 your APIs to certain scopes, tenants, roles etc. For first time users it's strongly advised to set up your
 application exactly how it's described there, and then alter it to your needs later.

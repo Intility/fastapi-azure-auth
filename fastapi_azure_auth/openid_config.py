@@ -38,23 +38,23 @@ class OpenIdConfig:
         refresh_time = datetime.now() - timedelta(hours=24)
         if not self._config_timestamp or self._config_timestamp < refresh_time:
             try:
-                log.debug('Loading Azure AD OpenID configuration.')
+                log.debug('Loading Azure Entra ID OpenID configuration.')
                 await self._load_openid_config()
                 self._config_timestamp = datetime.now()
             except Exception as error:
-                log.exception('Unable to fetch OpenID configuration from Azure AD. Error: %s', error)
+                log.exception('Unable to fetch OpenID configuration from Azure Entra ID. Error: %s', error)
                 # We can't fetch an up to date openid-config, so authentication will not work.
                 if self._config_timestamp:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail='Connection to Azure AD is down. Unable to fetch provider configuration',
+                        detail='Connection to Azure Entra ID is down. Unable to fetch provider configuration',
                         headers={'WWW-Authenticate': 'Bearer'},
                     ) from error
 
                 else:
                     raise RuntimeError(f'Unable to fetch provider information. {error}') from error
 
-            log.info('fastapi-azure-auth loaded settings from Azure AD.')
+            log.info('fastapi-azure-auth loaded settings from Azure Entra ID.')
             log.info('authorization endpoint: %s', self.authorization_endpoint)
             log.info('token endpoint:         %s', self.token_endpoint)
             log.info('issuer:                 %s', self.issuer)

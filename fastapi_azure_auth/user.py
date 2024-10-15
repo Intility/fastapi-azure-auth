@@ -16,7 +16,7 @@ class Claims(BaseModel):
     )
     iss: str = Field(
         ...,
-        description='Identifies the STS that constructs and returns the token, and the Azure AD tenant of the'
+        description='Identifies the STS that constructs and returns the token, and the Azure Entra ID tenant of the'
         ' authenticated user. If the token issued is a v2.0 token (see the ver claim), the URI ends in /v2.0.',
     )
     idp: Optional[str] = Field(
@@ -39,7 +39,7 @@ class Claims(BaseModel):
     )
     aio: Optional[str] = Field(
         default=None,
-        description='An internal claim used by Azure AD to record data for token reuse. Resources should not use this claim.',
+        description='An internal claim used by Azure Entra ID to record data for token reuse. Resources should not use this claim.',
     )
     name: Optional[str] = Field(
         default=None,
@@ -55,7 +55,7 @@ class Claims(BaseModel):
     )
     wids: List[str] = Field(
         default=[],
-        description='Denotes the tenant-wide roles assigned to this user, from the section of roles present in Azure AD built-in roles.',
+        description='Denotes the tenant-wide roles assigned to this user, from the section of roles present in Azure Entra ID built-in roles.',
     )
     groups: List[str] = Field(
         default=[],
@@ -86,7 +86,7 @@ class Claims(BaseModel):
         description='Indicates the version of the access token.',
     )
 
-    # Optional claims, configured in Azure AD
+    # Optional claims, configured in Azure Entra ID
     acct: Optional[int] = Field(
         default=None,
         description="User's account status in tenant",

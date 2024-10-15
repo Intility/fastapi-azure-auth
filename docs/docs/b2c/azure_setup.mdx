@@ -3,7 +3,7 @@ title: Azure configuration
 sidebar_position: 1
 ---
 
-We'll need to create two application registrations for Azure AD B2C authentication to cover both direct API
+We'll need to create two application registrations for Azure Entra ID B2C authentication to cover both direct API
 use and usage from the OpenAPI (swagger) documentation.
 
 :::info
@@ -15,7 +15,7 @@ This guide assumes that an Azure B2C tenant was already created and linked to an
 
 ### Step 1 - Create app registration
 Head over to
-[Azure -> Azure AD B2C -> App registrations](https://portal.azure.com/#view/Microsoft_AAD_B2CAdmin/TenantManagementMenuBlade/~/registeredApps),
+[Azure -> Azure Entra ID B2C -> App registrations](https://portal.azure.com/#view/Microsoft_AAD_B2CAdmin/TenantManagementMenuBlade/~/registeredApps),
 and create a new registration.
 
 Select a fitting name for your project; Azure will present the name to the user during consent.
@@ -56,7 +56,7 @@ OPENAPI_CLIENT_ID=
 AUTH_POLICY_NAME=
 ```
 
-Also, in the Azure AD B2C overview get the tenant name from the domain name (without the `.onmicrosoft.com` part)
+Also, in the Azure Entra ID B2C overview get the tenant name from the domain name (without the `.onmicrosoft.com` part)
 and add it to the `.env` file as well:
 
 ```bash title=".env" {1}
@@ -97,7 +97,7 @@ So, let's set it up!
 Just like in the previous chapter, we have to create an application registration for our OpenAPI.
 
 Head over to
-[Azure -> Azure AD B2C -> App registrations](https://portal.azure.com/#view/Microsoft_AAD_B2CAdmin/TenantManagementMenuBlade/~/registeredApps),
+[Azure -> Azure Entra ID B2C -> App registrations](https://portal.azure.com/#view/Microsoft_AAD_B2CAdmin/TenantManagementMenuBlade/~/registeredApps),
 and create a new registration.
 
 Use the same name, but with `- OpenAPI` appended to it.
@@ -157,7 +157,7 @@ That's it! Next step is to configure the FastAPI application.
 ### Step 1 - Create a user flow
 
 Head over to
-[Azure -> Azure AD B2C -> Users flows](https://portal.azure.com/#view/Microsoft_AAD_B2CAdmin/TenantManagementMenuBlade/~/userJourneys),
+[Azure -> Azure Entra ID B2C -> Users flows](https://portal.azure.com/#view/Microsoft_AAD_B2CAdmin/TenantManagementMenuBlade/~/userJourneys),
 and create a new user flow.
 
 Select a user flow type of `Sign up and sign in` with the Version `Recommended`, then press **Create**.

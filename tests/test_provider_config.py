@@ -20,7 +20,7 @@ async def test_http_error_old_config_found(respx_mock, mock_config_timestamp):
         app=app, base_url='http://test', headers={'Authorization': f'Bearer {build_access_token()}'}
     ) as ac:
         response = await ac.get('api/v1/hello')
-    assert response.json() == {'detail': 'Connection to Azure AD is down. Unable to fetch provider configuration'}
+    assert response.json() == {'detail': 'Connection to Azure Entra ID is down. Unable to fetch provider configuration'}
 
 
 @pytest.mark.anyio

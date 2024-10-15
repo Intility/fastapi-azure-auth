@@ -18,7 +18,7 @@ Steps to reproduce the behavior:
 3. See error
 
 
-If this can be related to your Azure AD set up, please also provide screenshots/reproduce steps of that.
+If this can be related to your Azure Entra ID set up, please also provide screenshots/reproduce steps of that.
 Blur sensitive data.
 -->
 

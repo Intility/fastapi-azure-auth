@@ -50,13 +50,13 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
         Initialize settings.
 
         :param app_client_id: str
-            Your application client ID. This will be the `Web app` in Azure AD
+            Your application client ID. This will be the `Web app` in Azure Entra ID
         :param auto_error: bool
             Whether to throw exceptions or return None on __call__.
         :param tenant_id: str
             Your Azure tenant ID, only needed for single tenant apps
         :param scopes: Optional[dict[str, str]
-            Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
+            Scopes, these are the ones you've configured in Azure Entra ID. Key is scope, value is a description.
             Example:
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
@@ -181,7 +181,7 @@ class AzureAuthorizationCodeBearerBase(SecurityBase):
             # Use the `kid` from the header to find a matching signing key to use
             try:
                 if key := self.openid_config.signing_keys.get(header.get('kid', '')):
-                    # We require and validate all fields in an Azure AD token
+                    # We require and validate all fields in an Azure Entra ID token
                     required_claims = ['exp', 'aud', 'iat', 'nbf', 'sub']
                     if self.validate_iss:
                         required_claims.append('iss')
@@ -277,13 +277,13 @@ class SingleTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase)
         Initialize settings for a single tenant application.
 
         :param app_client_id: str
-            Your application client ID. This will be the `Web app` in Azure AD
+            Your application client ID. This will be the `Web app` in Azure Entra ID
         :param tenant_id: str
             Your Azure tenant ID, only needed for single tenant apps
         :param auto_error: bool
             Whether to throw exceptions or return None on __call__.
         :param scopes: Optional[dict[str, str]
-            Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
+            Scopes, these are the ones you've configured in Azure Entra ID. Key is scope, value is a description.
             Example:
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
@@ -342,11 +342,11 @@ class MultiTenantAzureAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         Initialize settings for a multi-tenant application.
 
         :param app_client_id: str
-            Your application client ID. This will be the `Web app` in Azure AD
+            Your application client ID. This will be the `Web app` in Azure Entra ID
         :param auto_error: bool
             Whether to throw exceptions or return None on __call__.
         :param scopes: Optional[dict[str, str]
-            Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
+            Scopes, these are the ones you've configured in Azure Entra ID. Key is scope, value is a description.
             Example:
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'
@@ -413,13 +413,13 @@ class B2CMultiTenantAuthorizationCodeBearer(AzureAuthorizationCodeBearerBase):
         """
         Initialize settings for a B2C multi-tenant application.
         :param app_client_id: str
-            Your application client ID. This will be the `Web app` in Azure AD
+            Your application client ID. This will be the `Web app` in Azure Entra ID
         :param openid_config_url: str
             Override OpenID config URL (used for B2C tenants)
         :param auto_error: bool
             Whether to throw exceptions or return None on __call__.
         :param scopes: Optional[dict[str, str]
-            Scopes, these are the ones you've configured in Azure AD. Key is scope, value is a description.
+            Scopes, these are the ones you've configured in Azure Entra ID. Key is scope, value is a description.
             Example:
                 {
                     f'api://{settings.APP_CLIENT_ID}/user_impersonation': 'user impersonation'

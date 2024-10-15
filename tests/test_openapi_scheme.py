@@ -82,7 +82,7 @@ openapi_schema = {
             'HelloWorldResponse': {
                 'properties': {
                     'hello': {'type': 'string', 'title': 'Hello', 'description': "What we're saying hello to"},
-                    'user': {'allOf': [{'$ref': '#/components/schemas/User'}], 'description': 'The user object'},
+                    'user': {'$ref': '#/components/schemas/User', 'description': 'The user object'},
                 },
                 'type': 'object',
                 'required': ['hello', 'user'],
@@ -107,7 +107,7 @@ openapi_schema = {
                     'iss': {
                         'type': 'string',
                         'title': 'Iss',
-                        'description': 'Identifies the STS that constructs and returns the token, and the Azure AD tenant of the authenticated user. If the token issued is a v2.0 token (see the ver claim), the URI ends in /v2.0.',
+                        'description': 'Identifies the STS that constructs and returns the token, and the Azure Entra ID tenant of the authenticated user. If the token issued is a v2.0 token (see the ver claim), the URI ends in /v2.0.',
                     },
                     'idp': {
                         'anyOf': [{'type': 'string'}, {'type': 'null'}],
@@ -132,7 +132,7 @@ openapi_schema = {
                     'aio': {
                         'anyOf': [{'type': 'string'}, {'type': 'null'}],
                         'title': 'Aio',
-                        'description': 'An internal claim used by Azure AD to record data for token reuse. Resources should not use this claim.',
+                        'description': 'An internal claim used by Azure Entra ID to record data for token reuse. Resources should not use this claim.',
                     },
                     'name': {
                         'anyOf': [{'type': 'string'}, {'type': 'null'}],
@@ -157,7 +157,7 @@ openapi_schema = {
                         'items': {'type': 'string'},
                         'type': 'array',
                         'title': 'Wids',
-                        'description': 'Denotes the tenant-wide roles assigned to this user, from the section of roles present in Azure AD built-in roles.',
+                        'description': 'Denotes the tenant-wide roles assigned to this user, from the section of roles present in Azure Entra ID built-in roles.',
                         'default': [],
                     },
                     'groups': {

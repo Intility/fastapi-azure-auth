@@ -4,7 +4,7 @@ const darkCodeTheme = require('prism-react-renderer').themes.dracula
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 module.exports = {
   title: 'FastAPI-Azure-Auth',
-  tagline: 'Easy and secure implementation of Azure AD for your FastAPI APIs 🔒',
+  tagline: 'Easy and secure implementation of Azure Entra ID for your FastAPI APIs 🔒',
   url: 'https://your-docusaurus-test-site.com',
   baseUrl: '/fastapi-azure-auth/',
   onBrokenLinks: 'throw',

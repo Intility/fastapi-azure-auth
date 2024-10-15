@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "fastapi-azure-auth"
 version = "5.0.1"  # Remember to change in __init__.py as well
-description = "Easy and secure implementation of Azure AD for your FastAPI APIs"
+description = "Easy and secure implementation of Azure Entra ID for your FastAPI APIs"
 authors = ["Jonas Krüger Svensson <jonas.svensson@intility.no>"]
 readme = "README.md"
 homepage = "https://github.com/intility/fastapi-azure-auth"
@@ -14,6 +14,9 @@ keywords = [
     'authentication',
     'azure',
     'azure ad',
+    'azure entra id',
+    'azure entra',
+    'entra id',
     'azuread',
     'fastapi',
     'multi tenant',

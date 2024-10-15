@@ -41,7 +41,7 @@ if __name__ == '__main__':
 Run your application and ensure that everything works on [http://localhost:8000/docs](http://localhost:8000/docs)
 
 :::info
-You need to run the application on the configured port in Azure AD for the next steps to work!
+You need to run the application on the configured port in Azure Entra ID for the next steps to work!
 :::
 
 ## Add your settings
@@ -177,7 +177,7 @@ if __name__ == '__main__':
     uvicorn.run('main:app', host='localhost', port=8000, reload=True)
 ```
 
-The `swagger_ui_oauth2_redirect_url` setting for redirect should be as configured in Azure AD.
+The `swagger_ui_oauth2_redirect_url` setting for redirect should be as configured in Azure Entra ID.
 The `swagger_ui_init_oauth` are standard mapped OpenAPI properties. You can find documentation about them [here](https://swagger.io/docs/open-source-tools/swagger-ui/usage/oauth2/)
 
 We've used two flags: `usePkceWithAuthorizationCodeGrant`, which is the authentication flow.
