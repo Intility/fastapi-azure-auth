@@ -42,7 +42,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = "^3.8"
 fastapi = ">0.68.0"
-cryptography = ">=40.0.1"
+cryptography = ">=43.0.1"
 httpx = ">0.18.2"
 pyjwt = "^2.8.0"
 
